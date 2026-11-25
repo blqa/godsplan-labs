@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GodsPlan | Web Master Course</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Iconos Lucide -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        neutral: {
+                            850: '#171717',
+                            900: '#0a0a0a',
+                            950: '#000000',
+                        },
+                        red: {
+                            400: '#f87171',
+                            500: '#ef4444',
+                            600: '#dc2626',
+                            900: '#7f1d1d',
+                        },
+                        blue: { 
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                        },
+                        purple: {
+                            500: '#a855f7',
+                            600: '#9333ea',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Fira Code', 'monospace'],
+                    },
+                    animation: {
+                        'pulse-glow': 'pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'shake': 'shake 0.5s cubic-bezier(.36,.07,.19,.97) both',
+                        'slide-down': 'slideDown 0.3s ease-out forwards',
+                    },
+                    keyframes: {
+                        'pulse-glow': {
+                            '0%, 100%': { opacity: 1, boxShadow: '0 0 10px rgba(220, 38, 38, 0.5)' },
+                            '50%': { opacity: .5, boxShadow: '0 0 20px rgba(220, 38, 38, 0.1)' },
+                        },
+                        shake: {
+                            '10%, 90%': { transform: 'translate3d(-1px, 0, 0)' },
+                            '20%, 80%': { transform: 'translate3d(2px, 0, 0)' },
+                            '30%, 50%, 70%': { transform: 'translate3d(-4px, 0, 0)' },
+                            '40%, 60%': { transform: 'translate3d(4px, 0, 0)' }
+                        },
+                        slideDown: {
+                            '0%': { opacity: 0, transform: 'translateY(-10px)' },
+                            '100%': { opacity: 1, transform: 'translateY(0)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap');
+        
+        body { font-family: 'Inter', sans-serif; background-color: #000000; color: #e5e5e5; }
+        .font-mono { font-family: 'Fira Code', monospace; }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #000000; }
+        ::-webkit-scrollbar-thumb { background: #262626; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #dc2626; }
+
+        /* Code Syntax Highlighting */
+        .token-tag { color: #fca5a5; } 
+        .token-attr { color: #e5e5e5; font-style: italic; } 
+        .token-val { color: #ef4444; } 
+        .token-css-prop { color: #60a5fa; }
+        .token-css-val { color: #a5b4fc; }
+        .token-comment { color: #525252; font-style: italic; }
+
+        .code-editor-area {
+            background-image: radial-gradient(#262626 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        .nav-item.active {
+            background: linear-gradient(to right, rgba(220, 38, 38, 0.15), transparent);
+            border-left: 3px solid #dc2626;
+            color: #f87171;
+        }
+        
+        textarea:focus { outline: none; }
+        
+        .cert-pattern {
+            background-color: #ffffff;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23dc2626' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+
+        .concept-card {
+            background: rgba(23, 23, 23, 0.6);
+            border: 1px solid rgba(64, 64, 64, 0.5);
+            border-radius: 0.75rem;
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+        .concept-title {
+            color: #f87171;
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .code-snippet {
+            font-family: 'Fira Code', monospace;
+            background: #0a0a0a;
+            padding: 0.2rem 0.4rem;
+            border-radius: 0.25rem;
+            color: #fca5a5;
+            font-size: 0.85em;
+            border: 1px solid #404040;
+        }
+        .block-code {
+            font-family: 'Fira Code', monospace;
+            background: #050505;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            color: #a3a3a3;
+            font-size: 0.85rem;
+            border: 1px solid #262626;
+            margin: 1rem 0;
+            overflow-x: auto;
+        }
+        .text-content p { margin-bottom: 1rem; line-height: 1.7; color: #d4d4d4; }
+        .text-content ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1rem; color: #d4d4d4; }
+    </style>
+    <link rel="icon" type="image/svg+xml" data-gp href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2064%2064'%3E%3Crect%20width='64'%20height='64'%20rx='14'%20fill='%230a0a0a'/%3E%3Cpath%20d='M28%2010h8v16h16v8H36v22h-8V34H12v-8h16z'%20fill='%238a0303'/%3E%3C/svg%3E">
+    <meta name="theme-color" content="#0a0a0a" data-gp>
+</head>
+<body class="h-screen flex flex-col overflow-hidden selection:bg-red-500/30 selection:text-red-200">
+
+    <!-- Header -->
+    <header class="h-16 border-b border-neutral-800 bg-neutral-950 flex items-center justify-between px-4 md:px-6 z-50 shrink-0 relative">
+        <div class="absolute bottom-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-red-600/50 to-transparent"></div>
+
+        <div class="flex items-center gap-4">
+            <button onclick="toggleSidebar()" class="lg:hidden p-2 text-neutral-400 hover:text-white transition-colors">
+                <i data-lucide="menu" class="w-6 h-6"></i>
+            </button>
+            
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-red-700 to-red-500 flex items-center justify-center shadow-[0_0_15px_rgba(220,38,38,0.4)] group relative overflow-hidden">
+                    <div class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+                    <i data-lucide="layers" class="text-white w-6 h-6 relative z-10"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-white tracking-tight leading-none text-lg">
+                        GodsPlan | <span class="text-red-500">Web Master</span>
+                    </h1>
+                    <div class="flex items-center gap-2">
+                        <span class="text-[10px] text-neutral-500 uppercase tracking-widest font-semibold" id="user-rank">Novato</span>
+                        <div class="h-1 w-1 rounded-full bg-neutral-700"></div>
+                        <span class="text-[10px] text-red-400 font-mono font-bold" id="user-xp">0 XP</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-4 md:gap-6">
+            <button onclick="toggleGlossary()" class="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-neutral-900 border border-neutral-800 text-xs font-medium text-neutral-400 hover:text-white hover:border-red-500/30 transition-all group">
+                <i data-lucide="book" class="w-3 h-3 group-hover:text-red-500 transition-colors"></i> Glosario
+            </button>
+
+            <div class="hidden md:flex flex-col items-end w-32 lg:w-48">
+                <div class="flex items-center gap-2 text-[10px] font-bold uppercase text-neutral-500 mb-1">
+                    <span>Progreso</span>
+                    <span id="progress-text" class="text-red-500">0%</span>
+                </div>
+                <div class="w-full h-1.5 bg-neutral-900 rounded-full overflow-hidden border border-neutral-800">
+                    <div id="progress-bar" class="h-full bg-gradient-to-r from-red-800 to-red-500 w-0 transition-all duration-700 ease-out shadow-[0_0_10px_rgba(220,38,38,0.5)]"></div>
+                </div>
+            </div>
+
+            <a href="/coding/" onclick="window.location.reload()" class="group relative px-4 py-2 bg-neutral-900 border border-neutral-800 hover:border-red-500/50 rounded-lg transition-all duration-300 flex items-center gap-2 text-sm text-neutral-400 hover:text-white hover:-translate-y-0.5 shadow-lg hover:shadow-red-500/10">
+                <i data-lucide="log-out" class="w-4 h-4 group-hover:text-red-500 transition-colors"></i>
+            </a>
+        </div>
+    </header>
+
+    <!-- Layout -->
+    <div class="flex-1 flex overflow-hidden relative bg-black">
+        <div id="mobile-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/90 z-30 opacity-0 pointer-events-none transition-opacity duration-300 lg:hidden backdrop-blur-sm"></div>
+
+        <aside class="w-80 bg-neutral-950/95 border-r border-neutral-800 flex flex-col shrink-0 transition-transform duration-300 absolute lg:relative z-40 h-full -translate-x-full lg:translate-x-0 backdrop-blur-md" id="sidebar">
+            <div class="p-5 border-b border-neutral-800/50 flex justify-between items-center">
+                <h2 class="text-xs font-bold text-neutral-500 uppercase tracking-widest flex items-center gap-2">
+                    <i data-lucide="map" class="w-3 h-3"></i> Mapa del Curso
+                </h2>
+                <button onclick="toggleSidebar()" class="lg:hidden text-neutral-400 hover:text-red-500"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <nav id="module-list" class="flex-1 overflow-y-auto py-2 space-y-1 px-2 custom-scrollbar"></nav>
+            <div class="p-4 border-t border-neutral-800/50 bg-neutral-950 space-y-2">
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="exportData()" class="text-[10px] text-neutral-400 hover:text-white flex items-center justify-center gap-1 py-2 border border-neutral-800 rounded hover:bg-neutral-900">
+                        <i data-lucide="download" class="w-3 h-3"></i> Guardar
+                    </button>
+                    <button onclick="importData()" class="text-[10px] text-neutral-400 hover:text-white flex items-center justify-center gap-1 py-2 border border-neutral-800 rounded hover:bg-neutral-900">
+                        <i data-lucide="upload" class="w-3 h-3"></i> Cargar
+                    </button>
+                </div>
+                <button onclick="resetProgress()" class="w-full text-[10px] text-neutral-500 hover:text-red-400 flex items-center justify-center gap-2 py-2 border border-neutral-800 rounded hover:bg-neutral-900 hover:border-red-900/30">
+                    <i data-lucide="trash-2" class="w-3 h-3"></i> Resetear Todo
+                </button>
+            </div>
+        </aside>
+
+        <main class="flex-1 flex flex-col lg:flex-row min-w-0 bg-black relative">
+            <section class="flex-1 overflow-y-auto scroll-smooth custom-scrollbar relative" id="scroll-container">
+                <div class="max-w-4xl mx-auto p-6 lg:p-8 pb-32">
+                    <div id="lesson-content" class="mb-10 animate-[fadeIn_0.3s_ease-out] text-content"></div>
+
+                    <div id="workspace-area" class="hidden space-y-6">
+                        <div class="rounded-xl overflow-hidden border border-neutral-800 bg-[#0a0a0a] shadow-2xl ring-1 ring-white/5">
+                            <div class="bg-neutral-900/80 backdrop-blur px-4 py-2 flex justify-between items-center border-b border-neutral-800">
+                                <div class="flex items-center gap-3">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-2 h-2 rounded-full bg-red-600 animate-pulse shadow-[0_0_8px_rgba(220,38,38,0.8)]"></div>
+                                        <span class="text-xs font-bold text-neutral-300 uppercase tracking-wider">Terminal</span>
+                                    </div>
+                                    <span id="difficulty-badge" class="px-2 py-0.5 rounded text-[10px] font-bold bg-neutral-800 text-neutral-400 border border-neutral-700 uppercase">Básico</span>
+                                </div>
+                                <div class="flex gap-2">
+                                    <button onclick="resetCode()" title="Reiniciar Código" class="p-1.5 text-neutral-400 hover:text-white hover:bg-neutral-800 rounded transition-colors"><i data-lucide="rotate-ccw" class="w-4 h-4"></i></button>
+                                </div>
+                            </div>
+
+                            <div class="bg-neutral-900/40 p-4 border-b border-neutral-800/50">
+                                <div class="flex items-start gap-3 mb-2">
+                                    <div class="mt-1 min-w-[20px]"><i data-lucide="terminal" class="w-4 h-4 text-red-500"></i></div>
+                                    <p id="exercise-instruction" class="text-neutral-300 text-sm leading-relaxed font-medium"></p>
+                                </div>
+                                <!-- HINT BOX INTEGRADO -->
+                                <div id="hint-box" class="hidden mt-3 p-3 bg-blue-500/10 border border-blue-500/30 rounded text-xs text-blue-200 flex items-start gap-2 animate-slide-down">
+                                    <i data-lucide="info" class="w-4 h-4 mt-0.5 shrink-0 text-blue-400"></i>
+                                    <div>
+                                        <strong class="block text-blue-400 mb-1">INTELIGENCIA:</strong>
+                                        <span id="hint-text"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="relative code-editor-area group">
+                                <textarea id="code-input" spellcheck="false" class="w-full h-64 bg-transparent p-5 font-mono text-sm text-neutral-200 resize-y border-none focus:ring-0 leading-relaxed tab-size-4 placeholder-neutral-700" placeholder="<!-- Inicia el protocolo... -->"></textarea>
+                            </div>
+
+                            <div class="p-4 bg-neutral-900 border-t border-neutral-800 flex flex-col sm:flex-row justify-between items-center gap-4">
+                                <div id="feedback-msg" class="w-full sm:w-auto text-xs font-medium px-3 py-2 rounded transition-all opacity-0 text-center sm:text-left border border-transparent flex items-center gap-2"></div>
+                                <div class="flex gap-3 w-full sm:w-auto">
+                                    <button onclick="toggleHint()" id="btn-help" class="px-4 py-2 bg-neutral-800 hover:bg-neutral-700 text-neutral-400 hover:text-white border border-neutral-700 rounded-lg transition-all text-xs font-bold uppercase tracking-wide items-center justify-center gap-2 flex">
+                                        <i data-lucide="life-buoy" class="w-3 h-3"></i> Ayuda
+                                    </button>
+                                    <button onclick="validateCode()" class="flex-1 sm:flex-none px-6 py-2.5 bg-red-600 hover:bg-red-500 text-white text-xs font-bold uppercase tracking-widest rounded-lg shadow-[0_0_15px_rgba(220,38,38,0.3)] hover:shadow-[0_0_20px_rgba(220,38,38,0.5)] transition-all flex items-center justify-center gap-2 transform active:scale-95 group border border-red-500">
+                                        <i data-lucide="play" class="w-3 h-3 fill-current group-hover:translate-x-0.5 transition-transform"></i> Ejecutar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="quiz-container" class="hidden bg-neutral-900/30 border border-neutral-800 rounded-xl p-6 relative overflow-hidden transition-all duration-500">
+                            <div class="absolute -right-10 -top-10 w-40 h-40 bg-red-600/5 rounded-full blur-3xl"></div>
+                            <div class="flex items-start gap-4 relative z-10">
+                                <div class="w-10 h-10 rounded-lg bg-neutral-800 flex items-center justify-center shrink-0 text-red-500 border border-neutral-700"><i data-lucide="help-circle" class="w-5 h-5"></i></div>
+                                <div class="flex-1">
+                                    <h3 class="text-sm font-bold text-white mb-2 uppercase tracking-wide text-red-400">Verificación</h3>
+                                    <p id="quiz-question" class="text-neutral-300 mb-5 text-sm font-medium"></p>
+                                    <div id="quiz-options" class="grid grid-cols-1 gap-2"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-12 flex justify-between items-center pt-8 border-t border-neutral-800/50">
+                        <button onclick="prevLesson()" id="btn-prev" class="group px-4 py-2 text-neutral-500 hover:text-red-400 transition-colors flex items-center gap-2 text-sm font-medium disabled:opacity-30 disabled:pointer-events-none">
+                            <i data-lucide="arrow-left" class="w-4 h-4 group-hover:-translate-x-1 transition-transform"></i> Retornar
+                        </button>
+                        <button onclick="nextLesson()" id="btn-next" class="px-6 py-2.5 bg-neutral-800 text-white rounded-lg transition-all flex items-center gap-2 text-sm font-bold border border-neutral-700 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed hover:border-neutral-500">
+                            Siguiente <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="hidden lg:flex w-[45%] xl:w-[40%] flex-col border-l border-neutral-800 bg-[#000000] relative z-10">
+                <div class="h-10 bg-[#0a0a0a] border-b border-neutral-800 flex items-end px-2 gap-1 shrink-0">
+                    <div class="px-4 py-2 bg-neutral-900 text-red-400 text-xs font-mono border-t border-x border-neutral-800 rounded-t-md flex items-center gap-2 relative top-[1px] border-b-neutral-900 select-none">
+                        <i data-lucide="code" class="w-3 h-3"></i> index.html
+                    </div>
+                </div>
+                <div class="h-1/3 overflow-hidden bg-[#050505] border-b border-neutral-800 flex flex-col relative group">
+                    <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                         <span class="text-[10px] bg-neutral-800 text-neutral-400 px-2 py-1 rounded border border-neutral-700 shadow-sm">Solo Lectura</span>
+                    </div>
+                    <pre id="reference-code" class="flex-1 p-5 font-mono text-xs text-neutral-400 overflow-auto custom-scrollbar select-text leading-relaxed"></pre>
+                </div>
+                <div class="h-9 bg-neutral-100 border-b border-neutral-200 flex items-center px-3 gap-2 shrink-0">
+                    <div class="flex gap-1.5 opacity-50">
+                        <div class="w-2.5 h-2.5 rounded-full bg-neutral-400"></div>
+                        <div class="w-2.5 h-2.5 rounded-full bg-neutral-400"></div>
+                        <div class="w-2.5 h-2.5 rounded-full bg-neutral-400"></div>
+                    </div>
+                    <div class="flex-1 bg-white h-6 rounded border border-neutral-200 flex items-center px-2 shadow-sm ml-2">
+                        <i data-lucide="lock" class="w-2.5 h-2.5 text-neutral-400 mr-1.5"></i>
+                        <span class="text-[10px] text-neutral-400 font-sans">localhost:8080/live</span>
+                    </div>
+                </div>
+                <div class="flex-1 bg-white relative">
+                    <iframe id="preview-frame" class="w-full h-full border-none bg-white"></iframe>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Glosario Modal -->
+    <div id="glossary-modal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/90 backdrop-blur-sm" onclick="toggleGlossary()"></div>
+        <div class="bg-neutral-900 border border-neutral-800 w-full max-w-3xl max-h-[80vh] flex flex-col relative z-10 rounded-xl overflow-hidden shadow-2xl animate-[modal-in_0.3s_ease-out]">
+            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-600 via-red-500 to-red-600"></div>
+            <div class="p-6 border-b border-neutral-800 flex justify-between items-center bg-neutral-900/50">
+                <h2 class="text-xl font-bold text-white flex items-center gap-2"><i data-lucide="book-open" class="text-red-500"></i> Glosario de Comandos</h2>
+                <button onclick="toggleGlossary()" class="text-neutral-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <div class="p-6 overflow-y-auto custom-scrollbar">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="glossary-content"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Certificado -->
+    <div id="certificate-modal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/90 backdrop-blur-md" onclick="closeCertModal()"></div>
+        <div class="bg-white text-neutral-900 w-full max-w-2xl relative z-10 rounded-xl overflow-hidden shadow-2xl transform scale-95 opacity-0 transition-all duration-700 cert-pattern" id="cert-content">
+            <div class="border-8 border-double border-red-500/20 m-2 p-8 text-center relative">
+                <div class="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none"><i data-lucide="code-2" class="w-96 h-96"></i></div>
+                <div class="w-24 h-24 bg-red-600 mx-auto rounded-full flex items-center justify-center mb-6 shadow-xl text-white"><i data-lucide="award" class="w-12 h-12"></i></div>
+                <h2 class="text-4xl font-serif font-bold text-neutral-800 mb-2">Certificado de Honor</h2>
+                <p class="text-neutral-500 uppercase tracking-widest text-xs font-bold mb-8">GodsPlan Coding Academy</p>
+                <p class="text-lg text-neutral-600 mb-2">Certificamos que el Operador</p>
+                <h3 class="text-3xl font-bold text-red-600 mb-6 font-mono" id="cert-name">Desarrollador Web</h3>
+                <p class="text-neutral-600 max-w-lg mx-auto leading-relaxed mb-8">
+                    Ha completado satisfactoriamente los 30 módulos de entrenamiento en <strong>HTML5 Estructural</strong> y <strong>CSS3 Visual</strong>.
+                </p>
+                <div class="flex justify-between items-end border-t border-neutral-200 pt-6 mt-6">
+                    <div class="text-left"><div class="font-bold text-lg text-neutral-800 tracking-tighter mb-1">BLQA</div><p class="text-xs text-neutral-400 uppercase mt-1">Instructor Principal</p></div>
+                    <div class="text-right"><p class="text-xs text-neutral-400 uppercase">Fecha</p><p class="text-sm font-mono font-bold text-neutral-700" id="cert-date">12/12/2025</p></div>
+                </div>
+            </div>
+            <div class="bg-neutral-900 p-4 flex justify-center gap-4">
+                <button onclick="window.print()" class="px-6 py-2 bg-white text-neutral-900 rounded font-bold hover:bg-neutral-200 transition flex items-center gap-2"><i data-lucide="printer" class="w-4 h-4"></i> Imprimir</button>
+                <button onclick="closeCertModal()" class="px-6 py-2 border border-neutral-700 text-neutral-300 rounded hover:text-white transition">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JS Logic -->
+    <script>
+        // --- SOUND SYSTEM (Synth - No Assets) ---
+        let audioCtx;
+        function playTone(type) {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
+            if (type === 'success') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(500, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(1000, audioCtx.currentTime + 0.1);
+                gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+            } else if (type === 'error') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+                osc.frequency.linearRampToValueAtTime(100, audioCtx.currentTime + 0.2);
+                gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gainNode.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.2);
+            } else if (type === 'click') {
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+                gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.05);
+            }
+        }
+
+        // --- DATA DEL CURSO (30 MODULOS) - AHORA CON HINTS ---
+        const curriculum = [
+            // === FASE 1: HTML5 (Módulos 1-15) ===
+            {
+                id: "m01", title: "1. Estructura HTML", desc: "La base.",
+                content: `<div class="mb-4"><span class="badge-mod">HTML: Fase 1</span></div><h1 class="text-3xl font-bold text-white mb-6">El Esqueleto</h1><p>Toda web necesita huesos. Esos huesos son el HTML.</p><div class="concept-card"><p class="text-sm text-neutral-300">1. <code>!DOCTYPE</code>: Define el tipo.<br>2. <code>html</code>: La raíz.<br>3. <code>head</code>: Información invisible.<br>4. <code>body</code>: Lo que se ve.</p></div>`,
+                codeRef: `<!DOCTYPE html>\n<html>\n  <head><title>Demo</title></head>\n  <body>Hola</body>\n</html>`,
+                exercise: { instruction: "Escribe la estructura base completa (DOCTYPE, html, head, title='Test', body).", placeholder: "<!DOCTYPE html>\n...", difficulty: "Básico", hint: "La estructura es: html > head/body. No olvides <!DOCTYPE html> al principio.",
+                    validate: (doc, str) => { 
+                        if(!str.toLowerCase().includes('<!doctype html>')) return {valid:false, msg:"Falta <!DOCTYPE html>."};
+                        if(!doc.querySelector('body')) return {valid:false, msg:"Falta body."};
+                        if(doc.title !== 'Test') return {valid:false, msg:"El title debe ser 'Test'."};
+                        return {valid:true, msg:"¡Base lista!"};
+                    }
+                }, quiz: { q: "¿Dónde va el contenido visible?", options: ["head", "body", "footer"], correct: 1 }
+            },
+            {
+                id: "m02", title: "2. Títulos", desc: "H1-H6",
+                content: `<div class="mb-4"><span class="badge-mod">HTML: Fase 1</span></div><h1 class="text-3xl font-bold text-white mb-6">Jerarquía</h1><p>Los títulos (Headings) dan orden al contenido.</p>`,
+                codeRef: `<h1>Título</h1>\n<h2>Subtítulo</h2>`,
+                exercise: { instruction: "Crea un h1 con 'Hola' y un h2 con 'Mundo'.", placeholder: "<h1>...</h1>", difficulty: "Fácil", hint: "Usa <h1>Hola</h1> y luego <h2>Mundo</h2>.",
+                    validate: (doc) => {
+                        if(doc.querySelector('h1')?.innerText !== 'Hola') return {valid:false, msg:"Falta h1 'Hola'."};
+                        if(doc.querySelector('h2')?.innerText !== 'Mundo') return {valid:false, msg:"Falta h2 'Mundo'."};
+                        return {valid:true, msg:"¡Jerarquía OK!"};
+                    }
+                }, quiz: { q: "¿Cuántos H1 por página?", options: ["1", "Infinitos", "2"], correct: 0 }
+            },
+            {
+                id: "m03", title: "3. Párrafos", desc: "Texto.",
+                content: `<div class="mb-4"><span class="badge-mod">HTML: Fase 1</span></div><h1 class="text-3xl font-bold text-white mb-6">Párrafos</h1><p>Usa <code>p</code> para bloques de texto.</p>`,
+                codeRef: `<p>Texto 1.</p>\n<p>Texto 2.</p>`,
+                exercise: { instruction: "Crea dos párrafos distintos.", placeholder: "<p>...</p>", difficulty: "Fácil", hint: "Escribe dos líneas, cada una rodeada por <p> y </p>.",
+                    validate: (doc) => { return doc.querySelectorAll('p').length >= 2 ? {valid:true, msg:"¡Texto separado!"} : {valid:false, msg:"Necesitas 2 párrafos."}; }
+                }, quiz: { q: "¿HTML lee tus 'Enter'?", options: ["Sí", "No"], correct: 1 }
+            },
+            {
+                id: "m04", title: "4. Énfasis", desc: "Strong/Em",
+                content: `<div class="mb-4"><span class="badge-mod">HTML: Fase 1</span></div><h1 class="text-3xl font-bold text-white mb-6">Negrita y Cursiva</h1><p><code>strong</code> (importante) y <code>em</code> (énfasis).</p>`,
+                codeRef: `<strong>Fuerte</strong> <em>Suave</em>`,
+                exercise: { instruction: "Pon 'Alerta' en strong y 'ojo' en em.", difficulty: "Fácil", hint: "Usa <strong>Alerta</strong> y <em>ojo</em>.",
+                    validate: (doc) => { return (doc.querySelector('strong')?.innerText==='Alerta' && doc.querySelector('em')?.innerText==='ojo') ? {valid:true, msg:"¡Énfasis aplicado!"} : {valid:false, msg:"Revisa los textos."}; }
+                }, quiz: { q: "¿Cuál es negrita?", options: ["em", "strong"], correct: 1 }
+            },
+            {
+                id: "m05", title: "5. Enlaces", desc: "Links",
+                content: `<div class="mb-4"><span class="badge-mod">HTML: Fase 1</span></div><h1 class="text-3xl font-bold text-white mb-6">Conexiones</h1><p><code>a href='url'</code> crea un enlace.</p>`,
+                codeRef: `<a href="https://google.com">Google</a>`,
+                exercise: { instruction: "Crea enlace a 'https://x.com' que diga 'X'.", difficulty: "Fácil", hint: "Recuerda: <a href='URL'>Texto</a>.",
+                    validate: (doc) => { 
+                        const a = doc.querySelector('a');
+                        if(a && a.getAttribute('href') === 'https://x.com' && a.innerText === 'X') return {valid:true, msg:"¡Enlace creado!"};
+                        return {valid:false, msg:"Revisa href y texto."};
+                    }
+                }, quiz: { q: "¿Atributo de destino?", options: ["src", "href"], correct: 1 }
+            },
+            {
+                id: "m06", title: "6. Imágenes", desc: "Visuales",
+                content: `<div class="mb-4"><span class="badge-mod">HTML: Fase 1</span></div><h1 class="text-3xl font-bold text-white mb-6">Imágenes</h1><p><code>img</code> necesita <code>src</code> y <code>alt</code>.</p>`,
+                codeRef: `<img src="foto.jpg" alt="Descripción">`,
+                exercise: { instruction: "Imagen con src='logo.png' y alt='Logo'.", difficulty: "Fácil", hint: "<img> no tiene cierre. Usa src='...' y alt='...'.",
+                    validate: (doc) => { 
+                        const i = doc.querySelector('img');
+                        return (i && i.getAttribute('src')==='logo.png' && i.getAttribute('alt')==='Logo') ? {valid:true, msg:"¡Imagen visible!"} : {valid:false, msg:"Datos incorrectos."};
+                    }
+                }, quiz: { q: "¿img tiene cierre?", options: ["Sí", "No"], correct: 1 }
+            },
+            {
+                id: "m07", title: "7. Listas UL", desc: "Bullets",
+                content: `<div class="mb-4"><span class="badge-mod">HTML: Fase 1</span></div><h1 class="text-3xl font-bold text-white mb-6">Listas Desordenadas</h1><p><code>ul</code> con <code>li</code> dentro.</p>`,
+                codeRef: `<ul><li>A</li><li>B</li></ul>`,
+                exercise: { instruction: "Lista UL con 2 ítems: 'Sol', 'Luna'.", difficulty: "Fácil", hint: "Envuelve los <li> dentro de un <ul>.",
+                    validate: (doc) => { 
+                        const lis = doc.querySelectorAll('ul li');
+                        return (lis.length===2 && lis[0].innerText==='Sol') ? {valid:true, msg:"¡Lista OK!"} : {valid:false, msg:"Revisa los ítems."};
+                    }
+                }, quiz: { q: "¿Significado de UL?", options: ["Unordered List", "User List"], correct: 0 }
+            },
+            {
+                id: "m08", title: "8. Listas OL", desc: "Números",
+                content: `<div class="mb-4"><span class="badge-mod">HTML: Fase 1</span></div><h1 class="text-3xl font-bold text-white mb-6">Listas Ordenadas</h1><p><code>ol</code> numera automáticamente.</p>`,
+                codeRef: `<ol><li>1</li><li>2</li></ol>`,
+                exercise: { instruction: "Lista OL con 2 pasos: 'Uno', 'Dos'.", difficulty: "Fácil", hint: "Igual que UL, pero usa <ol> para números.",
+                    validate: (doc) => { return doc.querySelectorAll('ol li').length===2 ? {valid:true, msg:"¡Ordenado!"} : {valid:false, msg:"Usa <ol>."}; }
+                }, quiz: { q: "¿Cambia el orden?", options: ["Sí, automático", "No"], correct: 0 }
+            },
+            {
+                id: "m09", title: "9. Div & Span", desc: "Cajas",
+                content: `<div class="mb-4"><span class="badge-mod">HTML: Fase 1</span></div><h1 class="text-3xl font-bold text-white mb-6">Contenedores</h1><p><code>div</code> (bloque) y <code>span</code> (línea).</p>`,
+                codeRef: `<div><span>Texto</span></div>`,
+                exercise: { instruction: "Un div que contenga un span con texto 'Hola'.", difficulty: "Intermedio", hint: "<div> <span>Hola</span> </div>",
+                    validate: (doc) => { return doc.querySelector('div span')?.innerText==='Hola' ? {valid:true, msg:"¡Contenedores listos!"} : {valid:false, msg:"Estructura div > span."}; }
+                }, quiz: { q: "¿Div es de bloque?", options: ["Sí", "No"], correct: 0 }
+            },
+            {
+                id: "m10", title: "10. Class & ID", desc: "Nombres",
+                content: `<div class="mb-4"><span class="badge-mod">HTML: Fase 1</span></div><h1 class="text-3xl font-bold text-white mb-6">Identificadores</h1><p><code>id</code> único, <code>class</code> grupo.</p>`,
+                codeRef: `<div id="unico" class="grupo"></div>`,
+                exercise: { instruction: "Párrafo con id='test' y class='rojo'.", difficulty: "Fácil", hint: "<p id='test' class='rojo'>...</p>",
+                    validate: (doc) => { 
+                        const p = doc.querySelector('p');
+                        return (p && p.id==='test' && p.className==='rojo') ? {valid:true, msg:"¡Identificado!"} : {valid:false, msg:"Revisa atributos."};
+                    }
+                }, quiz: { q: "¿ID se repite?", options: ["Sí", "Nunca"], correct: 1 }
+            },
+            {
+                id: "m11", title: "11. Tablas", desc: "Datos",
+                content: `<div class="mb-4"><span class="badge-mod">HTML: Fase 1</span></div><h1 class="text-3xl font-bold text-white mb-6">Tablas Simples</h1><p><code>table</code> > <code>tr</code> > <code>td</code>.</p>`,
+                codeRef: `<table><tr><td>Dato</td></tr></table>`,
+                exercise: { instruction: "Tabla con 1 fila y 1 celda que diga 'Dato'.", difficulty: "Intermedio", hint: "<table> <tr> <td>Dato</td> </tr> </table>",
+                    validate: (doc) => { return doc.querySelector('table tr td')?.innerText==='Dato' ? {valid:true, msg:"¡Tabla creada!"} : {valid:false, msg:"Falta estructura."}; }
+                }, quiz: { q: "¿Qué es TR?", options: ["Table Row", "Table Right"], correct: 0 }
+            },
+            {
+                id: "m12", title: "12. Semántica", desc: "Header",
+                content: `<div class="mb-4"><span class="badge-mod">HTML: Fase 1</span></div><h1 class="text-3xl font-bold text-white mb-6">Layout</h1><p>Usa <code>header</code>, <code>nav</code>, <code>main</code>, <code>footer</code>.</p>`,
+                codeRef: `<header><nav>Menú</nav></header>`,
+                exercise: { instruction: "Un header con un nav dentro.", difficulty: "Intermedio", hint: "<header> <nav>...</nav> </header>",
+                    validate: (doc) => { return doc.querySelector('header nav') ? {valid:true, msg:"¡Semántico!"} : {valid:false, msg:"Falta nav dentro de header."}; }
+                }, quiz: { q: "¿Div es semántico?", options: ["Sí", "No, es genérico"], correct: 1 }
+            },
+            {
+                id: "m13", title: "13. Formularios", desc: "Inputs",
+                content: `<div class="mb-4"><span class="badge-mod">HTML: Fase 1</span></div><h1 class="text-3xl font-bold text-white mb-6">Inputs</h1><p><code>input type='text'</code>, <code>password</code>, <code>email</code>.</p>`,
+                codeRef: `<input type="text">`,
+                exercise: { instruction: "Input tipo password.", difficulty: "Fácil", hint: "<input type='password'>",
+                    validate: (doc) => { return doc.querySelector('input[type="password"]') ? {valid:true, msg:"¡Input seguro!"} : {valid:false, msg:"Tipo incorrecto."}; }
+                }, quiz: { q: "¿Password oculta texto?", options: ["Sí", "No"], correct: 0 }
+            },
+            {
+                id: "m14", title: "14. Botones", desc: "Acción",
+                content: `<div class="mb-4"><span class="badge-mod">HTML: Fase 1</span></div><h1 class="text-3xl font-bold text-white mb-6">Buttons</h1><p><code>button</code> para acciones.</p>`,
+                codeRef: `<button>Click</button>`,
+                exercise: { instruction: "Botón que diga 'Enviar'.", difficulty: "Fácil", hint: "<button>Enviar</button>",
+                    validate: (doc) => { return doc.querySelector('button')?.innerText==='Enviar' ? {valid:true, msg:"¡Botón listo!"} : {valid:false, msg:"Texto incorrecto."}; }
+                }, quiz: { q: "¿Etiqueta correcta?", options: ["btn", "button"], correct: 1 }
+            },
+            {
+                id: "m15", title: "15. Reto HTML", desc: "Prueba 1",
+                content: `<div class="mb-4"><span class="badge-mod">HTML: EXAMEN</span></div><h1 class="text-3xl font-bold text-white mb-6">Mini Perfil</h1><p>Combina: h1, p, a.</p>`,
+                codeRef: `<h1>Nombre</h1><p>Bio</p><a href="#">Web</a>`,
+                exercise: { instruction: "Crea un h1, un p y un a.", difficulty: "Difícil", hint: "Usa las tres etiquetas juntas en el editor.",
+                    validate: (doc) => { 
+                        return (doc.querySelector('h1') && doc.querySelector('p') && doc.querySelector('a')) ? {valid:true, msg:"¡HTML DOMINADO!"} : {valid:false, msg:"Faltan elementos."};
+                    }
+                }, quiz: { q: "¿Listo para CSS?", options: ["Sí", "Claro"], correct: 0 }
+            },
+
+            // === FASE 2: CSS3 (Módulos 16-25) ===
+            {
+                id: "m16", title: "16. Intro a CSS", desc: "Estilo.",
+                content: `<div class="mb-4"><span class="badge-mod text-blue-400 border-blue-500/30 bg-blue-500/10">CSS: Fase 2</span></div><h1 class="text-3xl font-bold text-white mb-6">Cascading Style Sheets</h1><p>HTML es el esqueleto, CSS es la piel y la ropa. Usamos la etiqueta <code>&lt;style&gt;</code> para escribir CSS.</p><div class="block-code">selector { propiedad: valor; }</div>`,
+                codeRef: `<style>\n  h1 { color: red; }\n</style>\n<h1>Hola</h1>`,
+                exercise: { instruction: "Usa <style> para poner el h1 de color 'blue'.", placeholder: "<style>\n  h1 { ... }\n</style>\n<h1>Hola</h1>", difficulty: "Básico", hint: "Dentro de <style>, escribe: h1 { color: blue; }",
+                    validate: (doc) => { 
+                        const style = doc.querySelector('style');
+                        if(!style) return {valid:false, msg:"Falta <style>."};
+                        if(!style.innerHTML.includes('color') || !style.innerHTML.includes('blue')) return {valid:false, msg:"La regla debe ser 'color: blue'."};
+                        return {valid:true, msg:"¡Tu primer estilo!"};
+                    }
+                }, quiz: { q: "¿Dónde va el CSS?", options: ["En <script>", "En <style>", "En <body>"], correct: 1 }
+            },
+            {
+                id: "m17", title: "17. Selectores", desc: "Targeting.",
+                content: `<div class="mb-4"><span class="badge-mod text-blue-400 border-blue-500/30 bg-blue-500/10">CSS: Fase 2</span></div><h1 class="text-3xl font-bold text-white mb-6">Apuntando Elementos</h1><p>Etiqueta: <code>p {}</code><br>Clase: <code>.nombre {}</code><br>ID: <code>#nombre {}</code></p>`,
+                codeRef: `<style>\n  .alerta { color: red; }\n</style>\n<p class="alerta">Error</p>`,
+                exercise: { instruction: "Crea una clase '.texto' que tenga 'color: green' y aplícala a un <p>.", difficulty: "Intermedio", hint: "En CSS: .texto { color: green; }. En HTML: <p class='texto'>...</p>",
+                    validate: (doc) => { 
+                        const p = doc.querySelector('p.texto');
+                        const style = doc.querySelector('style');
+                        if(!p) return {valid:false, msg:"Falta <p class='texto'>."};
+                        if(!style || !style.innerHTML.includes('.texto') || !style.innerHTML.includes('green')) return {valid:false, msg:"CSS incorrecto para .texto"};
+                        return {valid:true, msg:"¡Selector de clase!"};
+                    }
+                }, quiz: { q: "¿Prefijo para clases?", options: [".", "#", "@"], correct: 0 }
+            },
+            {
+                id: "m18", title: "18. Fondos", desc: "Backgrounds.",
+                content: `<div class="mb-4"><span class="badge-mod text-blue-400 border-blue-500/30 bg-blue-500/10">CSS: Fase 2</span></div><h1 class="text-3xl font-bold text-white mb-6">Colores de Fondo</h1><p><code>background-color</code> cambia el fondo.</p>`,
+                codeRef: `<style>body { background-color: black; }</style>`,
+                exercise: { instruction: "Haz que el <body> tenga background-color: black y el texto color: white.", difficulty: "Fácil", hint: "body { background-color: black; color: white; }",
+                    validate: (doc) => { 
+                        const css = doc.querySelector('style')?.innerHTML.toLowerCase() || "";
+                        if(css.includes('background-color: black') && css.includes('color: white')) return {valid:true, msg:"¡Modo oscuro activado!"};
+                        return {valid:false, msg:"Revisa los colores."};
+                    }
+                }, quiz: { q: "¿Propiedad para fondo?", options: ["bg", "background-color"], correct: 1 }
+            },
+            {
+                id: "m19", title: "19. Tipografía", desc: "Fonts.",
+                content: `<div class="mb-4"><span class="badge-mod text-blue-400 border-blue-500/30 bg-blue-500/10">CSS: Fase 2</span></div><h1 class="text-3xl font-bold text-white mb-6">Fuentes</h1><p><code>font-size</code> (tamaño), <code>font-weight</code> (grosor), <code>font-family</code> (tipo).</p>`,
+                codeRef: `p { font-size: 20px; font-weight: bold; }`,
+                exercise: { instruction: "Pon los párrafos a 'font-size: 18px' y 'font-weight: bold'.", difficulty: "Fácil", hint: "p { font-size: 18px; font-weight: bold; }",
+                    validate: (doc) => { 
+                        const css = doc.querySelector('style')?.innerHTML.toLowerCase() || "";
+                        if(css.includes('font-size: 18px') && css.includes('font-weight: bold')) return {valid:true, msg:"¡Texto grande!"};
+                        return {valid:false, msg:"Estilos faltantes."};
+                    }
+                }, quiz: { q: "¿Unidad común de texto?", options: ["px", "kg", "m"], correct: 0 }
+            },
+            {
+                id: "m20", title: "20. Box Model", desc: "Cajas.",
+                content: `<div class="mb-4"><span class="badge-mod text-blue-400 border-blue-500/30 bg-blue-500/10">CSS: Fase 2</span></div><h1 class="text-3xl font-bold text-white mb-6">El Modelo de Caja</h1><p>Todo en HTML es una caja. Tienes:<br>1. <strong>Content</strong> (Lo de adentro)<br>2. <strong>Padding</strong> (Relleno)<br>3. <strong>Border</strong> (Borde)<br>4. <strong>Margin</strong> (Espacio fuera)</p>`,
+                codeRef: `div { padding: 10px; border: 1px solid red; margin: 20px; }`,
+                exercise: { instruction: "Crea un div con 'padding: 20px', 'border: 2px solid red' y 'margin: 10px'.", difficulty: "Intermedio", hint: "div { padding: 20px; border: 2px solid red; margin: 10px; }",
+                    validate: (doc) => { 
+                        const css = doc.querySelector('style')?.innerHTML.toLowerCase() || "";
+                        if(css.includes('padding: 20px') && css.includes('border: 2px solid red') && css.includes('margin: 10px')) return {valid:true, msg:"¡Caja perfecta!"};
+                        return {valid:false, msg:"Revisa las propiedades."};
+                    }
+                }, quiz: { q: "¿Qué es el espacio INTERNO?", options: ["Margin", "Padding"], correct: 1 }
+            },
+            {
+                id: "m21", title: "21. Tamaños", desc: "Width/Height.",
+                content: `<div class="mb-4"><span class="badge-mod text-blue-400 border-blue-500/30 bg-blue-500/10">CSS: Fase 2</span></div><h1 class="text-3xl font-bold text-white mb-6">Dimensiones</h1><p>Controla el ancho (<code>width</code>) y alto (<code>height</code>).</p>`,
+                codeRef: `div { width: 50%; height: 100px; background: red; }`,
+                exercise: { instruction: "Crea un div cuadrado: width: 100px, height: 100px, background: blue.", difficulty: "Fácil", hint: "div { width: 100px; height: 100px; background: blue; }",
+                    validate: (doc) => { 
+                        const css = doc.querySelector('style')?.innerHTML.toLowerCase() || "";
+                        if(css.includes('width: 100px') && css.includes('height: 100px') && css.includes('blue')) return {valid:true, msg:"¡Cuadrado azul!"};
+                        return {valid:false, msg:"Dimensiones incorrectas."};
+                    }
+                }, quiz: { q: "¿Qué significa width: 100%?", options: ["Todo el ancho disponible", "100 pixeles"], correct: 0 }
+            },
+            {
+                id: "m22", title: "22. Bordes", desc: "Radius.",
+                content: `<div class="mb-4"><span class="badge-mod text-blue-400 border-blue-500/30 bg-blue-500/10">CSS: Fase 2</span></div><h1 class="text-3xl font-bold text-white mb-6">Estética de Bordes</h1><p><code>border-radius</code> redondea las esquinas.</p>`,
+                codeRef: `button { border-radius: 10px; border: 1px solid white; }`,
+                exercise: { instruction: "Crea un botón con 'border-radius: 20px' y fondo rojo.", difficulty: "Fácil", hint: "button { border-radius: 20px; background: red; }",
+                    validate: (doc) => { 
+                        const css = doc.querySelector('style')?.innerHTML.toLowerCase() || "";
+                        if(css.includes('border-radius: 20px') && css.includes('red')) return {valid:true, msg:"¡Botón moderno!"};
+                        return {valid:false, msg:"Faltan estilos."};
+                    }
+                }, quiz: { q: "¿Cómo hacer un círculo perfecto?", options: ["border-radius: 50%", "border-circle: true"], correct: 0 }
+            },
+            {
+                id: "m23", title: "23. Flexbox I", desc: "Layout.",
+                content: `<div class="mb-4"><span class="badge-mod text-blue-400 border-blue-500/30 bg-blue-500/10">CSS: Fase 2</span></div><h1 class="text-3xl font-bold text-white mb-6">Flexbox Básico</h1><p><code>display: flex</code> pone los elementos uno al lado del otro.</p>`,
+                codeRef: `.contenedor { display: flex; gap: 10px; }`,
+                exercise: { instruction: "Crea un div contenedor con 'display: flex' y 'gap: 20px'. Pon 2 divs dentro.", difficulty: "Intermedio", hint: "div { display: flex; gap: 20px; }",
+                    validate: (doc) => { 
+                        const css = doc.querySelector('style')?.innerHTML.toLowerCase() || "";
+                        if(css.includes('display: flex') && css.includes('gap: 20px')) return {valid:true, msg:"¡Layout flexible!"};
+                        return {valid:false, msg:"Falta display: flex."};
+                    }
+                }, quiz: { q: "¿Qué hace gap?", options: ["Espacio entre elementos", "Espacio externo"], correct: 0 }
+            },
+            {
+                id: "m24", title: "24. Flexbox II", desc: "Alineación.",
+                content: `<div class="mb-4"><span class="badge-mod text-blue-400 border-blue-500/30 bg-blue-500/10">CSS: Fase 2</span></div><h1 class="text-3xl font-bold text-white mb-6">Centrar Cosas</h1><p>El santo grial: <code>justify-content: center</code> (horizontal) y <code>align-items: center</code> (vertical).</p>`,
+                codeRef: `div { display: flex; justify-content: center; align-items: center; }`,
+                exercise: { instruction: "Centra el contenido de un div usando flex, justify-content: center y align-items: center.", difficulty: "Avanzado", hint: "Usa las 3 propiedades: display: flex, justify-content: center, align-items: center.",
+                    validate: (doc) => { 
+                        const css = doc.querySelector('style')?.innerHTML.toLowerCase() || "";
+                        if(css.includes('justify-content: center') && css.includes('align-items: center')) return {valid:true, msg:"¡Centrado perfecto!"};
+                        return {valid:false, msg:"Propiedades incorrectas."};
+                    }
+                }, quiz: { q: "¿Justify-content controla?", options: ["Eje principal", "Eje cruzado"], correct: 0 }
+            },
+            {
+                id: "m25", title: "25. Responsive", desc: "Móviles.",
+                content: `<div class="mb-4"><span class="badge-mod text-blue-400 border-blue-500/30 bg-blue-500/10">CSS: Fase 2</span></div><h1 class="text-3xl font-bold text-white mb-6">Media Queries</h1><p>Cambia el estilo según el tamaño de pantalla.</p><div class="block-code">@media (max-width: 600px) { body { background: blue; } }</div>`,
+                codeRef: `@media (max-width: 600px) { h1 { font-size: 10px; } }`,
+                exercise: { instruction: "Escribe una media query para max-width: 500px que cambie el body background a 'red'.", difficulty: "Experto", hint: "@media (max-width: 500px) { body { background: red; } }",
+                    validate: (doc) => { 
+                        const css = doc.querySelector('style')?.innerHTML.toLowerCase() || "";
+                        if(css.includes('@media') && css.includes('max-width: 500px') && css.includes('red')) return {valid:true, msg:"¡Web responsiva!"};
+                        return {valid:false, msg:"Sintaxis incorrecta."};
+                    }
+                }, quiz: { q: "¿Para qué sirve @media?", options: ["Animaciones", "Adaptar a dispositivos"], correct: 1 }
+            },
+
+            // === FASE 3: TÉCNICAS AVANZADAS (Módulos 26-30) ===
+            {
+                id: "m26", title: "26. Posicionamiento", desc: "Capas.",
+                content: `<div class="mb-4"><span class="badge-mod text-purple-400 border-purple-500/30 bg-purple-500/10">Fase 3: Elite</span></div><h1 class="text-3xl font-bold text-white mb-6">Control Absoluto</h1><p><code>position: absolute</code> saca el elemento del flujo normal. <code>relative</code> es su ancla.</p>`,
+                codeRef: `.box { position: absolute; top: 0; right: 0; }`,
+                exercise: { instruction: "Crea un div con 'position: absolute' y 'top: 0'.", difficulty: "Avanzado", hint: "div { position: absolute; top: 0; }",
+                    validate: (doc) => { 
+                        const css = doc.querySelector('style')?.innerHTML.toLowerCase() || "";
+                        if(css.includes('position: absolute') && css.includes('top: 0')) return {valid:true, msg:"¡Elemento posicionado!"};
+                        return {valid:false, msg:"Falta position o top."};
+                    }
+                }, quiz: { q: "¿Qué hace position: fixed?", options: ["Se fija a la pantalla", "Se fija al padre"], correct: 0 }
+            },
+            {
+                id: "m27", title: "27. CSS Grid", desc: "Matrices.",
+                content: `<div class="mb-4"><span class="badge-mod text-purple-400 border-purple-500/30 bg-purple-500/10">Fase 3: Elite</span></div><h1 class="text-3xl font-bold text-white mb-6">Grillas 2D</h1><p>Grid es más poderoso que Flexbox para estructuras complejas.</p><div class="block-code">display: grid; grid-template-columns: 1fr 1fr;</div>`,
+                codeRef: `.grid { display: grid; gap: 10px; }`,
+                exercise: { instruction: "Crea un contenedor con 'display: grid' y 'grid-template-columns: 1fr 1fr'.", difficulty: "Avanzado", hint: "div { display: grid; grid-template-columns: 1fr 1fr; }",
+                    validate: (doc) => { 
+                        const css = doc.querySelector('style')?.innerHTML.toLowerCase() || "";
+                        if(css.includes('display: grid') && css.includes('grid-template-columns')) return {valid:true, msg:"¡Matriz activada!"};
+                        return {valid:false, msg:"Configuración de grid incompleta."};
+                    }
+                }, quiz: { q: "¿Grid es mejor para?", options: ["Solo una fila", "Diseños 2D (filas y columnas)"], correct: 1 }
+            },
+            {
+                id: "m28", title: "28. Estados (:hover)", desc: "Interacción.",
+                content: `<div class="mb-4"><span class="badge-mod text-purple-400 border-purple-500/30 bg-purple-500/10">Fase 3: Elite</span></div><h1 class="text-3xl font-bold text-white mb-6">Pseudo-clases</h1><p>Cambia el estilo cuando el usuario interactúa.</p>`,
+                codeRef: `button:hover { background: red; }`,
+                exercise: { instruction: "Haz que un botón cambie a 'background: blue' al pasar el mouse (:hover).", difficulty: "Intermedio", hint: "button:hover { background: blue; }",
+                    validate: (doc) => { 
+                        const css = doc.querySelector('style')?.innerHTML.toLowerCase() || "";
+                        if(css.includes(':hover') && css.includes('blue')) return {valid:true, msg:"¡Interacción lista!"};
+                        return {valid:false, msg:"Falta el selector :hover."};
+                    }
+                }, quiz: { q: "¿Cuándo se activa :active?", options: ["Al pasar el mouse", "Al hacer clic"], correct: 1 }
+            },
+            {
+                id: "m29", title: "29. Transiciones", desc: "Suavidad.",
+                content: `<div class="mb-4"><span class="badge-mod text-purple-400 border-purple-500/30 bg-purple-500/10">Fase 3: Elite</span></div><h1 class="text-3xl font-bold text-white mb-6">Animación Básica</h1><p>Evita cambios bruscos.</p>`,
+                codeRef: `div { transition: all 0.3s; }`,
+                exercise: { instruction: "Añade 'transition: all 0.5s' a un div.", difficulty: "Fácil", hint: "div { transition: all 0.5s; }",
+                    validate: (doc) => { 
+                        const css = doc.querySelector('style')?.innerHTML.toLowerCase() || "";
+                        if(css.includes('transition') && css.includes('0.5s')) return {valid:true, msg:"¡Movimiento fluido!"};
+                        return {valid:false, msg:"Falta la propiedad transition."};
+                    }
+                }, quiz: { q: "¿Qué unidad es 's'?", options: ["Segundos", "Size"], correct: 0 }
+            },
+            {
+                id: "m30", title: "30. Variables CSS", desc: "Gestión.",
+                content: `<div class="mb-4"><span class="badge-mod text-purple-400 border-purple-500/30 bg-purple-500/10">Fase 3: Elite</span></div><h1 class="text-3xl font-bold text-white mb-6">Custom Properties</h1><p>Guarda valores para reusarlos.</p><div class="block-code">:root { --main: red; } p { color: var(--main); }</div>`,
+                codeRef: `:root { --bg: black; }`,
+                exercise: { instruction: "Define una variable '--color: red' en :root y úsala en un h1.", difficulty: "Experto", hint: ":root { --color: red; } h1 { color: var(--color); }",
+                    validate: (doc) => { 
+                        const css = doc.querySelector('style')?.innerHTML.toLowerCase() || "";
+                        if(css.includes('--color') && css.includes('var(--color)')) return {valid:true, msg:"¡Código modular!"};
+                        return {valid:false, msg:"Sintaxis de variable incorrecta."};
+                    }
+                }, quiz: { q: "¿Dónde se declaran variables globales?", options: [":root", "body", "html"], correct: 0 }
+            },
+
+            // === FASE 4: PROYECTO FINAL (Módulo 35) ===
+            {
+                id: "m35", title: "35. Misión Final", desc: "Master.",
+                content: `<div class="mb-4"><span class="badge-mod bg-red-600 text-white animate-pulse">GRADUACIÓN</span></div><h1 class="text-3xl font-bold text-white mb-6">Tarjeta de Perfil Definitiva</h1><p>Usa todo lo aprendido: Grid/Flex, Hover, Variables y Semántica.</p><div class="concept-card"><ul class="list-disc pl-4 text-sm text-neutral-300"><li>HTML: Estructura semántica completa.</li><li>CSS: Grid o Flex para centrar, variables para colores y efecto hover.</li></ul></div>`,
+                codeRef: `<style>\n:root { --bg: #222; }\n.card { background: var(--bg); transition: 0.3s; }\n.card:hover { transform: scale(1.05); }\n</style>\n<div class="card">...</div>`,
+                exercise: { instruction: "Crea una tarjeta (.card) que use una variable CSS para el fondo y tenga un efecto :hover.", placeholder: "<!-- HTML & CSS -->", difficulty: "Dios", hint: "Define --color en :root, úsalo en .card y agrega .card:hover.",
+                    validate: (doc) => { 
+                        const css = doc.querySelector('style')?.innerHTML.toLowerCase() || "";
+                        const html = doc.querySelector('.card');
+                        if(!html) return {valid:false, msg:"Falta el div class='card'."};
+                        if(!css.includes('var(--')) return {valid:false, msg:"Debes usar al menos una variable CSS."};
+                        if(!css.includes(':hover')) return {valid:false, msg:"Falta el efecto :hover."};
+                        return {valid:true, msg:"¡ERES UN WEB MASTER DE ELITE!"};
+                    }
+                }, quiz: { q: "¿Curso completado?", options: ["¡SÍ!", "YES"], correct: 0 }
+            }
+        ];
+
+        // --- 2. GLOSARIO DATA ACTUALIZADO ---
+        const glossaryData = [
+            { tag: "<html>", desc: "Raíz del documento." },
+            { tag: "<head>", desc: "Metadatos." },
+            { tag: "<body>", desc: "Contenido visible." },
+            { tag: "<div>", desc: "Caja de bloque." },
+            { tag: "<span>", desc: "Caja en línea." },
+            { tag: "<style>", desc: "Bloque de CSS." },
+            { tag: "color", desc: "Color del texto (CSS)." },
+            { tag: "background", desc: "Fondo (CSS)." },
+            { tag: "padding", desc: "Relleno interno (CSS)." },
+            { tag: "margin", desc: "Espacio externo (CSS)." },
+            { tag: "border", desc: "Borde (CSS)." },
+            { tag: "display: flex", desc: "Activa Flexbox." },
+            { tag: "display: grid", desc: "Activa Grid." },
+            { tag: "position", desc: "Control de ubicación." },
+            { tag: ":hover", desc: "Estilo al pasar mouse." },
+            { tag: "var(--x)", desc: "Variable CSS." }
+        ];
+
+        // --- 3. ESTADO Y LÓGICA ---
+        const STORAGE_KEY = 'godsplan_webmaster_v3';
+        let state = { currentIdx: 0, completed: [], xp: 0 };
+        const ranks = ["Novato", "Aprendiz", "Junior", "Operador", "Arquitecto", "Web Master"];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadState();
+            renderSidebar();
+            loadLesson(state.currentIdx);
+            updateUI();
+            lucide.createIcons();
+            renderGlossary();
+            
+            document.getElementById('code-input').addEventListener('keydown', function(e) {
+                if(e.key == 'Tab') {
+                    e.preventDefault();
+                    var start = this.selectionStart;
+                    var end = this.selectionEnd;
+                    this.value = this.value.substring(0, start) + "\t" + this.value.substring(end);
+                    this.selectionStart = this.selectionEnd = start + 1;
+                }
+            });
+        });
+
+        function loadState() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if(saved) {
+                try { 
+                    state = JSON.parse(saved); 
+                    if(state.currentIdx >= curriculum.length) state.currentIdx = curriculum.length - 1;
+                } catch(e) { console.error(e); }
+            }
+        }
+
+        function saveState() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+            updateUI();
+        }
+        
+        function exportData() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state));
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", "godsplan_progress.json");
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+            playTone('success');
+        }
+        
+        function importData() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = e => {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                reader.readAsText(file, "UTF-8");
+                reader.onload = readerEvent => {
+                    try {
+                        const content = JSON.parse(readerEvent.target.result);
+                        if(content.xp !== undefined && Array.isArray(content.completed)) {
+                            state = content;
+                            saveState();
+                            loadLesson(state.currentIdx);
+                            playTone('success');
+                            alert('¡Progreso restaurado!');
+                        }
+                    } catch(err) {
+                        playTone('error');
+                        alert('Archivo inválido.');
+                    }
+                }
+            }
+            input.click();
+        }
+
+        function updateUI() {
+            const rankIdx = Math.min(Math.floor(state.xp / 600), ranks.length - 1);
+            document.getElementById('user-rank').innerText = ranks[rankIdx];
+            document.getElementById('user-xp').innerText = state.xp + " XP";
+
+            const pct = Math.round((state.completed.length / curriculum.length) * 100);
+            document.getElementById('progress-bar').style.width = `${pct}%`;
+            document.getElementById('progress-text').innerText = `${pct}%`;
+
+            const btnNext = document.getElementById('btn-next');
+            const isCompleted = state.completed.includes(state.currentIdx);
+            
+            document.getElementById('btn-prev').disabled = state.currentIdx === 0;
+            
+            if(isCompleted) {
+                btnNext.disabled = false;
+                btnNext.classList.add('bg-red-600', 'border-red-500', 'hover:bg-red-500');
+                btnNext.classList.remove('bg-neutral-800');
+            } else {
+                btnNext.disabled = true;
+                btnNext.classList.remove('bg-red-600', 'border-red-500', 'hover:bg-red-500');
+                btnNext.classList.add('bg-neutral-800');
+            }
+            renderSidebar();
+        }
+
+        function renderSidebar() {
+            const list = document.getElementById('module-list');
+            list.innerHTML = curriculum.map((mod, i) => {
+                const done = state.completed.includes(i);
+                const active = i === state.currentIdx;
+                const activeClass = active ? 'active bg-neutral-900' : 'text-neutral-400 hover:text-neutral-200 hover:bg-neutral-900/50 border-transparent';
+                const statusIcon = done 
+                    ? `<i data-lucide="check-circle" class="w-4 h-4 text-red-500"></i>` 
+                    : `<span class="text-[10px] font-mono w-4 text-center opacity-50">${i+1}</span>`;
+
+                return `
+                <button onclick="loadLesson(${i})" class="nav-item w-full text-left px-3 py-2.5 rounded-md mb-1 flex items-center gap-3 text-sm font-medium transition-all border-l-[3px] group ${activeClass}">
+                    ${statusIcon}
+                    <div class="flex-1 truncate">
+                        <span class="${active ? 'text-white' : ''}">${mod.title}</span>
+                    </div>
+                    ${active ? '<i data-lucide="chevron-right" class="w-3 h-3 text-red-500"></i>' : ''}
+                </button>
+                `;
+            }).join('');
+            lucide.createIcons();
+        }
+
+        function renderGlossary() {
+            const container = document.getElementById('glossary-content');
+            container.innerHTML = glossaryData.map(item => `
+                <div class="p-3 bg-neutral-900/50 rounded border border-neutral-800 hover:border-red-500/30 transition-colors">
+                    <code class="text-red-400 font-bold">${item.tag.replace('<', '&lt;').replace('>', '&gt;')}</code>
+                    <p class="text-sm text-neutral-400 mt-1">${item.desc}</p>
+                </div>
+            `).join('');
+        }
+
+        function toggleGlossary() {
+            const modal = document.getElementById('glossary-modal');
+            modal.classList.toggle('hidden');
+            modal.classList.toggle('flex');
+        }
+
+        function loadLesson(idx) {
+            state.currentIdx = idx;
+            saveState();
+            const mod = curriculum[idx];
+            
+            document.getElementById('lesson-content').innerHTML = mod.content;
+            document.getElementById('reference-code').innerText = mod.codeRef;
+            document.getElementById('exercise-instruction').innerText = mod.exercise.instruction;
+            document.getElementById('difficulty-badge').innerText = mod.exercise.difficulty;
+            
+            const editor = document.getElementById('code-input');
+            editor.value = "";
+            editor.placeholder = mod.exercise.placeholder || "<!-- Escribe tu código... -->";
+            
+            document.getElementById('workspace-area').classList.remove('hidden');
+            document.getElementById('feedback-msg').style.opacity = '0';
+            document.getElementById('feedback-msg').className = ""; 
+            
+            // Hint Reset
+            document.getElementById('hint-box').classList.add('hidden');
+            document.getElementById('btn-help').classList.remove('hidden'); // Siempre mostrar ayuda
+            
+            document.getElementById('quiz-container').classList.add('hidden');
+            
+            updatePreview("");
+            document.getElementById('scroll-container').scrollTop = 0;
+            
+            if(window.innerWidth < 1024) {
+                document.getElementById('sidebar').classList.add('-translate-x-full');
+                document.getElementById('mobile-overlay').classList.remove('opacity-100', 'pointer-events-auto');
+            }
+            lucide.createIcons();
+        }
+
+        function updatePreview(code) {
+            const frame = document.getElementById('preview-frame');
+            const doc = frame.contentDocument || frame.contentWindow.document;
+            doc.open();
+            doc.write(`
+                <style>
+                    body { font-family: sans-serif; padding: 10px; color: #171717; }
+                    h1 { color: #dc2626; border-bottom: 1px solid #fecaca; padding-bottom: 5px; }
+                    /* Reset básico para que los estilos del usuario funcionen como esperan */
+                    * { box-sizing: border-box; }
+                </style>
+                ${code}
+            `);
+            doc.close();
+        }
+
+        function validateCode() {
+            const mod = curriculum[state.currentIdx];
+            const code = document.getElementById('code-input').value;
+            const fb = document.getElementById('feedback-msg');
+            
+            playTone('click');
+            updatePreview(code);
+            
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(code, "text/html");
+            const result = mod.exercise.validate(doc, code);
+            
+            fb.innerText = result.msg;
+            fb.style.opacity = '1';
+            
+            if(result.valid) {
+                playTone('success');
+                fb.className = "text-xs font-bold px-4 py-2 rounded bg-green-500/10 text-green-400 border border-green-500/20 flex items-center gap-2 w-full sm:w-auto animate-[pulse-glow_1s]";
+                fb.innerHTML = `<i data-lucide="check" class="w-4 h-4"></i> ${result.msg}`;
+                showQuiz(mod.quiz);
+                lucide.createIcons();
+                confetti({ particleCount: 50, spread: 60, origin: { y: 0.7 }, colors: ['#dc2626', '#ef4444'] });
+            } else {
+                playTone('error');
+                fb.className = "text-xs font-bold px-4 py-2 rounded bg-red-500/10 text-red-400 border border-red-500/20 flex items-center gap-2 w-full sm:w-auto animate-shake";
+                fb.innerHTML = `<i data-lucide="alert-triangle" class="w-4 h-4"></i> ${result.msg}`;
+                lucide.createIcons();
+            }
+        }
+
+        function showQuiz(quiz) {
+            const container = document.getElementById('quiz-container');
+            container.classList.remove('hidden');
+            document.getElementById('quiz-question').innerText = quiz.q;
+            
+            const isDone = state.completed.includes(state.currentIdx);
+            
+            document.getElementById('quiz-options').innerHTML = quiz.options.map((opt, i) => {
+                let colorClass = "bg-neutral-800 text-neutral-300 hover:bg-neutral-700 hover:text-white border-neutral-700";
+                if(isDone) {
+                    if(i === quiz.correct) colorClass = "bg-green-500/20 border-green-500 text-green-400";
+                    else colorClass = "bg-neutral-800/50 text-neutral-500 border-neutral-800 opacity-50";
+                }
+                
+                return `
+                <button onclick="checkQuiz(this, ${i}, ${quiz.correct})" ${isDone ? 'disabled' : ''} 
+                    class="w-full text-left p-3 rounded-lg text-sm border transition-all flex justify-between items-center ${colorClass}">
+                    ${opt}
+                    ${isDone && i === quiz.correct ? '<i data-lucide="check" class="w-4 h-4"></i>' : ''}
+                </button>
+                `;
+            }).join('');
+            
+            lucide.createIcons();
+            setTimeout(() => { container.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
+        }
+
+        function checkQuiz(btn, selected, correct) {
+            if(selected === correct) {
+                if(!state.completed.includes(state.currentIdx)) {
+                    state.completed.push(state.currentIdx);
+                    state.xp += 100;
+                    playTone('success');
+                    confetti({ particleCount: 150, spread: 100, colors: ['#dc2626', '#ffffff'] });
+                    if(state.completed.length === curriculum.length) setTimeout(showCertificate, 1500);
+                }
+                saveState();
+                showQuiz(curriculum[state.currentIdx].quiz); 
+            } else {
+                playTone('error');
+                btn.classList.add('bg-red-500/20', 'border-red-500', 'text-red-400', 'animate-shake');
+            }
+        }
+
+        function toggleHint() {
+            const hintBox = document.getElementById('hint-box');
+            const hintText = document.getElementById('hint-text');
+            const currentMod = curriculum[state.currentIdx];
+            
+            if (hintBox.classList.contains('hidden')) {
+                hintText.innerText = currentMod.exercise.hint || "No hay pistas disponibles para este nivel.";
+                hintBox.classList.remove('hidden');
+                playTone('click');
+            } else {
+                hintBox.classList.add('hidden');
+            }
+        }
+
+        function nextLesson() { if(state.currentIdx < curriculum.length - 1) loadLesson(state.currentIdx + 1); }
+        function prevLesson() { if(state.currentIdx > 0) loadLesson(state.currentIdx - 1); }
+        function resetCode() { document.getElementById('code-input').value = ""; document.getElementById('code-input').focus(); }
+        
+        function resetProgress() {
+            if(confirm("¿Estás seguro?")) {
+                localStorage.removeItem(STORAGE_KEY);
+                location.reload();
+            }
+        }
+
+        function toggleSidebar() {
+            const sb = document.getElementById('sidebar');
+            const ov = document.getElementById('mobile-overlay');
+            const isClosed = sb.classList.contains('-translate-x-full');
+            if(isClosed) { sb.classList.remove('-translate-x-full'); ov.classList.add('opacity-100', 'pointer-events-auto'); } 
+            else { sb.classList.add('-translate-x-full'); ov.classList.remove('opacity-100', 'pointer-events-auto'); }
+        }
+        
+        function showCertificate() {
+            playTone('success');
+            const modal = document.getElementById('certificate-modal');
+            const content = document.getElementById('cert-content');
+            const name = prompt("Nombre para Certificado:", "Operador");
+            document.getElementById('cert-name').innerText = name || "Anónimo";
+            const today = new Date();
+            document.getElementById('cert-date').innerText = today.toLocaleDateString('es-ES');
+            modal.classList.remove('hidden'); modal.classList.add('flex');
+            setTimeout(() => { content.classList.remove('scale-95', 'opacity-0'); content.classList.add('scale-100', 'opacity-100'); }, 50);
+        }
+        
+        function closeCertModal() {
+            document.getElementById('certificate-modal').classList.add('hidden');
+            document.getElementById('certificate-modal').classList.remove('flex');
+        }
+    </script>
+    
+    <!-- Helper Styles -->
+    <style>
+        .badge-mod {
+            display: inline-block;
+            padding: 4px 8px;
+            background: rgba(220, 38, 38, 0.1);
+            color: #f87171;
+            border: 1px solid rgba(220, 38, 38, 0.2);
+            border-radius: 4px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+        @keyframes modal-in {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+    <footer data-gp-credit style="flex:none;width:100%;text-align:center;padding:3px 8px;font:500 10px/1.4 system-ui,sans-serif;letter-spacing:.04em;opacity:.55;color:inherit"><a href="https://godsplan.dev" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">© 2026 God's Plan · godsplan.dev</a></footer>
+</body>
+</html>

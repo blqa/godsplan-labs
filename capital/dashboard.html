@@ -1,0 +1,1551 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Godsplan | Core Dashboard</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        gp: {
+                            bg: '#050505',
+                            surface: '#121212',
+                            border: '#262626',
+                            text: '#FFFFFF',
+                            muted: '#A1A1AA',
+                            brand: '#3B82F6'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <style>
+        body { transition: background-color 0.3s ease, color 0.3s ease; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .view-section { animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+    <link rel="icon" type="image/svg+xml" data-gp href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2064%2064'%3E%3Crect%20width='64'%20height='64'%20rx='14'%20fill='%230a0a0a'/%3E%3Cpath%20d='M28%2010h8v16h16v8H36v22h-8V34H12v-8h16z'%20fill='%238a0303'/%3E%3C/svg%3E">
+</head>
+<body class="bg-gray-50 text-gray-900 dark:bg-gp-bg dark:text-gp-text min-h-screen flex overflow-hidden">
+
+    <!-- CORTINA DE SEGURIDAD -->
+    <div id="security-curtain" class="fixed inset-0 z-[200] bg-white dark:bg-gp-bg flex flex-col items-center justify-center transition-colors">
+        <i class="ph-bold ph-shield-check text-5xl text-blue-500 mb-4 animate-pulse"></i>
+        <p id="security-status" class="font-mono text-gray-500 dark:text-gp-muted text-sm">Validando token de acceso...</p>
+    </div>
+
+    <!-- ALERTA DINÁMICA TOAST -->
+    <div id="toast-alert" class="fixed top-20 md:top-8 right-4 md:right-8 bg-green-500 text-white px-6 py-3 rounded-xl shadow-2xl transform transition-all duration-300 translate-x-[150%] opacity-0 z-[150] flex items-center gap-3 font-medium">
+        <i class="ph-bold ph-check-circle text-xl"></i>
+        <span id="toast-message">Operación exitosa</span>
+    </div>
+
+    <!-- CABECERA MÓVIL (Solo visible en móviles) -->
+    <div class="md:hidden fixed top-0 w-full h-16 bg-white dark:bg-gp-surface border-b border-gray-200 dark:border-gp-border flex items-center justify-between px-4 z-[60] transition-colors">
+        <div class="flex items-center gap-2">
+            <div class="w-8 h-8 bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 rounded-lg flex items-center justify-center font-bold">G</div>
+            <span class="font-bold text-lg tracking-tight text-gray-900 dark:text-white">Godsplan.</span>
+        </div>
+        <button id="mobile-menu-btn" class="text-gray-500 dark:text-gp-muted hover:text-gray-900 dark:hover:text-white focus:outline-none p-2 rounded-lg bg-gray-100 dark:bg-zinc-800">
+            <i class="ph-bold ph-list text-xl"></i>
+        </button>
+    </div>
+
+    <!-- BACKDROP PARA EL SIDEBAR EN MÓVIL -->
+    <div id="sidebar-backdrop" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[70] hidden md:hidden transition-opacity"></div>
+
+    <!-- SIDEBAR -->
+    <aside id="sidebar" class="fixed inset-y-0 left-0 transform -translate-x-full md:relative md:translate-x-0 w-64 h-full bg-white dark:bg-gp-surface border-r border-gray-200 dark:border-gp-border flex flex-col z-[80] transition-transform duration-300 ease-in-out">
+        <div class="h-16 md:h-20 flex items-center justify-between px-6 border-b border-gray-200 dark:border-gp-border">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 rounded-lg flex items-center justify-center font-bold">G</div>
+                <span class="font-bold text-lg tracking-tight text-gray-900 dark:text-white">Godsplan.</span>
+            </div>
+            <button id="close-sidebar-btn" class="md:hidden text-gray-400 hover:text-white">
+                <i class="ph-bold ph-x text-xl"></i>
+            </button>
+        </div>
+
+        <nav class="flex-1 overflow-y-auto no-scrollbar py-6 px-4 space-y-1">
+            <p class="px-3 text-[10px] font-bold text-gray-400 dark:text-zinc-600 uppercase tracking-widest mb-2">Visibilidad</p>
+            <button data-target="view-dashboard" class="nav-link w-full flex items-center gap-3 px-3 py-2.5 rounded-xl bg-gray-100 dark:bg-zinc-800 text-blue-600 dark:text-white font-medium hover:bg-gray-50 dark:hover:bg-zinc-800/50 hover:text-gray-900 dark:hover:text-white transition-colors">
+                <i class="ph-fill ph-layout text-xl"></i> Dashboard
+            </button>
+            <button id="nav-history" data-target="view-history" class="nav-link w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-500 dark:text-gp-muted hover:bg-gray-50 dark:hover:bg-zinc-800/50 hover:text-gray-900 dark:hover:text-white transition-colors">
+                <i class="ph-fill ph-clock-counter-clockwise text-xl"></i> Historial
+            </button>
+            <a href="statements.html" id="nav-statements" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-500 dark:text-gp-muted hover:bg-gray-50 dark:hover:bg-zinc-800/50 hover:text-gray-900 dark:hover:text-white transition-colors">
+                <i class="ph-fill ph-file-text text-xl"></i> Estados de Cuenta
+            </a>
+            
+            <p id="nav-group-plan-title" class="px-3 text-[10px] font-bold text-gray-400 dark:text-zinc-600 uppercase tracking-widest mt-6 mb-2">Planificación</p>
+            <button id="nav-quincena" data-target="view-quincena" class="nav-link w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-500 dark:text-gp-muted hover:bg-gray-50 dark:hover:bg-zinc-800/50 hover:text-gray-900 dark:hover:text-white transition-colors">
+                <i class="ph-fill ph-calendar-check text-xl"></i> Org. Quincena
+            </button>
+            <button id="nav-fixed" data-target="view-fixed-payments" class="nav-link w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-500 dark:text-gp-muted hover:bg-gray-50 dark:hover:bg-zinc-800/50 hover:text-gray-900 dark:hover:text-white transition-colors">
+                <i class="ph-fill ph-calendar-blank text-xl"></i> Pagos Fijos
+            </button>
+            <button id="nav-tdc" data-target="view-tdc" class="nav-link w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-500 dark:text-gp-muted hover:bg-gray-50 dark:hover:bg-zinc-800/50 hover:text-gray-900 dark:hover:text-white transition-colors">
+                <i class="ph-fill ph-credit-card text-xl"></i> Organizador TDC
+            </button>
+            
+            <p class="px-3 text-[10px] font-bold text-gray-400 dark:text-zinc-600 uppercase tracking-widest mt-6 mb-2">Acción</p>
+            <button data-target="view-payments" class="nav-link w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-500 dark:text-gp-muted hover:bg-gray-50 dark:hover:bg-zinc-800/50 hover:text-gray-900 dark:hover:text-white transition-colors">
+                <i class="ph-fill ph-swap text-xl"></i> Transacciones
+            </button>
+            
+            <p class="px-3 text-[10px] font-bold text-gray-400 dark:text-zinc-600 uppercase tracking-widest mt-6 mb-2">Configuración</p>
+            <button data-target="view-accounts" class="nav-link w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-500 dark:text-gp-muted hover:bg-gray-50 dark:hover:bg-zinc-800/50 hover:text-gray-900 dark:hover:text-white transition-colors">
+                <i class="ph-fill ph-vault text-xl"></i> Cuentas Espejo
+            </button>
+            <button data-target="view-settings" class="nav-link w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-500 dark:text-gp-muted hover:bg-gray-50 dark:hover:bg-zinc-800/50 hover:text-gray-900 dark:hover:text-white transition-colors">
+                <i class="ph-fill ph-sliders text-xl"></i> Preferencias
+            </button>
+        </nav>
+
+        <div class="p-4 border-t border-gray-200 dark:border-gp-border">
+            <div class="mb-4 px-3">
+                <p class="text-[10px] text-gray-400 dark:text-zinc-500 uppercase tracking-wider mb-1">Bóveda Activa</p>
+                <p class="text-xs text-gray-900 dark:text-white font-mono truncate" id="user-display">cargando...</p>
+            </div>
+            <button id="themeToggleBtn" class="w-full flex items-center justify-center gap-2 px-3 py-2.5 mb-2 rounded-xl text-gray-600 dark:text-gp-muted hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors">
+                <i class="ph-bold ph-moon dark:hidden"></i>
+                <i class="ph-bold ph-sun hidden dark:block"></i>
+                <span class="text-sm font-medium">Tema Visual</span>
+            </button>
+            <button id="logout-btn" class="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors">
+                <i class="ph-bold ph-sign-out"></i>
+                <span class="text-sm font-medium">Desconectar</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- MAIN APP AREA -->
+    <main class="flex-1 w-full h-screen overflow-y-auto p-4 pt-20 md:p-8 md:pt-8 relative">
+
+        <!-- ================================================================= -->
+        <!-- VISTA 1: DASHBOARD (/dashboard)                                   -->
+        <!-- ================================================================= -->
+        <section id="view-dashboard" class="view-section block max-w-6xl mx-auto">
+            <header class="flex flex-col md:flex-row justify-between md:items-end gap-4 mb-8 md:mb-10">
+                <div>
+                    <h1 class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">Centro de Mando</h1>
+                    <p class="text-gray-500 dark:text-gp-muted text-sm mt-1">Visión global de tu patrimonio en tiempo real</p>
+                </div>
+                <button onclick="document.querySelector('[data-target=\'view-payments\']').click()" class="w-full md:w-auto bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 px-5 py-3 md:py-2.5 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg transition-transform active:scale-95 md:hover:scale-105">
+                    <i class="ph-bold ph-plus"></i> Ingresar Registro
+                </button>
+            </header>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 mb-6">
+                <!-- Se ajusta la clase lg:col-span-2 a dinámico en caso de apagar el modulo quincena -->
+                <div id="patrimonio-card" class="lg:col-span-2 bg-white dark:bg-gp-surface rounded-2xl md:rounded-3xl p-6 md:p-8 border border-gray-200 dark:border-gp-border shadow-sm flex flex-col justify-between transition-all duration-300">
+                    <div class="flex justify-between items-start mb-6">
+                        <div class="flex items-center gap-2 text-gray-500 dark:text-gp-muted font-medium text-xs md:text-sm uppercase tracking-wider">
+                            <i class="ph-fill ph-scales"></i> Patrimonio Neto Exacto
+                        </div>
+                    </div>
+                    <div>
+                        <h2 class="text-4xl sm:text-5xl lg:text-6xl font-mono font-extrabold text-gray-900 dark:text-white tracking-tight break-words" id="display-patrimonio">$0<span class="text-gray-400 dark:text-zinc-600 text-2xl md:text-3xl">.00</span></h2>
+                        <p class="text-xs md:text-sm text-gray-500 dark:text-gp-muted mt-2">Suma de saldos iniciales ± transacciones</p>
+                    </div>
+                </div>
+
+                <div id="daily-budget-card" class="rounded-2xl md:rounded-3xl p-6 md:p-8 shadow-xl flex flex-col justify-center relative overflow-hidden group transition-colors cursor-pointer bg-blue-600 hover:bg-blue-700 text-white" onclick="document.querySelector('[data-target=\'view-quincena\']').click()">
+                    <div class="absolute -right-4 -bottom-4 opacity-20 transform group-hover:scale-110 transition-transform">
+                        <i class="ph-fill ph-calendar-check text-9xl"></i>
+                    </div>
+                    <div class="relative z-10" id="daily-budget-content">
+                        <!-- JS Inject -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 mb-6">
+                <div class="lg:col-span-3 bg-white dark:bg-gp-surface rounded-2xl md:rounded-3xl p-6 md:p-8 border border-gray-200 dark:border-gp-border shadow-sm flex flex-col justify-center">
+                    <h3 class="text-xs md:text-sm font-bold text-gray-500 dark:text-gp-muted uppercase tracking-wider mb-4 md:mb-6">Flujo Histórico (Todas las transacciones)</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="flex justify-between items-center p-3 bg-gray-50 dark:bg-gp-bg rounded-lg border border-gray-100 dark:border-gp-border">
+                            <span class="text-[10px] md:text-xs font-bold text-gray-500 uppercase"><i class="ph-fill ph-arrow-down text-green-500 mr-1"></i> Entradas Totales</span>
+                            <span class="font-mono text-green-500 font-bold text-sm md:text-base" id="display-ingresos">$0.00</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-gray-50 dark:bg-gp-bg rounded-lg border border-gray-100 dark:border-gp-border">
+                            <span class="text-[10px] md:text-xs font-bold text-gray-500 uppercase"><i class="ph-fill ph-arrow-up text-red-500 mr-1"></i> Salidas Totales</span>
+                            <span class="font-mono text-red-500 font-bold text-sm md:text-base" id="display-gastos">$0.00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================================================================= -->
+        <!-- VISTA 1.5: ORGANIZADOR QUINCENA (/quincena)                       -->
+        <!-- ================================================================= -->
+        <section id="view-quincena" class="view-section hidden max-w-6xl mx-auto">
+            <header class="flex flex-col md:flex-row justify-between md:items-end gap-4 mb-8">
+                <div>
+                    <h1 class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">Organizador de Quincena</h1>
+                    <p class="text-gray-500 dark:text-gp-muted text-sm mt-1">Calculadora algorítmica de dinero líquido para llegar al siguiente pago.</p>
+                </div>
+            </header>
+
+            <div class="flex flex-col lg:flex-row gap-6 md:gap-8">
+                <div class="lg:w-2/3 order-2 lg:order-1">
+                    <div class="bg-white dark:bg-gp-surface border border-gray-200 dark:border-gp-border rounded-2xl md:rounded-3xl p-6 md:p-8 shadow-sm h-full flex flex-col justify-center">
+                        <h3 class="font-bold text-lg text-gray-900 dark:text-white mb-6 border-b border-gray-100 dark:border-gp-border pb-4">Desglose de Liquidez</h3>
+                        <div id="quincena-breakdown-panel" class="space-y-4">
+                            <p class="text-sm text-gray-500">Configura tus fechas de pago en el panel lateral.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lg:w-1/3 order-1 lg:order-2">
+                    <div class="bg-white dark:bg-gp-surface border border-gray-200 dark:border-gp-border rounded-2xl md:rounded-3xl p-6 shadow-sm sticky top-8">
+                        <h3 class="font-bold text-base md:text-lg text-gray-900 dark:text-white mb-4 md:mb-6 flex items-center gap-2">
+                            <i class="ph-bold ph-gear text-blue-500"></i> Días de Pago
+                        </h3>
+                        <p class="text-xs text-gray-500 dark:text-gp-muted mb-6">Ingresa los días exactos del mes en los que recibes ingresos regulares.</p>
+                        
+                        <form id="quincena-config-form" class="space-y-4">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-500 dark:text-gp-muted uppercase tracking-wider mb-2">Día 1</label>
+                                    <input type="number" id="q-day1" min="1" max="31" required placeholder="Ej. 15" class="w-full bg-gray-50 dark:bg-gp-bg border border-gray-200 dark:border-gp-border rounded-xl px-4 py-3 text-sm font-mono text-gray-900 dark:text-white focus:outline-none focus:border-blue-500">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-500 dark:text-gp-muted uppercase tracking-wider mb-2">Día 2 (Opcional)</label>
+                                    <input type="number" id="q-day2" min="1" max="31" placeholder="Ej. 30" class="w-full bg-gray-50 dark:bg-gp-bg border border-gray-200 dark:border-gp-border rounded-xl px-4 py-3 text-sm font-mono text-gray-900 dark:text-white focus:outline-none focus:border-blue-500">
+                                </div>
+                            </div>
+                            <button type="submit" id="submit-q-config-btn" class="w-full mt-4 px-6 py-3 rounded-xl bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 font-bold transition-transform active:scale-95 shadow-lg">
+                                Actualizar Ciclo
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ================================================================= -->
+        <!-- VISTA 2: HISTORIAL (/history)                                     -->
+        <!-- ================================================================= -->
+        <section id="view-history" class="view-section hidden max-w-6xl mx-auto">
+            <header class="flex flex-col md:flex-row justify-between md:items-end gap-4 mb-8">
+                <div>
+                    <h1 class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">Libro Mayor</h1>
+                    <p class="text-gray-500 dark:text-gp-muted text-sm mt-1">Registro inmutable de transacciones</p>
+                </div>
+            </header>
+
+            <div class="bg-white dark:bg-gp-surface border border-gray-200 dark:border-gp-border rounded-2xl shadow-sm overflow-hidden">
+                <div class="overflow-x-auto w-full">
+                    <table class="w-full text-left border-collapse min-w-[600px]">
+                        <thead>
+                            <tr class="bg-gray-50 dark:bg-zinc-900 border-b border-gray-200 dark:border-gp-border text-[10px] md:text-xs uppercase tracking-wider text-gray-500 dark:text-gp-muted whitespace-nowrap">
+                                <th class="p-3 md:p-4 font-medium">Fecha</th>
+                                <th class="p-3 md:p-4 font-medium">Descripción</th>
+                                <th class="p-3 md:p-4 font-medium">Cuenta(s)</th>
+                                <th class="p-3 md:p-4 font-medium">Tipo</th>
+                                <th class="p-3 md:p-4 font-medium text-right">Monto</th>
+                                <th class="p-3 md:p-4 font-medium text-center">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="history-table-body" class="divide-y divide-gray-100 dark:divide-gp-border text-xs md:text-sm">
+                            <!-- JS Inject -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================================================================= -->
+        <!-- VISTA 3: TRANSACCIONES (/payments)                                -->
+        <!-- ================================================================= -->
+        <section id="view-payments" class="view-section hidden max-w-2xl mx-auto">
+            <header class="mb-8 text-center md:mb-10">
+                <h1 class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white" id="tx-header-title">Registrar Operación</h1>
+                <p class="text-gray-500 dark:text-gp-muted text-sm mt-1">Suma, resta o mueve fondos entre bóvedas</p>
+            </header>
+
+            <div class="bg-white dark:bg-gp-surface border border-gray-200 dark:border-gp-border rounded-2xl md:rounded-3xl p-5 md:p-8 shadow-xl relative">
+                <button id="cancel-edit-btn" class="hidden absolute top-4 right-4 text-xs font-bold text-red-500 bg-red-50 dark:bg-red-500/10 px-3 py-1 rounded-lg hover:bg-red-100 dark:hover:bg-red-500/20 transition-colors">
+                    <i class="ph-bold ph-x"></i> Cancelar
+                </button>
+
+                <form id="transaction-form" class="space-y-6">
+                    <input type="hidden" id="tx-id-hidden" value="">
+                    <!-- Input oculto para enlazar el pago a un "Pago Fijo" -->
+                    <input type="hidden" id="tx-fixed-id" value="">
+
+                    <!-- Selector de Tipo -->
+                    <div class="flex gap-2 md:gap-4 p-1 bg-gray-100 dark:bg-gp-bg rounded-xl mb-6">
+                        <label class="flex-1 cursor-pointer">
+                            <input type="radio" name="tx_type" id="tx_type_gasto" value="gasto" class="peer sr-only" checked>
+                            <div class="text-center py-2 rounded-lg text-xs md:text-sm font-medium text-gray-500 peer-checked:bg-white peer-checked:dark:bg-gp-surface peer-checked:text-red-500 peer-checked:shadow-sm transition-all">Gasto</div>
+                        </label>
+                        <label class="flex-1 cursor-pointer">
+                            <input type="radio" name="tx_type" id="tx_type_ingreso" value="ingreso" class="peer sr-only">
+                            <div class="text-center py-2 rounded-lg text-xs md:text-sm font-medium text-gray-500 peer-checked:bg-white peer-checked:dark:bg-gp-surface peer-checked:text-green-500 peer-checked:shadow-sm transition-all">Ingreso</div>
+                        </label>
+                        <label class="flex-1 cursor-pointer">
+                            <input type="radio" name="tx_type" id="tx_type_transferencia" value="transferencia" class="peer sr-only">
+                            <div class="text-center py-2 rounded-lg text-xs md:text-sm font-medium text-gray-500 peer-checked:bg-white peer-checked:dark:bg-gp-surface peer-checked:text-blue-500 peer-checked:shadow-sm transition-all">Transferencia</div>
+                        </label>
+                    </div>
+
+                    <div class="text-center">
+                        <label class="block text-[10px] md:text-xs font-bold text-gray-500 dark:text-gp-muted uppercase tracking-wider mb-2">Monto</label>
+                        <div class="flex items-center justify-center text-4xl md:text-5xl font-mono font-bold text-gray-900 dark:text-white">
+                            <span class="text-gray-400 dark:text-zinc-600 mr-1 md:mr-2">$</span>
+                            <input type="number" id="tx-amount" step="0.01" required placeholder="0.00" class="bg-transparent w-full max-w-[200px] text-center focus:outline-none placeholder-gray-300 dark:placeholder-zinc-700">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 dark:text-gp-muted uppercase tracking-wider mb-2" id="lbl-cuenta-origen">Cuenta Afectada</label>
+                            <select id="tx-account" required class="w-full bg-gray-50 dark:bg-gp-bg border border-gray-200 dark:border-gp-border rounded-xl px-4 py-3 text-sm text-gray-900 dark:text-white focus:outline-none focus:border-blue-500">
+                                <option value="" disabled selected>Selecciona bóveda...</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Categoría (Oculto en Transferencia) -->
+                        <div id="tx-category-container">
+                            <label class="block text-xs font-bold text-gray-500 dark:text-gp-muted uppercase tracking-wider mb-2">Categoría</label>
+                            <select id="tx-category" required class="w-full bg-gray-50 dark:bg-gp-bg border border-gray-200 dark:border-gp-border rounded-xl px-4 py-3 text-sm text-gray-900 dark:text-white focus:outline-none focus:border-blue-500">
+                                <option value="General" selected>General</option>
+                            </select>
+                        </div>
+
+                        <!-- Cuenta Destino (Visible en Transferencia) -->
+                        <div id="tx-dest-container" class="hidden">
+                            <label class="block text-xs font-bold text-gray-500 dark:text-gp-muted uppercase tracking-wider mb-2">Cuenta Destino</label>
+                            <select id="tx-account-dest" class="w-full bg-gray-50 dark:bg-gp-bg border border-gray-200 dark:border-gp-border rounded-xl px-4 py-3 text-sm text-gray-900 dark:text-white focus:outline-none focus:border-blue-500">
+                                <option value="" disabled selected>Hacia bóveda...</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 dark:text-gp-muted uppercase tracking-wider mb-2">Descripción</label>
+                        <input type="text" id="tx-desc" required placeholder="Ej. Compra supermercado" class="w-full bg-gray-50 dark:bg-gp-bg border border-gray-200 dark:border-gp-border rounded-xl px-4 py-3 text-sm text-gray-900 dark:text-white focus:outline-none focus:border-blue-500">
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 dark:text-gp-muted uppercase tracking-wider mb-2">Fecha (Opcional)</label>
+                            <input type="datetime-local" id="tx-date" class="w-full bg-gray-50 dark:bg-gp-bg border border-gray-200 dark:border-gp-border rounded-xl px-4 py-3 text-sm text-gray-900 dark:text-white focus:outline-none focus:border-blue-500">
+                            <p class="text-[10px] text-gray-500 mt-1">Dejar vacío usa la fecha/hora actual.</p>
+                        </div>
+                        <div class="flex items-center pt-2 sm:pt-6" id="tx-ignore-container">
+                            <input type="checkbox" id="tx-ignore-daily" class="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-zinc-800 dark:border-zinc-700">
+                            <label for="tx-ignore-daily" class="ml-2 text-xs font-medium text-gray-500 dark:text-gp-muted cursor-pointer leading-tight">
+                                Ignorar del presupuesto diario (Ej. Pago Fijo ya reservado)
+                            </label>
+                        </div>
+                    </div>
+
+                    <button type="submit" id="submit-tx-btn" class="w-full py-4 rounded-xl bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 font-bold md:text-lg transition-transform active:scale-95 shadow-lg disabled:opacity-50">
+                        Guardar Operación
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- ================================================================= -->
+        <!-- VISTA 3.5: PAGOS FIJOS (/fixed-payments)  (NUEVO Y MEJORADO)      -->
+        <!-- ================================================================= -->
+        <section id="view-fixed-payments" class="view-section hidden max-w-6xl mx-auto">
+            <header class="flex flex-col md:flex-row justify-between md:items-end gap-4 mb-8">
+                <div>
+                    <h1 class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">Pagos Fijos</h1>
+                    <p class="text-gray-500 dark:text-gp-muted text-sm mt-1">Tus gastos recurrentes que afectan la liquidez quincenal.</p>
+                </div>
+            </header>
+
+            <div class="flex flex-col lg:flex-row gap-6 md:gap-8">
+                <div class="lg:w-2/3 order-2 lg:order-1">
+                    <div id="fixed-payments-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <!-- JS Inject -->
+                    </div>
+                </div>
+
+                <div class="lg:w-1/3 order-1 lg:order-2">
+                    <div class="bg-white dark:bg-gp-surface border border-gray-200 dark:border-gp-border rounded-2xl md:rounded-3xl p-6 shadow-sm sticky top-8">
+                        <h3 class="font-bold text-base md:text-lg text-gray-900 dark:text-white mb-4 md:mb-6 flex items-center gap-2" id="fixed-header-title">
+                            <i class="ph-bold ph-calendar-plus text-blue-500"></i> Nuevo Pago Fijo
+                        </h3>
+                        <form id="fixed-form" class="space-y-4">
+                            <input type="hidden" id="fixed-id-hidden" value="">
+                            
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 dark:text-gp-muted uppercase tracking-wider mb-2">Concepto</label>
+                                <input type="text" id="fixed-title" required placeholder="Ej. Renta Casa" class="w-full bg-gray-50 dark:bg-gp-bg border border-gray-200 dark:border-gp-border rounded-xl px-4 py-3 text-sm text-gray-900 dark:text-white focus:outline-none focus:border-blue-500">
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-500 dark:text-gp-muted uppercase tracking-wider mb-2">Monto Apox.</label>
+                                    <input type="number" id="fixed-amount" step="0.01" required placeholder="0.00" class="w-full bg-gray-50 dark:bg-gp-bg border border-gray-200 dark:border-gp-border rounded-xl px-4 py-3 text-sm font-mono text-gray-900 dark:text-white focus:outline-none focus:border-blue-500">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-500 dark:text-gp-muted uppercase tracking-wider mb-2">Día cobro</label>
+                                    <input type="number" id="fixed-day" min="1" max="31" required placeholder="1-31" class="w-full bg-gray-50 dark:bg-gp-bg border border-gray-200 dark:border-gp-border rounded-xl px-4 py-3 text-sm font-mono text-gray-900 dark:text-white focus:outline-none focus:border-blue-500">
+                                </div>
+                            </div>
+                            
+                            <!-- Toggle de Activo/Inactivo -->
+                            <div class="flex items-center pt-2 border-t border-gray-100 dark:border-zinc-800 mt-2">
+                                <input type="checkbox" id="fixed-active" checked class="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-zinc-800 dark:border-zinc-700">
+                                <label for="fixed-active" class="ml-2 text-xs font-medium text-gray-500 dark:text-gp-muted cursor-pointer leading-tight">
+                                    Suscripción / Pago Activo
+                                </label>
+                            </div>
+
+                            <button type="submit" id="submit-fixed-btn" class="w-full mt-4 px-6 py-3 rounded-xl bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 font-bold transition-transform active:scale-95 shadow-lg">
+                                Guardar Pago
+                            </button>
+                            <button type="button" id="cancel-fixed-edit-btn" class="hidden w-full text-xs font-bold text-red-500 bg-red-50 dark:bg-red-500/10 px-3 py-2.5 rounded-xl hover:bg-red-100 dark:hover:bg-red-500/20 transition-colors">
+                                Cancelar Edición
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================================================================= -->
+        <!-- VISTA 3.6: ORGANIZADOR TDC (/tdc)                                 -->
+        <!-- ================================================================= -->
+        <section id="view-tdc" class="view-section hidden max-w-6xl mx-auto">
+            <header class="flex flex-col md:flex-row justify-between md:items-end gap-4 mb-8">
+                <div>
+                    <h1 class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">Organizador TDC</h1>
+                    <p class="text-gray-500 dark:text-gp-muted text-sm mt-1">Fechas de corte y montos para no generar intereses.</p>
+                </div>
+            </header>
+
+            <div class="flex flex-col xl:flex-row gap-6 md:gap-8">
+                <div class="xl:w-2/3 order-2 xl:order-1">
+                    <div id="tdc-cards-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                        <!-- JS Inject -->
+                    </div>
+                </div>
+                <div class="xl:w-1/3 order-1 xl:order-2">
+                    <div class="bg-white dark:bg-gp-surface border border-gray-200 dark:border-gp-border rounded-2xl md:rounded-3xl p-6 shadow-sm sticky top-8">
+                        <h3 class="font-bold text-base md:text-lg text-gray-900 dark:text-white mb-2 flex items-center gap-2">
+                            <i class="ph-bold ph-faders text-blue-500"></i> Configurar Tarjeta
+                        </h3>
+                        <p class="text-[10px] md:text-xs text-gray-500 dark:text-gp-muted mb-6">Selecciona una de tus cuentas 'Crédito' para asignarle fechas.</p>
+                        <form id="tdc-config-form" class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 dark:text-gp-muted uppercase tracking-wider mb-2">Cuenta (Crédito)</label>
+                                <select id="tdc-config-account" required class="w-full bg-gray-50 dark:bg-gp-bg border border-gray-200 dark:border-gp-border rounded-xl px-4 py-3 text-sm text-gray-900 dark:text-white focus:outline-none focus:border-blue-500">
+                                    <option value="" disabled selected>Selecciona tarjeta...</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 dark:text-gp-muted uppercase tracking-wider mb-2">Límite de Crédito</label>
+                                <input type="number" id="tdc-config-limit" step="0.01" required placeholder="Ej. 25000" class="w-full bg-gray-50 dark:bg-gp-bg border border-gray-200 dark:border-gp-border rounded-xl px-4 py-3 text-sm font-mono text-gray-900 dark:text-white focus:outline-none focus:border-blue-500">
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-[10px] md:text-xs font-bold text-gray-500 dark:text-gp-muted uppercase tracking-wider mb-2">Día de Corte</label>
+                                    <input type="number" id="tdc-config-cutoff" min="1" max="31" required placeholder="Ej. 5" class="w-full bg-gray-50 dark:bg-gp-bg border border-gray-200 dark:border-gp-border rounded-xl px-4 py-3 text-sm font-mono text-gray-900 dark:text-white focus:outline-none focus:border-blue-500">
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] md:text-xs font-bold text-gray-500 dark:text-gp-muted uppercase tracking-wider mb-2">Límite Pago</label>
+                                    <input type="number" id="tdc-config-payment" min="1" max="31" required placeholder="Ej. 25" class="w-full bg-gray-50 dark:bg-gp-bg border border-gray-200 dark:border-gp-border rounded-xl px-4 py-3 text-sm font-mono text-gray-900 dark:text-white focus:outline-none focus:border-blue-500">
+                                </div>
+                            </div>
+                            <button type="submit" id="submit-tdc-config-btn" class="w-full mt-4 px-6 py-3 rounded-xl bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 font-bold transition-transform active:scale-95 shadow-lg">
+                                Guardar Config
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================================================================= -->
+        <!-- VISTA 4: CUENTAS ESPEJO (/accounts)                               -->
+        <!-- ================================================================= -->
+        <section id="view-accounts" class="view-section hidden max-w-6xl mx-auto">
+            <header class="flex flex-col md:flex-row justify-between md:items-end gap-4 mb-8">
+                <div>
+                    <h1 class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">Tus Bóvedas</h1>
+                    <p class="text-gray-500 dark:text-gp-muted text-sm mt-1">Los saldos actuales incluyen el cálculo de tus transacciones</p>
+                </div>
+            </header>
+
+            <div id="accounts-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-8 md:mb-12">
+                <!-- JS Inject -->
+            </div>
+
+            <div class="bg-white dark:bg-gp-surface border border-gray-200 dark:border-gp-border rounded-2xl md:rounded-3xl p-6 md:p-8 shadow-sm max-w-2xl">
+                <h3 class="font-bold text-base md:text-lg text-gray-900 dark:text-white mb-4 md:mb-6 flex items-center gap-2">
+                    <i class="ph-bold ph-plus-circle text-blue-500"></i> Instanciar Nueva Bóveda
+                </h3>
+                <form id="account-form" class="space-y-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 dark:text-gp-muted uppercase tracking-wider mb-2">Nombre</label>
+                            <input type="text" id="acc-name" required placeholder="Ej. Tarjeta Nu" class="w-full bg-gray-50 dark:bg-gp-bg border border-gray-200 dark:border-gp-border rounded-xl px-4 py-3 text-sm text-gray-900 dark:text-white focus:outline-none focus:border-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 dark:text-gp-muted uppercase tracking-wider mb-2">Tipo</label>
+                            <select id="acc-type" required class="w-full bg-gray-50 dark:bg-gp-bg border border-gray-200 dark:border-gp-border rounded-xl px-4 py-3 text-sm text-gray-900 dark:text-white focus:outline-none focus:border-blue-500">
+                                <option value="Débito">Débito</option>
+                                <option value="Crédito">Crédito</option>
+                                <option value="Efectivo">Efectivo Físico</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 dark:text-gp-muted uppercase tracking-wider mb-2">Saldo Inicial (Punto de partida)</label>
+                        <input type="number" id="acc-balance" step="0.01" required placeholder="0.00" class="w-full bg-gray-50 dark:bg-gp-bg border border-gray-200 dark:border-gp-border rounded-xl px-4 py-3 text-sm font-mono text-gray-900 dark:text-white focus:outline-none focus:border-blue-500">
+                    </div>
+                    <button type="submit" id="submit-acc-btn" class="w-full md:w-auto mt-2 px-6 py-3 rounded-xl bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 font-bold transition-transform active:scale-95 shadow-lg">
+                        Crear Bóveda
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- ================================================================= -->
+        <!-- VISTA 5: SETTINGS (/settings)                                     -->
+        <!-- ================================================================= -->
+        <section id="view-settings" class="view-section hidden max-w-4xl mx-auto">
+            <header class="mb-8 md:mb-10">
+                <h1 class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">Preferencias</h1>
+                <p class="text-gray-500 dark:text-gp-muted text-sm mt-1">Configura módulos, etiquetas, e importa/exporta tu información</p>
+            </header>
+
+            <div class="bg-white dark:bg-gp-surface border border-gray-200 dark:border-gp-border rounded-2xl md:rounded-3xl overflow-hidden shadow-sm mb-6">
+                <div class="p-6 md:p-8 flex flex-col sm:flex-row items-center sm:items-start gap-4 md:gap-6 text-center sm:text-left">
+                    <div class="w-16 h-16 md:w-20 md:h-20 rounded-full bg-blue-100 dark:bg-blue-500/10 flex items-center justify-center text-3xl md:text-4xl text-blue-500 flex-shrink-0">
+                        <i class="ph-fill ph-user-circle"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-xl md:text-2xl font-bold text-gray-900 dark:text-white break-all" id="settings-email">usuario@correo.com</h2>
+                        <p class="text-xs md:text-sm text-gray-500 dark:text-gp-muted font-mono mt-1"><i class="ph-fill ph-lock-key"></i> Autenticado vía Firebase Auth</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECCIÓN NUEVA: MÓDULOS ACTIVOS -->
+            <div class="bg-white dark:bg-gp-surface border border-gray-200 dark:border-gp-border rounded-2xl md:rounded-3xl overflow-hidden shadow-sm mb-6">
+                <div class="p-6 md:p-8">
+                    <h2 class="text-lg md:text-xl font-bold text-gray-900 dark:text-white mb-2 flex items-center gap-2"><i class="ph-fill ph-plugs text-blue-500"></i> Módulos de la Aplicación</h2>
+                    <p class="text-xs md:text-sm text-gray-500 dark:text-gp-muted mb-6">Enciende o apaga las características que necesites para simplificar tu interfaz.</p>
+                    
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gp-bg rounded-xl border border-gray-100 dark:border-gp-border">
+                            <div>
+                                <p class="text-sm font-bold text-gray-900 dark:text-white">Libro Mayor (Historial)</p>
+                                <p class="text-[10px] text-gray-500 dark:text-gp-muted">Registro detallado de tus transacciones.</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="toggle-mod-history" class="sr-only peer module-toggle" checked>
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-zinc-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                            </label>
+                        </div>
+                        
+                        <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gp-bg rounded-xl border border-gray-100 dark:border-gp-border">
+                            <div>
+                                <p class="text-sm font-bold text-gray-900 dark:text-white">Estados de Cuenta</p>
+                                <p class="text-[10px] text-gray-500 dark:text-gp-muted">Acceso a la vista de estados de cuenta y cortes mensuales.</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="toggle-mod-statements" class="sr-only peer module-toggle" checked>
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-zinc-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                            </label>
+                        </div>
+
+                        <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gp-bg rounded-xl border border-gray-100 dark:border-gp-border">
+                            <div>
+                                <p class="text-sm font-bold text-gray-900 dark:text-white">Organizador de Quincena</p>
+                                <p class="text-[10px] text-gray-500 dark:text-gp-muted">Calcula tu presupuesto diario para llegar a tu siguiente pago.</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="toggle-mod-quincena" class="sr-only peer module-toggle" checked>
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-zinc-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                            </label>
+                        </div>
+
+                        <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gp-bg rounded-xl border border-gray-100 dark:border-gp-border">
+                            <div>
+                                <p class="text-sm font-bold text-gray-900 dark:text-white">Pagos Fijos</p>
+                                <p class="text-[10px] text-gray-500 dark:text-gp-muted">Gestiona gastos recurrentes mensuales (luz, renta, suscripciones).</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="toggle-mod-fixed" class="sr-only peer module-toggle" checked>
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-zinc-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                            </label>
+                        </div>
+
+                        <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gp-bg rounded-xl border border-gray-100 dark:border-gp-border">
+                            <div>
+                                <p class="text-sm font-bold text-gray-900 dark:text-white">Organizador TDC</p>
+                                <p class="text-[10px] text-gray-500 dark:text-gp-muted">Calculadora de "para no generar intereses" para tarjetas de crédito.</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="toggle-mod-tdc" class="sr-only peer module-toggle" checked>
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-zinc-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white dark:bg-gp-surface border border-gray-200 dark:border-gp-border rounded-2xl md:rounded-3xl overflow-hidden shadow-sm">
+                <div class="p-6 md:p-8 border-b border-gray-100 dark:border-gp-border">
+                    <h2 class="text-lg md:text-xl font-bold text-gray-900 dark:text-white mb-2">Gestión de Categorías</h2>
+                    <p class="text-xs md:text-sm text-gray-500 dark:text-gp-muted mb-6">Crea etiquetas personalizadas.</p>
+                    <form id="category-form" class="flex flex-col sm:flex-row gap-3 mb-6">
+                        <input type="text" id="cat-name" required placeholder="Nueva etiqueta" class="flex-1 bg-gray-50 dark:bg-gp-bg border border-gray-200 dark:border-gp-border rounded-xl px-4 py-3 text-sm text-gray-900 dark:text-white focus:outline-none focus:border-blue-500">
+                        <button type="submit" id="submit-cat-btn" class="bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 px-6 py-3 rounded-xl font-bold text-sm transition-transform active:scale-95 w-full sm:w-auto">Añadir Etiqueta</button>
+                    </form>
+                    <div id="categories-list" class="space-y-2 md:space-y-3"></div>
+                </div>
+
+                <div class="p-6 md:p-8 bg-gray-50 dark:bg-gp-bg">
+                    <h2 class="text-lg md:text-xl font-bold text-gray-900 dark:text-white mb-2">Migración y Respaldo</h2>
+                    <p class="text-xs md:text-sm text-gray-500 dark:text-gp-muted mb-6">Importa datos o descarga un respaldo completo.</p>
+                    <div class="flex flex-col sm:flex-row gap-3 md:gap-4">
+                        <button id="export-csv-btn" class="bg-white dark:bg-gp-surface border border-gray-200 dark:border-gp-border text-gray-900 dark:text-white px-4 py-3 rounded-xl font-bold text-sm hover:border-blue-500 transition-colors flex items-center justify-center gap-2 shadow-sm w-full sm:w-1/2">
+                            <i class="ph-bold ph-download-simple text-lg text-blue-500"></i> Descargar CSV
+                        </button>
+                        <input type="file" id="import-json-input" accept=".json" class="hidden">
+                        <button id="import-json-btn" class="bg-white dark:bg-gp-surface border border-gray-200 dark:border-gp-border text-gray-900 dark:text-white px-4 py-3 rounded-xl font-bold text-sm hover:border-green-500 transition-colors flex items-center justify-center gap-2 shadow-sm w-full sm:w-1/2">
+                            <i class="ph-bold ph-upload-simple text-lg text-green-500"></i> Importar JSON
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ================================================================= -->
+    <!-- LOGICA JAVASCRIPT: ESTADO GLOBAL Y FIREBASE CRUD                  -->
+    <!-- ================================================================= -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, deleteDoc, doc, updateDoc, getDoc, writeBatch, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyB9eeepHd1fcRBQbS17fyRWsO1ba734dbw",
+            authDomain: "capital-gp.firebaseapp.com",
+            projectId: "capital-gp",
+            storageBucket: "capital-gp.firebasestorage.app",
+            messagingSenderId: "14321430221",
+            appId: "1:14321430221:web:7c827dc99b8d9446ae8384"
+        };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        let currentUser = null;
+
+        // ESTADO GLOBAL Y GESTOR DE CARGA
+        let estadoApp = { cuentas: [], transacciones: [], categorias: [], pagosFijos: [], tdcConfig: [], quincenaConfig: null, modulosConfig: { history: true, statements: true, quincena: true, fixedPayments: true, tdc: true } };
+        window.cuentasConSaldosGlobal = [];
+        window.patrimonioNetoTotalGlobal = 0;
+
+        let loadStatus = { cuentas: false, transacciones: false, categorias: false, pagosFijos: false, modulos: false };
+        function checkAppReady() {
+            if (loadStatus.cuentas && loadStatus.transacciones && loadStatus.categorias && loadStatus.pagosFijos && loadStatus.modulos) {
+                document.getElementById('security-curtain').style.display = 'none';
+                aplicarConfiguracionModulos();
+                calcularYRenderizar(); 
+            }
+        }
+
+        // --- MANEJO DEL FORMULARIO DE TRANSFERENCIAS (UI) ---
+        document.querySelectorAll('input[name="tx_type"]').forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                const isTransfer = e.target.value === 'transferencia';
+                document.getElementById('tx-dest-container').classList.toggle('hidden', !isTransfer);
+                document.getElementById('tx-category-container').classList.toggle('hidden', isTransfer);
+                document.getElementById('tx-ignore-container').classList.toggle('hidden', isTransfer);
+                document.getElementById('lbl-cuenta-origen').textContent = isTransfer ? 'Cuenta Origen' : 'Cuenta Afectada';
+                
+                document.getElementById('tx-account-dest').required = isTransfer;
+                document.getElementById('tx-category').required = !isTransfer;
+            });
+        });
+
+        // --- SEGURIDAD ---
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUser = user;
+                document.getElementById('user-display').textContent = user.email;
+                document.getElementById('settings-email').textContent = user.email;
+                document.getElementById('security-status').textContent = "Descargando bóvedas...";
+                iniciarListenersBD();
+            } else {
+                window.location.href = 'auth.html';
+            }
+        });
+
+        // --- LISTENERS FIRESTORE ---
+        function iniciarListenersBD() {
+            onSnapshot(doc(db, `usuarios/${currentUser.uid}/configuraciones`, 'modulos'), (docSnap) => {
+                if (docSnap.exists()) {
+                    estadoApp.modulosConfig = { ...estadoApp.modulosConfig, ...docSnap.data() };
+                }
+                loadStatus.modulos = true;
+                if (document.getElementById('security-curtain').style.display === 'none') {
+                    aplicarConfiguracionModulos(); 
+                } else {
+                    checkAppReady();
+                }
+            });
+
+            onSnapshot(query(collection(db, `usuarios/${currentUser.uid}/categorias`), orderBy("nombre", "asc")), (snapshot) => {
+                estadoApp.categorias = []; snapshot.forEach(doc => estadoApp.categorias.push({ id: doc.id, ...doc.data() })); 
+                loadStatus.categorias = true;
+                renderizarCategorias();
+                checkAppReady();
+            });
+            onSnapshot(query(collection(db, `usuarios/${currentUser.uid}/pagos_fijos`), orderBy("dia", "asc")), (snapshot) => {
+                estadoApp.pagosFijos = []; snapshot.forEach(doc => estadoApp.pagosFijos.push({ id: doc.id, ...doc.data() })); 
+                loadStatus.pagosFijos = true;
+                renderizarPagosFijos();
+                checkAppReady();
+            });
+            onSnapshot(query(collection(db, `usuarios/${currentUser.uid}/tdc_config`)), (snapshot) => {
+                estadoApp.tdcConfig = []; snapshot.forEach(doc => estadoApp.tdcConfig.push({ id: doc.id, ...doc.data() })); 
+                if(loadStatus.cuentas && loadStatus.transacciones) actualizarVistaTDC();
+            });
+            onSnapshot(doc(db, `usuarios/${currentUser.uid}/configuraciones`, 'quincena'), (docSnap) => {
+                if (docSnap.exists()) {
+                    estadoApp.quincenaConfig = docSnap.data();
+                    document.getElementById('q-day1').value = estadoApp.quincenaConfig.dia1 || '';
+                    document.getElementById('q-day2').value = estadoApp.quincenaConfig.dia2 || '';
+                }
+                if(loadStatus.cuentas && loadStatus.transacciones) calcularQuincena();
+            });
+            onSnapshot(query(collection(db, `usuarios/${currentUser.uid}/cuentas`), orderBy("fecha_creacion", "asc")), (snapshot) => {
+                estadoApp.cuentas = []; snapshot.forEach(doc => estadoApp.cuentas.push({ id: doc.id, ...doc.data() })); 
+                loadStatus.cuentas = true;
+                checkAppReady();
+                if(loadStatus.transacciones) calcularYRenderizar();
+            });
+            onSnapshot(query(collection(db, `usuarios/${currentUser.uid}/transacciones`), orderBy("fecha", "desc")), (snapshot) => {
+                estadoApp.transacciones = []; snapshot.forEach(doc => estadoApp.transacciones.push({ id: doc.id, ...doc.data() })); 
+                loadStatus.transacciones = true;
+                checkAppReady();
+                if(loadStatus.cuentas) calcularYRenderizar();
+            });
+        }
+
+        // --- GESTIÓN DE MÓDULOS ACTIVOS ---
+        function aplicarConfiguracionModulos() {
+            const mod = estadoApp.modulosConfig;
+            
+            document.getElementById('toggle-mod-history').checked = mod.history;
+            document.getElementById('toggle-mod-statements').checked = mod.statements;
+            document.getElementById('toggle-mod-quincena').checked = mod.quincena;
+            document.getElementById('toggle-mod-fixed').checked = mod.fixedPayments;
+            document.getElementById('toggle-mod-tdc').checked = mod.tdc;
+
+            document.getElementById('nav-history').classList.toggle('hidden', !mod.history);
+            document.getElementById('nav-statements').classList.toggle('hidden', !mod.statements);
+            document.getElementById('nav-quincena').classList.toggle('hidden', !mod.quincena);
+            document.getElementById('nav-fixed').classList.toggle('hidden', !mod.fixedPayments);
+            document.getElementById('nav-tdc').classList.toggle('hidden', !mod.tdc);
+
+            const planifVisible = mod.quincena || mod.fixedPayments || mod.tdc;
+            document.getElementById('nav-group-plan-title').classList.toggle('hidden', !planifVisible);
+
+            const dailyBudgetCard = document.getElementById('daily-budget-card');
+            const patrimonioCard = document.getElementById('patrimonio-card');
+            
+            if (mod.quincena) {
+                dailyBudgetCard.classList.remove('hidden');
+                patrimonioCard.classList.replace('lg:col-span-3', 'lg:col-span-2');
+            } else {
+                dailyBudgetCard.classList.add('hidden');
+                patrimonioCard.classList.replace('lg:col-span-2', 'lg:col-span-3');
+            }
+
+            const vistasActivas = document.querySelectorAll('.view-section:not(.hidden)');
+            vistasActivas.forEach(vista => {
+                if (vista.id === 'view-history' && !mod.history) document.querySelector('[data-target="view-dashboard"]').click();
+                if (vista.id === 'view-quincena' && !mod.quincena) document.querySelector('[data-target="view-dashboard"]').click();
+                if (vista.id === 'view-fixed-payments' && !mod.fixedPayments) document.querySelector('[data-target="view-dashboard"]').click();
+                if (vista.id === 'view-tdc' && !mod.tdc) document.querySelector('[data-target="view-dashboard"]').click();
+            });
+        }
+
+        document.querySelectorAll('.module-toggle').forEach(toggle => {
+            toggle.addEventListener('change', async (e) => {
+                const id = e.target.id;
+                let campo = '';
+                if(id === 'toggle-mod-history') campo = 'history';
+                if(id === 'toggle-mod-statements') campo = 'statements';
+                if(id === 'toggle-mod-quincena') campo = 'quincena';
+                if(id === 'toggle-mod-fixed') campo = 'fixedPayments';
+                if(id === 'toggle-mod-tdc') campo = 'tdc';
+
+                if(campo) {
+                    try {
+                        const nuevaConfig = { ...estadoApp.modulosConfig, [campo]: e.target.checked };
+                        await setDoc(doc(db, `usuarios/${currentUser.uid}/configuraciones`, 'modulos'), nuevaConfig, { merge: true });
+                        mostrarNotificacion("Interfaz actualizada");
+                    } catch (error) {
+                        alert("Error guardando preferencias.");
+                        e.target.checked = !e.target.checked; 
+                    }
+                }
+            });
+        });
+
+        // --- MOTOR DE CÁLCULO CENTRAL ---
+        function calcularYRenderizar() {
+            if (!loadStatus.cuentas || !loadStatus.transacciones) return;
+
+            let patrimonioNetoTotal = 0; let totalIngresos = 0; let totalGastos = 0;
+            let cuentasCalculadas = estadoApp.cuentas.map(c => ({ ...c, saldo_actual: c.saldo_inicial }));
+
+            estadoApp.transacciones.forEach(tx => {
+                let cuentaAfectada = cuentasCalculadas.find(c => c.nombre === tx.cuenta);
+                
+                if (tx.tipo === 'ingreso') { 
+                    totalIngresos += tx.monto; if(cuentaAfectada) cuentaAfectada.saldo_actual += tx.monto; 
+                } else if (tx.tipo === 'gasto') { 
+                    totalGastos += tx.monto; if(cuentaAfectada) cuentaAfectada.saldo_actual -= tx.monto; 
+                } else if (tx.tipo === 'ajuste') { 
+                    if(cuentaAfectada) cuentaAfectada.saldo_actual += tx.monto; 
+                } else if (tx.tipo === 'transferencia') {
+                    let cuentaDestino = cuentasCalculadas.find(c => c.nombre === tx.cuenta_destino);
+                    if(cuentaAfectada) cuentaAfectada.saldo_actual -= tx.monto;
+                    if(cuentaDestino) cuentaDestino.saldo_actual += tx.monto;
+                }
+            });
+
+            patrimonioNetoTotal = cuentasCalculadas.reduce((sum, c) => sum + c.saldo_actual, 0);
+            window.cuentasConSaldosGlobal = cuentasCalculadas;
+            window.patrimonioNetoTotalGlobal = patrimonioNetoTotal; 
+
+            document.getElementById('display-patrimonio').innerHTML = `$${patrimonioNetoTotal.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+            document.getElementById('display-ingresos').textContent = `$${totalIngresos.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+            document.getElementById('display-gastos').textContent = `$${totalGastos.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+
+            const accountsGrid = document.getElementById('accounts-grid');
+            const txAccountSelect = document.getElementById('tx-account');
+            const txAccountDestSelect = document.getElementById('tx-account-dest');
+            
+            accountsGrid.innerHTML = ''; 
+            txAccountSelect.innerHTML = '<option value="" disabled selected>Selecciona bóveda...</option>';
+            txAccountDestSelect.innerHTML = '<option value="" disabled selected>Hacia bóveda...</option>';
+
+            cuentasCalculadas.forEach(acc => {
+                let icon = 'ph-bank'; let colorClass = 'text-blue-500'; let bgClass = 'bg-blue-100 dark:bg-blue-500/10';
+                if(acc.tipo === 'Crédito') { icon = 'ph-credit-card'; colorClass = 'text-purple-500'; bgClass = 'bg-purple-100 dark:bg-purple-500/10'; }
+                if(acc.tipo === 'Efectivo') { icon = 'ph-wallet'; colorClass = 'text-green-500'; bgClass = 'bg-green-100 dark:bg-green-500/10'; }
+                
+                accountsGrid.insertAdjacentHTML('beforeend', `
+                <div class="bg-white dark:bg-gp-surface border border-gray-200 dark:border-gp-border rounded-2xl md:rounded-3xl p-5 md:p-6 flex flex-col justify-between h-40 md:h-48 relative overflow-hidden group">
+                    <div class="absolute top-0 left-0 w-1 h-full ${bgClass.split(' ')[0].replace('100','500')}"></div>
+                    <div class="flex justify-between items-start">
+                        <div class="w-8 h-8 md:w-10 md:h-10 rounded-full ${bgClass} ${colorClass} flex items-center justify-center text-lg md:text-xl"><i class="ph-fill ${icon}"></i></div>
+                        <div class="flex gap-2">
+                            <button onclick="window.ajustarCuenta('${acc.id}', ${acc.saldo_actual}, '${acc.nombre}')" class="text-gray-400 hover:text-blue-500 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity p-1"><i class="ph-bold ph-sliders text-lg"></i></button>
+                            <button onclick="window.borrarCuenta('${acc.id}')" class="text-gray-400 hover:text-red-500 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity p-1"><i class="ph-bold ph-trash text-lg"></i></button>
+                        </div>
+                    </div>
+                    <div>
+                        <p class="font-bold text-base md:text-lg text-gray-900 dark:text-white truncate">${acc.nombre}</p>
+                        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-end mt-1">
+                            <p class="text-xs md:text-sm text-gray-500 dark:text-gp-muted">${acc.tipo}</p>
+                            <p class="font-mono font-bold text-gray-900 dark:text-white text-lg md:text-xl ${acc.saldo_actual < 0 ? 'text-red-500' : ''}">$${acc.saldo_actual.toLocaleString('en-US', {minimumFractionDigits: 2})}</p>
+                        </div>
+                    </div>
+                </div>`);
+                txAccountSelect.insertAdjacentHTML('beforeend', `<option value="${acc.nombre}">${acc.nombre} ($${acc.saldo_actual.toFixed(2)})</option>`);
+                txAccountDestSelect.insertAdjacentHTML('beforeend', `<option value="${acc.nombre}">${acc.nombre} ($${acc.saldo_actual.toFixed(2)})</option>`);
+            });
+
+            const tbody = document.getElementById('history-table-body'); 
+            tbody.innerHTML = '';
+            const txFragment = document.createDocumentFragment();
+
+            estadoApp.transacciones.forEach(tx => {
+                let fechaObj = tx.fecha ? tx.fecha.toDate() : new Date();
+                let fechaStr = fechaObj.toLocaleDateString('es-MX', { day: '2-digit', month: 'short', hour: '2-digit', minute:'2-digit' });
+                
+                let colorMonto = 'text-gray-500'; let signo = ''; let montoMostrado = Math.abs(tx.monto).toFixed(2);
+                let cuentaAfectadaHTML = `<td class="p-3 md:p-4 text-gray-500 dark:text-gp-muted truncate max-w-[100px] sm:max-w-none">${tx.cuenta}</td>`;
+                
+                if (tx.tipo === 'ingreso') { colorMonto = 'text-green-500'; signo = '+'; } 
+                else if (tx.tipo === 'gasto') { colorMonto = 'text-red-500'; signo = '-'; } 
+                else if (tx.tipo === 'ajuste') { colorMonto = 'text-blue-500'; signo = tx.monto >= 0 ? '+' : '-'; }
+                else if (tx.tipo === 'transferencia') { 
+                    colorMonto = 'text-blue-500'; 
+                    cuentaAfectadaHTML = `<td class="p-3 md:p-4 text-gray-500 dark:text-gp-muted text-[10px] sm:text-xs font-mono">${tx.cuenta} <i class="ph-bold ph-arrow-right mx-1 text-blue-500"></i> ${tx.cuenta_destino}</td>`;
+                }
+                
+                let ignoreBadge = tx.ignoreDaily ? '<span class="text-[8px] bg-red-100 text-red-600 dark:bg-red-500/20 dark:text-red-400 px-1 rounded ml-1" title="Ignorado del presupuesto diario">IGN</span>' : '';
+                // Badge visual para identificar si viene de un pago fijo
+                let fixedBadge = tx.linked_fixed_payment_id ? '<span class="text-[8px] bg-purple-100 text-purple-600 dark:bg-purple-500/20 dark:text-purple-400 px-1 rounded ml-1" title="Pago Fijo Vinculado">FIJO</span>' : '';
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-gray-50 dark:hover:bg-zinc-800/50 transition-colors";
+                tr.innerHTML = `
+                    <td class="p-3 md:p-4 text-gray-500 dark:text-gp-muted font-mono whitespace-nowrap">${fechaStr}</td>
+                    <td class="p-3 md:p-4 font-medium text-gray-900 dark:text-white"><span class="truncate block max-w-[120px] sm:max-w-none">${tx.descripcion} ${ignoreBadge} ${fixedBadge}</span><span class="text-[10px] text-gray-400 font-normal uppercase tracking-wider block mt-0.5">#${tx.categoria}</span></td>
+                    ${cuentaAfectadaHTML}
+                    <td class="p-3 md:p-4 text-[10px] md:text-xs uppercase font-bold text-gray-500">${tx.tipo}</td>
+                    <td class="p-3 md:p-4 text-right font-mono font-bold ${colorMonto}">${signo}$${montoMostrado}</td>
+                    <td class="p-3 md:p-4 text-center whitespace-nowrap"><button onclick="window.editarTx('${tx.id}')" class="text-blue-500 hover:text-blue-400 mr-2 md:mr-3 p-1"><i class="ph-bold ph-pencil text-lg"></i></button><button onclick="window.borrarTx('${tx.id}')" class="text-red-500 hover:text-red-400 p-1"><i class="ph-bold ph-trash text-lg"></i></button></td>
+                `;
+                txFragment.appendChild(tr);
+            });
+            tbody.appendChild(txFragment);
+
+            if(estadoApp.modulosConfig.tdc) actualizarVistaTDC();
+            if(estadoApp.modulosConfig.quincena) calcularQuincena();
+        }
+
+        // --- MÓDULO QUINCENA ---
+        function calcularQuincena() {
+            const config = estadoApp.quincenaConfig;
+            const cardDash = document.getElementById('daily-budget-card');
+            const contentDash = document.getElementById('daily-budget-content');
+            const viewQuincenaPanel = document.getElementById('quincena-breakdown-panel');
+
+            if (!config || (!config.dia1 && !config.dia2)) {
+                cardDash.className = "rounded-2xl md:rounded-3xl p-6 md:p-8 shadow-xl flex flex-col justify-center relative overflow-hidden group transition-colors cursor-pointer bg-blue-600 hover:bg-blue-700 text-white";
+                contentDash.innerHTML = `<h3 class="text-xs md:text-sm font-bold text-blue-200 uppercase tracking-wider mb-2">Presupuesto de Hoy</h3><h2 class="text-4xl lg:text-5xl font-mono font-black tracking-tight my-2">$0.00</h2><p class="text-xs md:text-sm text-blue-200 mt-2 font-medium">Configura tus días de pago</p>`;
+                if (viewQuincenaPanel) viewQuincenaPanel.innerHTML = '<p class="text-gray-500 text-sm">Configura tus fechas de pago en el panel lateral para iniciar el análisis.</p>';
+                return;
+            }
+
+            const hoy = new Date();
+            const hoySoloFecha = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
+            const hoyStr = hoy.toLocaleDateString('es-MX');
+            const currentYYYYMM = `${hoy.getFullYear()}-${String(hoy.getMonth()+1).padStart(2, '0')}`;
+
+            let diasPago = [];
+            if (config.dia1) diasPago.push(parseInt(config.dia1));
+            if (config.dia2) diasPago.push(parseInt(config.dia2));
+            diasPago.sort((a, b) => a - b);
+
+            let nextPayday = null;
+            let currentMonth = hoy.getMonth();
+            let currentYear = hoy.getFullYear();
+
+            for (let dia of diasPago) {
+                let lastDayOfMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+                let effectiveDay = Math.min(dia, lastDayOfMonth);
+                let possibleDate = new Date(currentYear, currentMonth, effectiveDay);
+                if (possibleDate > hoySoloFecha) { nextPayday = possibleDate; break; }
+            }
+
+            if (!nextPayday) {
+                currentMonth++; if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+                let dia = diasPago[0];
+                let lastDayOfMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+                let effectiveDay = Math.min(dia, lastDayOfMonth);
+                nextPayday = new Date(currentYear, currentMonth, effectiveDay);
+            }
+
+            const msPerDay = 1000 * 60 * 60 * 24;
+            let daysLeft = Math.ceil((nextPayday - hoySoloFecha) / msPerDay);
+            if (daysLeft === 0) daysLeft = 1;
+
+            let pagosFijosPendientesTotal = 0; let pagosFijosList = [];
+            for(let i=1; i<=daysLeft; i++) {
+                let checkDate = new Date(hoySoloFecha.getTime() + (i * msPerDay));
+                let checkDay = checkDate.getDate();
+                let checkDateYYYYMM = `${checkDate.getFullYear()}-${String(checkDate.getMonth()+1).padStart(2, '0')}`;
+                
+                estadoApp.pagosFijos.forEach(pf => {
+                    if(pf.activo === false) return;
+
+                    let checkDateLastDay = new Date(checkDate.getFullYear(), checkDate.getMonth() + 1, 0).getDate();
+                    let effectivePfDia = Math.min(parseInt(pf.dia), checkDateLastDay);
+                    
+                    if (effectivePfDia === checkDay && pf.ultimo_pago !== checkDateYYYYMM) { 
+                        pagosFijosPendientesTotal += pf.monto; 
+                        pagosFijosList.push(pf); 
+                    }
+                });
+            }
+
+            let gastosHoy = 0;
+            estadoApp.transacciones.forEach(tx => {
+                if(tx.tipo === 'gasto' && !tx.ignoreDaily && tx.fecha) {
+                    const txDateStr = tx.fecha.toDate().toLocaleDateString('es-MX');
+                    if(txDateStr === hoyStr) gastosHoy += tx.monto;
+                }
+            });
+
+            let liquidezActual = 0;
+            window.cuentasConSaldosGlobal.forEach(acc => {
+                if (acc.tipo === 'Débito' || acc.tipo === 'Efectivo') {
+                    liquidezActual += acc.saldo_actual;
+                }
+            });
+
+            let dineroLibreActual = liquidezActual - pagosFijosPendientesTotal;
+            let dineroLibreInicioDia = dineroLibreActual + gastosHoy;
+            let presupuestoBaseHoy = dineroLibreInicioDia / daysLeft;
+            let restanteHoy = presupuestoBaseHoy - gastosHoy;
+
+            if (restanteHoy >= 0) {
+                cardDash.className = "rounded-2xl md:rounded-3xl p-6 md:p-8 shadow-xl flex flex-col justify-center relative overflow-hidden group transition-colors cursor-pointer bg-blue-600 hover:bg-blue-700 text-white";
+                contentDash.innerHTML = `
+                    <h3 class="text-xs md:text-sm font-bold text-blue-200 uppercase tracking-wider mb-2">Libres Para Hoy</h3>
+                    <h2 class="text-4xl lg:text-5xl font-mono font-black tracking-tight my-2">$${restanteHoy.toLocaleString('en-US', {minimumFractionDigits: 2})}</h2>
+                    <p class="text-xs text-blue-100 mt-2 font-medium">Límite base: $${presupuestoBaseHoy.toLocaleString('en-US', {minimumFractionDigits: 2})} | Has gastado: $${gastosHoy.toLocaleString('en-US', {minimumFractionDigits: 2})}</p>
+                    <p class="text-[10px] text-blue-300 mt-1 font-mono">${daysLeft} días al prox. pago</p>
+                `;
+            } else {
+                cardDash.className = "rounded-2xl md:rounded-3xl p-6 md:p-8 shadow-xl flex flex-col justify-center relative overflow-hidden group transition-colors cursor-pointer bg-red-600 hover:bg-red-700 text-white";
+                let presupuestoFuturo = daysLeft > 1 ? (dineroLibreActual / (daysLeft - 1)) : 0;
+                contentDash.innerHTML = `
+                    <h3 class="text-xs md:text-sm font-bold text-red-200 uppercase tracking-wider mb-2">Presupuesto Excedido</h3>
+                    <h2 class="text-4xl lg:text-5xl font-mono font-black tracking-tight my-2 text-red-100">-$${Math.abs(restanteHoy).toLocaleString('en-US', {minimumFractionDigits: 2})}</h2>
+                    <p class="text-xs text-red-100 mt-2 font-medium">Has gastado: $${gastosHoy.toLocaleString('en-US', {minimumFractionDigits: 2})} (Límite era: $${presupuestoBaseHoy.toLocaleString('en-US', {minimumFractionDigits: 2})})</p>
+                    <p class="text-[10px] text-red-200 mt-1 font-mono font-bold uppercase">Nuevo límite mañana: $${presupuestoFuturo.toLocaleString('en-US', {minimumFractionDigits: 2})}</p>
+                `;
+            }
+
+            if (viewQuincenaPanel) {
+                let strListaPagos = pagosFijosList.length > 0 
+                    ? pagosFijosList.map(pf => `<div class="flex justify-between text-xs text-red-500 dark:text-red-400 mb-1.5 font-medium"><span>${pf.titulo} (Día ${pf.dia})</span><span class="font-mono">-$${pf.monto.toLocaleString('en-US', {minimumFractionDigits: 2})}</span></div>`).join('') 
+                    : `<p class="text-xs text-gray-500 bg-gray-50 dark:bg-zinc-800/50 p-2 rounded">No hay pagos fijos pendientes antes de tu próximo pago.</p>`;
+
+                viewQuincenaPanel.innerHTML = `
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center border-b border-gray-100 dark:border-gp-border pb-4">
+                            <span class="text-sm font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Liquidez (Débito + Efectivo)</span>
+                            <span class="font-mono font-bold text-gray-900 dark:text-white text-lg">$${liquidezActual.toLocaleString('en-US', {minimumFractionDigits: 2})}</span>
+                        </div>
+                        <div class="border-b border-gray-100 dark:border-gp-border pb-4">
+                            <span class="text-xs font-bold text-gray-500 dark:text-gp-muted uppercase tracking-wider block mb-3"><i class="ph-fill ph-lock-key"></i> Reservado para Pagos Fijos</span>
+                            ${strListaPagos}
+                            <div class="flex justify-between font-bold text-sm text-red-600 dark:text-red-500 mt-3 pt-3 border-t border-red-500/20">
+                                <span>Total a separar</span>
+                                <span class="font-mono">-$${pagosFijosPendientesTotal.toLocaleString('en-US', {minimumFractionDigits: 2})}</span>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center border-b border-gray-100 dark:border-gp-border pb-4">
+                            <span class="text-sm font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Dinero Libre (Base)</span>
+                            <span class="font-mono font-bold text-blue-600 dark:text-blue-500 text-lg">$${dineroLibreActual.toLocaleString('en-US', {minimumFractionDigits: 2})}</span>
+                        </div>
+                        <div class="bg-gray-50 dark:bg-zinc-800/30 rounded-2xl p-6 mt-6 border border-gray-100 dark:border-gp-border">
+                            <p class="text-xs text-gray-500 dark:text-gp-muted mb-2">Para mantener tus finanzas estables hasta el <strong>${nextPayday.toLocaleDateString('es-MX', {day: 'numeric', month: 'long'})}</strong> (${daysLeft} días):</p>
+                            <ul class="text-sm space-y-2 font-mono text-gray-900 dark:text-white">
+                                <li>• Tu base diaria de hoy era: <strong class="text-blue-500">$${presupuestoBaseHoy.toLocaleString('en-US', {minimumFractionDigits: 2})}</strong></li>
+                                <li>• Gastos regulares de hoy: <strong class="text-red-500">-$${gastosHoy.toLocaleString('en-US', {minimumFractionDigits: 2})}</strong></li>
+                                <li class="pt-2 border-t border-gray-200 dark:border-zinc-700 font-black text-lg">
+                                    ESTADO ACTUAL: <span class="${restanteHoy >= 0 ? 'text-green-500' : 'text-red-500'}">$${restanteHoy.toLocaleString('en-US', {minimumFractionDigits: 2})}</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        document.getElementById('quincena-config-form').addEventListener('submit', async (e) => {
+            e.preventDefault(); const btn = document.getElementById('submit-q-config-btn'); btn.disabled = true;
+            try { await setDoc(doc(db, `usuarios/${currentUser.uid}/configuraciones`, 'quincena'), { dia1: parseInt(document.getElementById('q-day1').value), dia2: document.getElementById('q-day2').value ? parseInt(document.getElementById('q-day2').value) : null }); mostrarNotificacion("Días actualizados"); } catch (error) { alert("Error"); } finally { btn.disabled = false; }
+        });
+
+        // --- ORGANIZADOR TDC ---
+        function actualizarVistaTDC() {
+            const grid = document.getElementById('tdc-cards-grid');
+            const selectConfig = document.getElementById('tdc-config-account');
+            
+            grid.innerHTML = ''; selectConfig.innerHTML = '<option value="" disabled selected>Selecciona tarjeta...</option>';
+
+            const tarjetasCredito = window.cuentasConSaldosGlobal.filter(c => c.tipo === 'Crédito');
+            if(tarjetasCredito.length === 0) { grid.innerHTML = '<p class="text-sm text-gray-500">No tienes cuentas de "Crédito".</p>'; return; }
+
+            const hoy = new Date(); const diaActual = hoy.getDate(); const mesActual = hoy.getMonth(); const anioActual = hoy.getFullYear();
+
+            tarjetasCredito.forEach(acc => {
+                selectConfig.insertAdjacentHTML('beforeend', `<option value="${acc.nombre}">${acc.nombre}</option>`);
+                const config = estadoApp.tdcConfig.find(c => c.cuenta === acc.nombre);
+                
+                if(!config) {
+                    grid.insertAdjacentHTML('beforeend', `<div class="bg-white dark:bg-gp-surface border border-gray-200 dark:border-gp-border rounded-2xl md:rounded-3xl p-6 flex flex-col justify-center items-center h-48 border-dashed"><i class="ph-bold ph-credit-card text-gray-400 text-3xl mb-2"></i><p class="font-bold text-gray-900 dark:text-white">${acc.nombre}</p><p class="text-xs text-gray-500 text-center mt-1">Requiere configuración de fechas.</p></div>`); return;
+                }
+
+                const limite = parseFloat(config.limite); const diaCorte = parseInt(config.dia_corte); const diaPago = parseInt(config.dia_pago);
+
+                let fechaUltimoCorte = new Date(anioActual, mesActual, diaCorte, 23, 59, 59);
+                if (diaActual < diaCorte) fechaUltimoCorte.setMonth(fechaUltimoCorte.getMonth() - 1);
+                let fechaLimitePago = new Date(fechaUltimoCorte); fechaLimitePago.setDate(diaPago);
+                if (fechaLimitePago <= fechaUltimoCorte) fechaLimitePago.setMonth(fechaLimitePago.getMonth() + 1);
+
+                let gastosTransito = 0;
+                estadoApp.transacciones.forEach(tx => {
+                    if (tx.cuenta === acc.nombre && tx.tipo === 'gasto') {
+                        const txDate = tx.fecha ? tx.fecha.toDate() : new Date();
+                        if (txDate > fechaUltimoCorte) gastosTransito += tx.monto;
+                    }
+                });
+
+                const deudaTotal = acc.saldo_actual < 0 ? Math.abs(acc.saldo_actual) : 0;
+                const pagoNoIntereses = Math.max(0, deudaTotal - gastosTransito);
+                const creditoDisponible = limite - deudaTotal;
+                const porcentajeUso = Math.min((deudaTotal / limite) * 100, 100);
+
+                const strCorte = fechaUltimoCorte.toLocaleDateString('es-MX', { day: '2-digit', month: 'short' });
+                const strPago = fechaLimitePago.toLocaleDateString('es-MX', { day: '2-digit', month: 'short' });
+                
+                const diffTime = fechaLimitePago - hoy; const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                let colorAlerta = 'text-gray-500 dark:text-gp-muted'; let msjAlerta = `Límite: ${strPago}`;
+                if (diffDays <= 5 && diffDays >= 0 && pagoNoIntereses > 0) { colorAlerta = 'text-orange-500 font-bold animate-pulse'; msjAlerta = `¡Paga en ${diffDays} días!`; } 
+                else if (diffDays < 0 && pagoNoIntereses > 0) { colorAlerta = 'text-red-500 font-bold'; msjAlerta = `Pago Vencido`; }
+
+                grid.insertAdjacentHTML('beforeend', `
+                    <div class="bg-white dark:bg-gp-surface border border-gray-200 dark:border-gp-border rounded-2xl md:rounded-3xl p-5 md:p-6 relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 p-4 opacity-5 dark:opacity-10"><i class="ph-fill ph-contactless-payment text-4xl"></i></div>
+                        <div class="flex justify-between items-start mb-4 md:mb-6">
+                            <div>
+                                <h3 class="font-bold text-lg md:text-xl text-gray-900 dark:text-white truncate pr-8">${acc.nombre}</h3>
+                                <p class="text-[10px] md:text-xs text-gray-500 font-mono mt-1">Corte: ${strCorte}</p>
+                            </div>
+                        </div>
+                        <div class="mb-4 md:mb-6 bg-gray-50 dark:bg-gp-bg rounded-xl p-3 md:p-4 border border-gray-100 dark:border-zinc-800">
+                            <p class="text-[10px] font-bold text-gray-500 dark:text-gp-muted uppercase tracking-wider mb-1">Para no generar intereses</p>
+                            <h2 class="text-2xl md:text-3xl font-mono font-black ${pagoNoIntereses > 0 ? 'text-red-500' : 'text-green-500'}">
+                                $${pagoNoIntereses.toLocaleString('en-US', {minimumFractionDigits: 2})}
+                            </h2>
+                            <p class="text-[10px] md:text-xs mt-1 md:mt-2 ${colorAlerta}"><i class="ph-fill ph-calendar-blank"></i> ${msjAlerta}</p>
+                        </div>
+                        <div class="flex justify-between text-[10px] md:text-xs mb-1">
+                            <span class="text-gray-500">Deuda: $${deudaTotal.toLocaleString()}</span>
+                            <span class="text-gray-500">Disp: $${creditoDisponible.toLocaleString()}</span>
+                        </div>
+                        <div class="w-full bg-gray-100 dark:bg-zinc-800 rounded-full h-1 md:h-1.5 mb-4">
+                            <div class="${porcentajeUso > 80 ? 'bg-red-500' : 'bg-blue-500'} h-full rounded-full transition-all duration-500" style="width: ${porcentajeUso}%"></div>
+                        </div>
+                        <div class="text-[9px] md:text-[10px] text-gray-400 font-mono border-t border-gray-100 dark:border-zinc-800 pt-3 flex justify-between items-center">
+                            <span>En tránsito: $${gastosTransito.toLocaleString()}</span>
+                            <button onclick="window.borrarConfigTDC('${config.id}')" class="hover:text-red-500 p-1">Reset Config</button>
+                        </div>
+                    </div>
+                `);
+            });
+        }
+
+        document.getElementById('tdc-config-form').addEventListener('submit', async (e) => {
+            e.preventDefault(); const btn = document.getElementById('submit-tdc-config-btn'); btn.disabled = true;
+            const cuentaSeleccionada = document.getElementById('tdc-config-account').value;
+            const dataConfig = { cuenta: cuentaSeleccionada, limite: parseFloat(document.getElementById('tdc-config-limit').value), dia_corte: parseInt(document.getElementById('tdc-config-cutoff').value), dia_pago: parseInt(document.getElementById('tdc-config-payment').value) };
+            try {
+                const existe = estadoApp.tdcConfig.find(c => c.cuenta === cuentaSeleccionada);
+                if (existe) await updateDoc(doc(db, `usuarios/${currentUser.uid}/tdc_config`, existe.id), dataConfig);
+                else await addDoc(collection(db, `usuarios/${currentUser.uid}/tdc_config`), dataConfig);
+                document.getElementById('tdc-config-form').reset(); mostrarNotificacion("Configuración guardada");
+            } catch (error) { alert("Error."); } finally { btn.disabled = false; }
+        });
+        window.borrarConfigTDC = async (id) => { if(confirm("¿Eliminar la configuración?")) await deleteDoc(doc(db, `usuarios/${currentUser.uid}/tdc_config`, id)); }
+
+
+        // --- PAGOS FIJOS (RENOVADO: VINCULACIÓN BIDIRECCIONAL Y UNDO) ---
+        function renderizarPagosFijos() {
+            const grid = document.getElementById('fixed-payments-grid'); grid.innerHTML = '';
+            if(estadoApp.pagosFijos.length === 0) { grid.innerHTML = '<p class="text-sm text-gray-500 col-span-2">No hay pagos fijos configurados.</p>'; return; }
+            
+            const hoy = new Date();
+            const currentYYYYMM = `${hoy.getFullYear()}-${String(hoy.getMonth()+1).padStart(2, '0')}`;
+
+            estadoApp.pagosFijos.forEach(pago => {
+                const isPaidThisMonth = pago.ultimo_pago === currentYYYYMM;
+                const isActivo = pago.activo !== false; 
+                
+                const checkDateLastDay = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0).getDate();
+                const effectivePfDia = Math.min(parseInt(pago.dia), checkDateLastDay);
+                const isOverdue = !isPaidThisMonth && isActivo && (hoy.getDate() > effectivePfDia);
+
+                let actionButtons = '';
+                let statusBadge = '';
+                let cardOpacity = '';
+                
+                if (!isActivo) {
+                    statusBadge = `<span class="bg-gray-200 dark:bg-zinc-700 text-gray-500 dark:text-gray-400 text-[10px] px-2 py-0.5 rounded-full font-bold">Pausado</span>`;
+                    cardOpacity = 'opacity-60 grayscale-[50%]';
+                    actionButtons = `<div class="mt-3 text-center py-1.5 bg-gray-100 dark:bg-zinc-800 text-gray-500 text-xs font-bold rounded-lg border border-gray-200 dark:border-zinc-700"><i class="ph-bold ph-pause"></i> Reactiva para pagar</div>`;
+                } else if(isPaidThisMonth) {
+                    statusBadge = `<span class="bg-green-100 dark:bg-green-500/20 text-green-600 dark:text-green-400 text-[10px] px-2 py-0.5 rounded-full font-bold">Al día</span>`;
+                    
+                    // BOTÓN DESHACER AÑADIDO AQUÍ
+                    actionButtons = `
+                    <div class="flex gap-2 mt-3 w-full items-stretch">
+                        <div class="flex-1 py-1.5 bg-green-500/10 text-green-600 dark:text-green-400 text-xs font-bold rounded-lg border border-green-500/20 flex items-center justify-center gap-1">
+                            <i class="ph-bold ph-check"></i> Resuelto
+                        </div>
+                        <button onclick="window.deshacerPagoFijo('${pago.id}')" class="px-3 bg-gray-100 dark:bg-zinc-800 text-gray-500 dark:text-gray-400 hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-500/10 dark:hover:text-red-400 text-xs font-bold rounded-lg transition-colors flex items-center justify-center" title="Deshacer (Marcar como pendiente)">
+                            <i class="ph-bold ph-arrow-u-up-left text-base"></i>
+                        </button>
+                    </div>`;
+                } else {
+                    if (isOverdue) {
+                        statusBadge = `<span class="bg-red-100 dark:bg-red-500/20 text-red-600 dark:text-red-400 text-[10px] px-2 py-0.5 rounded-full font-bold animate-pulse">¡Atrasado!</span>`;
+                    } else {
+                        statusBadge = `<span class="bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 text-[10px] px-2 py-0.5 rounded-full font-bold">Pendiente</span>`;
+                    }
+                    actionButtons = `
+                    <div class="flex gap-2 mt-3 w-full">
+                        <button onclick="window.prepararPagoFijo('${pago.id}')" class="flex-1 py-1.5 bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 text-xs font-bold rounded-lg transition-transform active:scale-95 shadow-sm">Pagar</button>
+                        <button onclick="window.omitirPagoFijo('${pago.id}')" class="flex-1 py-1.5 bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-gray-300 text-xs font-bold rounded-lg hover:bg-gray-200 dark:hover:bg-zinc-700 transition-colors">Omitir</button>
+                    </div>`;
+                }
+
+                grid.insertAdjacentHTML('beforeend', `
+                    <div class="bg-white dark:bg-gp-surface border ${isOverdue ? 'border-red-300 dark:border-red-500/50 shadow-red-500/10' : 'border-gray-200 dark:border-gp-border'} rounded-xl md:rounded-2xl p-4 flex flex-col justify-between group relative overflow-hidden transition-all ${cardOpacity}">
+                        <div class="absolute top-2 right-2 flex gap-1 md:opacity-0 md:group-hover:opacity-100 transition-opacity bg-white/80 dark:bg-gp-surface/80 backdrop-blur-sm rounded-lg p-0.5 z-10">
+                            <button onclick="window.editarPagoFijo('${pago.id}')" class="text-gray-400 hover:text-blue-500 p-1"><i class="ph-bold ph-pencil text-sm"></i></button>
+                            <button onclick="window.borrarPagoFijo('${pago.id}')" class="text-gray-400 hover:text-red-500 p-1"><i class="ph-bold ph-trash text-sm"></i></button>
+                        </div>
+                        
+                        <div class="flex items-start gap-3 md:gap-4 overflow-hidden mb-2">
+                            <div class="w-10 h-10 md:w-14 md:h-14 rounded-xl ${isOverdue ? 'bg-red-50 dark:bg-red-500/10 border-red-200 dark:border-red-500/20 text-red-600 dark:text-red-400' : 'bg-blue-50 dark:bg-blue-500/10 border-blue-100 dark:border-blue-500/20 text-blue-600 dark:text-blue-400'} border flex flex-col items-center justify-center flex-shrink-0 mt-1">
+                                <span class="text-[8px] md:text-[10px] font-bold uppercase tracking-wider mb-0.5">Día</span>
+                                <span class="text-base md:text-xl font-black font-mono leading-none">${pago.dia}</span>
+                            </div>
+                            <div class="min-w-0 flex-1">
+                                <div class="flex items-center gap-2 mb-0.5">
+                                    <p class="font-bold text-sm md:text-base text-gray-900 dark:text-white truncate">${pago.titulo}</p>
+                                    ${statusBadge}
+                                </div>
+                                <p class="text-xs md:text-sm font-mono font-bold text-red-500">-$${pago.monto.toLocaleString('en-US', {minimumFractionDigits: 2})}</p>
+                            </div>
+                        </div>
+                        ${actionButtons}
+                    </div>
+                `);
+            });
+            if(loadStatus.cuentas && loadStatus.transacciones && estadoApp.modulosConfig.quincena) calcularQuincena();
+        }
+
+        // --- LÓGICA DE INTERACCIONES DE PAGOS FIJOS ---
+        window.editarPagoFijo = (id) => {
+            const pf = estadoApp.pagosFijos.find(p => p.id === id);
+            if (!pf) return;
+            
+            document.getElementById('fixed-id-hidden').value = pf.id;
+            document.getElementById('fixed-title').value = pf.titulo;
+            document.getElementById('fixed-amount').value = pf.monto;
+            document.getElementById('fixed-day').value = pf.dia;
+            document.getElementById('fixed-active').checked = pf.activo !== false;
+            
+            document.getElementById('fixed-header-title').innerHTML = '<i class="ph-bold ph-pencil text-blue-500"></i> Editar Pago Fijo';
+            document.getElementById('submit-fixed-btn').textContent = "Actualizar Pago";
+            document.getElementById('cancel-fixed-edit-btn').classList.remove('hidden');
+        };
+
+        function cancelarEdicionFijo() {
+            document.getElementById('fixed-id-hidden').value = '';
+            document.getElementById('fixed-form').reset();
+            document.getElementById('fixed-header-title').innerHTML = '<i class="ph-bold ph-calendar-plus text-blue-500"></i> Nuevo Pago Fijo';
+            document.getElementById('submit-fixed-btn').textContent = "Guardar Pago";
+            document.getElementById('cancel-fixed-edit-btn').classList.add('hidden');
+        }
+        document.getElementById('cancel-fixed-edit-btn').addEventListener('click', cancelarEdicionFijo);
+
+        document.getElementById('fixed-form').addEventListener('submit', async (e) => {
+            e.preventDefault(); const btn = document.getElementById('submit-fixed-btn'); btn.disabled = true;
+            const idEdicion = document.getElementById('fixed-id-hidden').value;
+            
+            const data = { 
+                titulo: document.getElementById('fixed-title').value, 
+                monto: parseFloat(document.getElementById('fixed-amount').value), 
+                dia: parseInt(document.getElementById('fixed-day').value),
+                activo: document.getElementById('fixed-active').checked
+            };
+
+            try { 
+                if (idEdicion) {
+                    await updateDoc(doc(db, `usuarios/${currentUser.uid}/pagos_fijos`, idEdicion), data);
+                    mostrarNotificacion("Pago fijo actualizado");
+                    cancelarEdicionFijo();
+                } else {
+                    await addDoc(collection(db, `usuarios/${currentUser.uid}/pagos_fijos`), data); 
+                    document.getElementById('fixed-form').reset(); 
+                    mostrarNotificacion("Pago fijo guardado"); 
+                }
+            } catch (error) { 
+                alert("Error al guardar."); 
+            } finally { 
+                btn.disabled = false; 
+            }
+        });
+
+        window.prepararPagoFijo = (id) => {
+            const pf = estadoApp.pagosFijos.find(p => p.id === id);
+            if(!pf) return;
+            document.getElementById('tx_type_gasto').checked = true;
+            document.getElementById('tx_type_gasto').dispatchEvent(new Event('change'));
+            document.getElementById('tx-amount').value = pf.monto;
+            document.getElementById('tx-desc').value = `Pago Fijo: ${pf.titulo}`;
+            document.getElementById('tx-ignore-daily').checked = true;
+            document.getElementById('tx-fixed-id').value = pf.id; // Vinculación secreta
+            
+            mostrarNotificacion("Revisa el monto y selecciona la cuenta de origen para pagar.");
+            document.querySelector('[data-target="view-payments"]').click();
+        };
+
+        window.omitirPagoFijo = async (id) => {
+            if(confirm("¿Omitir este pago por este mes? (Se quitará de tu dinero retenido pero no se registrará como gasto).")) {
+                const hoy = new Date();
+                const currentYYYYMM = `${hoy.getFullYear()}-${String(hoy.getMonth()+1).padStart(2, '0')}`;
+                try {
+                    await updateDoc(doc(db, `usuarios/${currentUser.uid}/pagos_fijos`, id), { ultimo_pago: currentYYYYMM });
+                    mostrarNotificacion("Pago omitido este mes");
+                } catch (error) { alert("Error al omitir."); }
+            }
+        };
+
+        // NUEVO: DESHACER PAGO (Manual desde UI)
+        window.deshacerPagoFijo = async (id) => {
+            if(confirm("¿Marcar este pago como PENDIENTE de nuevo?\n\nNota: Si habías registrado una transacción real para este pago, tendrás que ir al Historial a borrarla manualmente para que el dinero regrese a tu cuenta.")) {
+                try {
+                    await updateDoc(doc(db, `usuarios/${currentUser.uid}/pagos_fijos`, id), { ultimo_pago: "" });
+                    mostrarNotificacion("Pago marcado como pendiente");
+                } catch (error) {
+                    alert("Error al deshacer.");
+                }
+            }
+        };
+
+
+        // --- CATEGORÍAS ---
+        function renderizarCategorias() {
+            const list = document.getElementById('categories-list'); const select = document.getElementById('tx-category');
+            list.innerHTML = ''; select.innerHTML = '<option value="General" selected>General</option>';
+            estadoApp.categorias.forEach(cat => {
+                list.insertAdjacentHTML('beforeend', `<div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gp-bg rounded-xl border border-gray-200 dark:border-gp-border group"><div class="flex items-center gap-3"><span class="w-2 md:w-3 h-2 md:h-3 rounded-full bg-blue-500"></span><span class="font-medium text-gray-900 dark:text-white text-xs md:text-sm">${cat.nombre}</span></div><button onclick="window.borrarCategoria('${cat.id}')" class="text-gray-400 hover:text-red-500 p-1 md:opacity-0 md:group-hover:opacity-100 transition-opacity"><i class="ph-bold ph-trash"></i></button></div>`);
+                select.insertAdjacentHTML('beforeend', `<option value="${cat.nombre}">${cat.nombre}</option>`);
+            });
+        }
+        document.getElementById('category-form').addEventListener('submit', async (e) => {
+            e.preventDefault(); const btn = document.getElementById('submit-cat-btn'); const nameInput = document.getElementById('cat-name'); btn.disabled = true;
+            try { await addDoc(collection(db, `usuarios/${currentUser.uid}/categorias`), { nombre: nameInput.value }); nameInput.value = ''; mostrarNotificacion("Etiqueta añadida"); } catch (error) { alert("Error."); } finally { btn.disabled = false; }
+        });
+        window.borrarCategoria = async (id) => { if(confirm("¿Eliminar esta etiqueta?")) await deleteDoc(doc(db, `usuarios/${currentUser.uid}/categorias`, id)); };
+
+        // --- TRANSACCIONES ---
+        const txForm = document.getElementById('transaction-form');
+        txForm.addEventListener('submit', async (e) => {
+            e.preventDefault(); const btn = document.getElementById('submit-tx-btn'); btn.disabled = true;
+            const idEdicion = document.getElementById('tx-id-hidden').value; 
+            const dateInput = document.getElementById('tx-date').value;
+            const ignoreDaily = document.getElementById('tx-ignore-daily').checked;
+            const linkedFixedId = document.getElementById('tx-fixed-id').value;
+            const tipoTx = document.querySelector('input[name="tx_type"]:checked').value;
+            
+            const data = { 
+                monto: parseFloat(document.getElementById('tx-amount').value), 
+                descripcion: document.getElementById('tx-desc').value, 
+                cuenta: document.getElementById('tx-account').value, 
+                categoria: tipoTx === 'transferencia' ? 'Transferencia' : document.getElementById('tx-category').value, 
+                tipo: tipoTx,
+                ignoreDaily: ignoreDaily,
+                linked_fixed_payment_id: linkedFixedId || null // Vínculo Fuerte al crear
+            };
+
+            if (tipoTx === 'transferencia') {
+                data.cuenta_destino = document.getElementById('tx-account-dest').value;
+            }
+
+            if (dateInput) data.fecha = new Date(dateInput); else if (!idEdicion) data.fecha = serverTimestamp();
+            try {
+                if (idEdicion) { 
+                    await updateDoc(doc(db, `usuarios/${currentUser.uid}/transacciones`, idEdicion), data); 
+                    mostrarNotificacion("Actualizado"); 
+                    cancelarEdicion(); 
+                } else { 
+                    await addDoc(collection(db, `usuarios/${currentUser.uid}/transacciones`), data); 
+                    
+                    if (linkedFixedId) {
+                        const hoy = new Date();
+                        const currentYYYYMM = `${hoy.getFullYear()}-${String(hoy.getMonth()+1).padStart(2, '0')}`;
+                        await updateDoc(doc(db, `usuarios/${currentUser.uid}/pagos_fijos`, linkedFixedId), { ultimo_pago: currentYYYYMM });
+                        document.getElementById('tx-fixed-id').value = ''; 
+                    }
+                    mostrarNotificacion("Registrado"); 
+                }
+                txForm.reset(); document.querySelector('[data-target="view-dashboard"]').click();
+            } catch (error) { alert("Error."); } finally { btn.disabled = false; }
+        });
+
+        // Crear Cuenta
+        document.getElementById('account-form').addEventListener('submit', async (e) => {
+            e.preventDefault(); const btn = document.getElementById('submit-acc-btn'); btn.disabled = true;
+            try { await addDoc(collection(db, `usuarios/${currentUser.uid}/cuentas`), { nombre: document.getElementById('acc-name').value, tipo: document.getElementById('acc-type').value, saldo_inicial: parseFloat(document.getElementById('acc-balance').value), fecha_creacion: serverTimestamp() }); document.getElementById('account-form').reset(); mostrarNotificacion("Bóveda creada"); } catch (error) { alert("Error."); } finally { btn.disabled = false; }
+        });
+
+        // --- MIGRACIÓN JSON ---
+        document.getElementById('import-json-btn').addEventListener('click', () => { document.getElementById('import-json-input').click(); });
+        document.getElementById('import-json-input').addEventListener('change', async (e) => {
+            const file = e.target.files[0]; if (!file) return;
+            const btn = document.getElementById('import-json-btn'); const originalText = btn.innerHTML;
+            btn.innerHTML = `<i class="ph-bold ph-spinner animate-spin text-lg"></i>`; btn.disabled = true;
+            const reader = new FileReader();
+            reader.onload = async (event) => {
+                try {
+                    const data = JSON.parse(event.target.result);
+                    let cuentaMigrada = estadoApp.cuentas.find(c => c.nombre === "Bóveda Anterior");
+                    if (!cuentaMigrada && data.transactions && data.transactions.length > 0) await addDoc(collection(db, `usuarios/${currentUser.uid}/cuentas`), { nombre: "Bóveda Anterior", tipo: "Efectivo", saldo_inicial: 0, fecha_creacion: serverTimestamp() });
+                    if (data.transactions && Array.isArray(data.transactions)) {
+                        const cats = [...new Set(data.transactions.map(t => t.category).filter(Boolean))];
+                        for (const cat of cats) { if (!estadoApp.categorias.find(c => c.nombre.toLowerCase() === cat.toLowerCase())) await addDoc(collection(db, `usuarios/${currentUser.uid}/categorias`), { nombre: cat }); }
+                        for (let i = 0; i < data.transactions.length; i += 400) {
+                            const batch = writeBatch(db);
+                            data.transactions.slice(i, i + 400).forEach(tx => {
+                                batch.set(doc(collection(db, `usuarios/${currentUser.uid}/transacciones`)), { 
+                                    monto: Number(tx.amount)||0, descripcion: tx.title||"Migración", cuenta: "Bóveda Anterior", 
+                                    categoria: tx.category||"General", tipo: tx.type==='income'?'ingreso':'gasto', 
+                                    fecha: tx.createdAt ? new Date(tx.createdAt) : new Date((tx.date||'')+"T12:00:00"),
+                                    ignoreDaily: tx.ignoreDaily || tx.ignoreBudget || false
+                                });
+                            });
+                            await batch.commit();
+                        }
+                    }
+                    if (data.fixed && Array.isArray(data.fixed)) {
+                        const batchFijos = writeBatch(db);
+                        data.fixed.forEach(fijo => batchFijos.set(doc(collection(db, `usuarios/${currentUser.uid}/pagos_fijos`)), { titulo: fijo.title||"Fijo", monto: Number(fijo.amount)||0, dia: Number(fijo.day)||1 }));
+                        await batchFijos.commit();
+                    }
+                    mostrarNotificacion(`Importado.`); e.target.value = '';
+                } catch (error) { alert("Error: " + error.message); } finally { btn.innerHTML = originalText; btn.disabled = false; }
+            }; reader.readAsText(file);
+        });
+
+        // --- EXPORTAR CSV ---
+        document.getElementById('export-csv-btn').addEventListener('click', () => {
+            if(estadoApp.transacciones.length === 0) return alert("Sin datos.");
+            let csv = "Fecha,Descripcion,Cuenta,Categoria,Tipo,Monto,IgnoradoPresupuesto\n";
+            estadoApp.transacciones.forEach(tx => csv += `${tx.fecha ? tx.fecha.toDate().toISOString() : new Date().toISOString()},"${tx.descripcion}","${tx.cuenta}","${tx.categoria}",${tx.tipo},${tx.monto},${tx.ignoreDaily||false}\n`);
+            const link = document.createElement("a"); link.setAttribute("href", URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' })));
+            link.setAttribute("download", `godsplan_${Date.now()}.csv`); document.body.appendChild(link); link.click(); document.body.removeChild(link);
+        });
+
+        // --- CRUD WINDOW (CON INTERCEPTOR DE BORRADO) ---
+        
+        window.borrarTx = async (id) => { 
+            if(confirm("¿Eliminar este registro?")) { 
+                const docRef = doc(db, `usuarios/${currentUser.uid}/transacciones`, id);
+                
+                // MAGIA: Antes de borrar, verificamos si era de un pago fijo
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    const txData = docSnap.data();
+                    if (txData.linked_fixed_payment_id) {
+                        // Deshacemos el estado del pago fijo automáticamente
+                        await updateDoc(doc(db, `usuarios/${currentUser.uid}/pagos_fijos`, txData.linked_fixed_payment_id), { ultimo_pago: "" });
+                    }
+                }
+
+                await deleteDoc(docRef); 
+                mostrarNotificacion("Eliminado"); 
+            } 
+        };
+
+        window.borrarCuenta = async (id) => { if(confirm("¿Eliminar bóveda?")) { await deleteDoc(doc(db, `usuarios/${currentUser.uid}/cuentas`, id)); mostrarNotificacion("Eliminada"); } };
+        window.borrarPagoFijo = async (id) => { if(confirm("¿Eliminar pago fijo por completo?")) { await deleteDoc(doc(db, `usuarios/${currentUser.uid}/pagos_fijos`, id)); mostrarNotificacion("Eliminado"); } };
+        window.ajustarCuenta = async (id, saldoActual, nombre) => {
+            const saldoReal = parseFloat(prompt(`Saldo actual: $${saldoActual.toFixed(2)}\nDinero REAL:`));
+            if (isNaN(saldoReal)) return; const dif = saldoReal - saldoActual; if (dif === 0) return;
+            await addDoc(collection(db, `usuarios/${currentUser.uid}/transacciones`), { monto: dif, descripcion: 'Cuadre de caja', cuenta: nombre, categoria: 'Sistema', tipo: 'ajuste', fecha: serverTimestamp(), ignoreDaily: true });
+        };
+        window.editarTx = async (id) => {
+            const docSnap = await getDoc(doc(db, `usuarios/${currentUser.uid}/transacciones`, id));
+            if (docSnap.exists()) {
+                const tx = docSnap.data(); document.getElementById('tx-id-hidden').value = id; document.getElementById('tx-amount').value = tx.monto; document.getElementById('tx-desc').value = tx.descripcion; document.getElementById('tx-account').value = tx.cuenta; document.getElementById('tx-category').value = tx.categoria;
+                document.querySelector(`input[name="tx_type"][value="${tx.tipo}"]`).checked = true;
+                document.querySelector('input[name="tx_type"]:checked').dispatchEvent(new Event('change')); 
+                
+                if (tx.tipo === 'transferencia') document.getElementById('tx-account-dest').value = tx.cuenta_destino;
+                
+                document.getElementById('tx-ignore-daily').checked = tx.ignoreDaily || false;
+                
+                // Mantenemos la vinculación secreta si la editamos
+                document.getElementById('tx-fixed-id').value = tx.linked_fixed_payment_id || ''; 
+
+                if(tx.fecha) { const d = tx.fecha.toDate(); document.getElementById('tx-date').value = (new Date(d - d.getTimezoneOffset() * 60000)).toISOString().slice(0, 16); }
+                document.getElementById('tx-header-title').textContent = "Editar Operación"; document.getElementById('submit-tx-btn').textContent = "Actualizar"; document.getElementById('cancel-edit-btn').classList.remove('hidden'); document.querySelector('[data-target="view-payments"]').click();
+            }
+        };
+        function cancelarEdicion() { document.getElementById('tx-id-hidden').value = ''; document.getElementById('tx-fixed-id').value = ''; document.getElementById('transaction-form').reset(); document.getElementById('tx-header-title').textContent = "Registrar Operación"; document.getElementById('submit-tx-btn').textContent = "Guardar Operación"; document.getElementById('cancel-edit-btn').classList.add('hidden'); document.getElementById('tx_type_gasto').dispatchEvent(new Event('change'));}
+        document.getElementById('cancel-edit-btn').addEventListener('click', (e) => { e.preventDefault(); cancelarEdicion(); });
+
+        // --- UI & MOBILE SIDEBAR ---
+        document.getElementById('themeToggleBtn').addEventListener('click', () => { document.documentElement.classList.toggle('dark'); });
+        document.getElementById('logout-btn').addEventListener('click', () => { signOut(auth); });
+        function mostrarNotificacion(m) { const t = document.getElementById('toast-alert'); document.getElementById('toast-message').textContent = m; t.classList.remove('translate-x-[150%]', 'opacity-0'); setTimeout(() => t.classList.add('translate-x-[150%]', 'opacity-0'), 3000); }
+
+        const sidebar = document.getElementById('sidebar');
+        const sidebarBackdrop = document.getElementById('sidebar-backdrop');
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const closeSidebarBtn = document.getElementById('close-sidebar-btn');
+
+        function toggleMobileSidebar() {
+            sidebar.classList.toggle('-translate-x-full');
+            sidebarBackdrop.classList.toggle('hidden');
+        }
+
+        mobileMenuBtn.addEventListener('click', toggleMobileSidebar);
+        closeSidebarBtn.addEventListener('click', toggleMobileSidebar);
+        sidebarBackdrop.addEventListener('click', toggleMobileSidebar);
+
+        const navLinks = document.querySelectorAll('.nav-link');
+        const viewSections = document.querySelectorAll('.view-section');
+        navLinks.forEach(link => {
+            if(link.hasAttribute('data-target')) {
+                link.addEventListener('click', () => {
+                    if (window.innerWidth < 768 && !sidebar.classList.contains('-translate-x-full')) {
+                        toggleMobileSidebar();
+                    }
+                    const targetId = link.getAttribute('data-target');
+                    viewSections.forEach(s => s.classList.add('hidden'));
+                    document.getElementById(targetId).classList.remove('hidden');
+                    
+                    // Restablecer estilos en todos
+                    navLinks.forEach(nav => { 
+                        nav.classList.remove('bg-gray-100', 'dark:bg-zinc-800', 'text-blue-600', 'dark:text-white'); 
+                        nav.classList.add('text-gray-500', 'dark:text-gp-muted'); 
+                    });
+                    
+                    // Aplicar estilo activo
+                    link.classList.remove('text-gray-500', 'dark:text-gp-muted'); 
+                    link.classList.add('bg-gray-100', 'dark:bg-zinc-800', 'text-blue-600', 'dark:text-white');
+                });
+            }
+        });
+
+    </script>
+</body>
+</html>

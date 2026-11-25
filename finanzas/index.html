@@ -1,0 +1,1535 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>God's Plan | Finanzas</title>
+    
+    <!-- FUENTE UNIFICADA: PLUS JAKARTA SANS -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- ICONOS -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <!-- TAILWIND CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class', 
+            theme: {
+                extend: {
+                    colors: {
+                        bg: 'var(--bg)',
+                        card: 'var(--card)',
+                        text: 'var(--text)',
+                        muted: 'var(--muted)',
+                        border: 'var(--border)',
+                        brand: '#dc2626',   // Rojo
+                        money: '#16a34a',   // Verde
+                        horizon: '#3b82f6'  // Azul
+                    },
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+                        'glow': '0 0 20px rgba(220, 38, 38, 0.3)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* TEMA CLARO (Default) */
+        :root {
+            --bg: #f4f4f5;        /* zinc-100 */
+            --card: #ffffff;      /* white */
+            --text: #18181b;      /* zinc-900 */
+            --muted: #71717a;     /* zinc-500 */
+            --border: #e4e4e7;    /* zinc-200 */
+        }
+
+        /* TEMA OSCURO */
+        .dark {
+            --bg: #000000;        /* black */
+            --card: #09090b;      /* zinc-950 */
+            --text: #fafafa;      /* zinc-50 */
+            --muted: #a1a1aa;     /* zinc-400 */
+            --border: #27272a;    /* zinc-800 */
+        }
+
+        body { 
+            background-color: var(--bg); 
+            color: var(--text); 
+            -webkit-tap-highlight-color: transparent;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Componentes UI */
+        .input-gp {
+            width: 100%;
+            background-color: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            outline: none;
+        }
+        .input-gp:focus {
+            border-color: var(--brand);
+            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+        }
+        .input-gp::placeholder { color: var(--muted); font-weight: 500; }
+        input[type="date"], input[type="datetime-local"] { color-scheme: light dark; }
+
+        .btn-brand {
+            background-color: var(--brand);
+            color: white;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            transition: all 0.2s;
+        }
+        .btn-brand:hover { transform: translateY(-2px); box-shadow: var(--glow); }
+        .btn-brand:active { transform: translateY(0); }
+
+        .glass-nav {
+            background-color: rgba(var(--card-rgb), 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        /* Modales */
+        .modal-overlay {
+            display: none;
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            align-items: center; justify-content: center;
+            padding: 20px;
+            opacity: 0; transition: opacity 0.2s ease;
+        }
+        .modal-overlay.is-open {
+            display: flex; opacity: 1;
+        }
+        .modal-content {
+            background-color: var(--card);
+            border: 1px solid var(--border);
+            width: 100%; max-width: 420px;
+            border-radius: 24px;
+            padding: 24px;
+            max-height: 90vh; overflow-y: auto;
+            transform: scale(0.95); transition: transform 0.2s ease;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+        .modal-overlay.is-open .modal-content { transform: scale(1); }
+
+        /* Chips y Burbujas */
+        .chip {
+            border: 1px solid var(--border);
+            background-color: var(--bg);
+            color: var(--muted);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.75rem; font-weight: 700;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .chip.active {
+            background-color: var(--text);
+            color: var(--bg);
+            border-color: var(--text);
+        }
+
+        .filter-pill {
+            padding: 8px 16px; border-radius: 12px; font-weight: 800; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; cursor: pointer; transition: all 0.2s; border: 1px solid var(--border); background-color: var(--card); color: var(--muted);
+        }
+        .filter-pill.active {
+            background-color: var(--text); color: var(--bg); border-color: var(--text);
+        }
+
+        .debt-bubble {
+            width: 26px; height: 26px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 10px; font-weight: 800; cursor: pointer;
+            border: 1px solid var(--border);
+            background-color: var(--bg); color: var(--muted);
+            transition: all 0.2s;
+        }
+        .debt-bubble.paid {
+            background-color: var(--money); border-color: var(--money); color: white;
+        }
+
+        /* Utilidades SVG para mantener consistencia de colores rgb */
+        .dark { --card-rgb: 9, 9, 11; }
+        :root { --card-rgb: 255, 255, 255; }
+    </style>
+    <link rel="icon" type="image/svg+xml" data-gp href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2064%2064'%3E%3Crect%20width='64'%20height='64'%20rx='14'%20fill='%230a0a0a'/%3E%3Cpath%20d='M28%2010h8v16h16v8H36v22h-8V34H12v-8h16z'%20fill='%238a0303'/%3E%3C/svg%3E">
+</head>
+<body class="font-sans flex flex-col h-[100dvh] overflow-hidden">
+
+    <!-- PANTALLA DE CARGA -->
+    <div id="loading-screen" class="fixed inset-0 bg-bg z-[2000] flex items-center justify-center transition-opacity duration-300">
+        <div class="text-center">
+            <i class="ph-bold ph-spinner animate-spin text-4xl text-brand mb-4"></i>
+            <p class="text-muted font-bold text-xs tracking-widest uppercase">Inicializando...</p>
+        </div>
+    </div>
+
+    <!-- PANTALLA DE LOGIN -->
+    <div id="login-view" class="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-bg hidden">
+        <div class="w-full max-w-sm">
+            <div class="text-center mb-10">
+                <div class="w-16 h-16 bg-card border border-border rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-soft">
+                    <i class="ph-fill ph-wallet text-3xl text-brand"></i>
+                </div>
+                <h1 class="text-4xl font-black tracking-tight text-text mb-2">God's Plan</h1>
+                <p class="text-muted text-xs font-bold tracking-widest uppercase">Finanzas Personales</p>
+            </div>
+            
+            <div class="bg-card border border-border rounded-3xl p-8 shadow-soft">
+                <div class="flex bg-bg rounded-xl p-1 mb-6 border border-border">
+                    <button onclick="App.auth.toggleMode('login')" id="tab-login" class="flex-1 py-2 text-xs font-bold rounded-lg bg-card text-text shadow-sm transition-all">INGRESAR</button>
+                    <button onclick="App.auth.toggleMode('register')" id="tab-register" class="flex-1 py-2 text-xs font-bold text-muted transition-all">REGISTRO</button>
+                </div>
+
+                <form onsubmit="App.auth.submit(event)" class="space-y-4">
+                    <div id="field-name" class="hidden relative">
+                        <i class="ph-bold ph-user absolute left-4 top-1/2 -translate-y-1/2 text-muted"></i>
+                        <input type="text" id="auth-name" class="input-gp pl-11" placeholder="Tu Nombre">
+                    </div>
+                    <div class="relative">
+                        <i class="ph-bold ph-envelope absolute left-4 top-1/2 -translate-y-1/2 text-muted"></i>
+                        <input type="email" id="auth-email" class="input-gp pl-11" placeholder="Correo Electrónico" required>
+                    </div>
+                    <div class="relative">
+                        <i class="ph-bold ph-lock-key absolute left-4 top-1/2 -translate-y-1/2 text-muted"></i>
+                        <input type="password" id="auth-pass" class="input-gp pl-11" placeholder="Contraseña" required>
+                    </div>
+
+                    <div id="auth-error" class="hidden p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-brand text-xs font-bold text-center"></div>
+
+                    <button type="submit" id="auth-btn" class="btn-brand w-full py-3.5 rounded-xl mt-4 flex items-center justify-center gap-2">
+                        <span id="auth-btn-text">INICIAR SESIÓN</span> <i class="ph-bold ph-arrow-right"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- HEADER PRINCIPAL -->
+    <header id="global-nav" class="bg-card/90 backdrop-blur-md border-b border-border fixed top-0 left-0 w-full z-50 flex items-center justify-between px-4 h-[64px] hidden">
+        <div class="flex items-center gap-3">
+            <div class="w-9 h-9 bg-bg rounded-full flex items-center justify-center text-brand border border-border">
+                <i class="ph-fill ph-wallet text-xl"></i>
+            </div>
+            <div>
+                <h1 class="text-text font-black text-sm tracking-wide leading-none">God's Plan</h1>
+                <p class="text-[10px] text-muted font-bold mt-1 uppercase tracking-wider" id="header-date">--/--/----</p>
+            </div>
+        </div>
+        
+        <div class="flex items-center gap-2">
+            <!-- Theme Toggle -->
+            <button onclick="App.ui.toggleTheme()" class="w-9 h-9 rounded-full bg-bg border border-border flex items-center justify-center text-text hover:bg-border transition-colors">
+                <i id="theme-icon" class="ph-bold ph-moon"></i>
+            </button>
+            <div class="w-9 h-9 rounded-full bg-bg border border-border flex items-center justify-center text-muted">
+                <i class="ph-bold ph-user"></i>
+            </div>
+        </div>
+    </header>
+
+    <!-- ÁREA DE CONTENIDO PRINCIPAL -->
+    <main id="main-container" class="flex-1 overflow-y-auto pt-[80px] pb-[100px] px-4 md:px-8 w-full max-w-[800px] mx-auto hide-scrollbar hidden scroll-smooth">
+        
+        <!-- VISTA: DASHBOARD -->
+        <section id="view-dashboard" class="space-y-6 animate-fade-in">
+            <!-- Tarjeta Balance Principal -->
+            <div class="bg-card border border-border rounded-3xl p-6 relative overflow-hidden shadow-soft">
+                <div class="flex justify-between items-start mb-6">
+                    <span class="text-xs font-black text-muted uppercase tracking-widest flex items-center gap-2">
+                        <i class="ph-bold ph-coins text-brand"></i> Balance Disponible
+                    </span>
+                    <button onclick="App.ui.modals.open('adjust')" class="text-xs font-bold text-muted bg-bg px-3 py-1.5 rounded-lg border border-border hover:text-text transition-colors">Ajustar</button>
+                </div>
+                
+                <div class="text-4xl md:text-5xl font-black text-text mb-8 tracking-tight" id="dash-balance">$0.00</div>
+                
+                <div class="grid grid-cols-2 gap-4 border-t border-border pt-5">
+                    <div>
+                        <span class="text-[10px] text-muted uppercase font-black mb-1 flex items-center gap-1"><i class="ph-bold ph-arrow-down-left text-money"></i> Ingresos del mes</span>
+                        <span class="text-lg font-bold text-money" id="dash-income">$0.00</span>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-[10px] text-muted uppercase font-black mb-1 flex items-center justify-end gap-1">Gastos del mes <i class="ph-bold ph-arrow-up-right text-brand"></i></span>
+                        <span class="text-lg font-bold text-brand" id="dash-expense">$0.00</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tarjeta Fórmula / Plan del Día -->
+            <div class="bg-card border border-border rounded-3xl p-6 shadow-soft">
+                <div class="flex justify-between items-start mb-4">
+                    <p class="text-xs font-black text-horizon uppercase tracking-widest flex items-center gap-2">
+                        <i class="ph-fill ph-calculator"></i> Límite Diario Sugerido
+                    </p>
+                    <span id="dash-payday-badge" class="text-[10px] bg-bg text-text px-2 py-1 rounded border border-border font-bold uppercase">-- Días</span>
+                </div>
+                
+                <div class="flex items-end justify-between mb-2">
+                    <span class="font-black text-3xl text-text tracking-tight" id="dash-daily-limit">$0.00</span>
+                    <div class="text-right">
+                        <p class="text-[10px] text-muted font-black uppercase">Gastos Fijos Restantes</p>
+                        <p id="dash-pending-fixed" class="text-xs font-bold text-muted">-$0.00</p>
+                    </div>
+                </div>
+                <p class="text-xs text-muted font-medium mb-4" id="dash-formula-expl">Calculando presupuesto...</p>
+
+                <div id="horizon-controls" class="hidden bg-blue-500/10 border border-blue-500/20 rounded-xl p-3 flex justify-between items-center mt-4">
+                    <div class="flex items-center gap-2">
+                        <i class="ph-fill ph-binoculars text-horizon"></i>
+                        <span class="text-[10px] font-bold text-horizon uppercase">Proyección Siguiente Quincena</span>
+                    </div>
+                    <button onclick="App.logic.toggleHorizon()" id="btn-horizon" class="bg-white/50 dark:bg-black/50 text-horizon border border-blue-500/30 px-3 py-1 rounded-lg text-[10px] font-black uppercase transition-colors">ACTIVAR</button>
+                </div>
+            </div>
+
+            <!-- Resumen Deudas / Préstamos -->
+            <div class="grid grid-cols-2 gap-4">
+                <div class="bg-bg border border-border rounded-2xl p-4 flex flex-col justify-center">
+                    <p class="text-[10px] text-muted uppercase font-black mb-1 flex items-center gap-1"><i class="ph-fill ph-trend-down text-brand"></i> Deudas a Plazos</p>
+                    <p class="text-xl font-black text-text" id="dash-debt-total">$0.00</p>
+                </div>
+                <div class="bg-bg border border-border rounded-2xl p-4 flex flex-col justify-center text-right">
+                    <p class="text-[10px] text-muted uppercase font-black mb-1 flex items-center justify-end gap-1">Préstamos <i class="ph-fill ph-handshake text-horizon"></i></p>
+                    <p class="text-xl font-black text-text" id="dash-loan-net">$0.00</p>
+                </div>
+            </div>
+
+            <!-- Actividad Reciente -->
+            <div>
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xs font-black text-muted uppercase tracking-widest">Actividad Reciente</h3>
+                    <button onclick="App.ui.switchTab('history')" class="text-xs font-bold text-brand flex items-center gap-1 hover:underline">Ver Todo <i class="ph-bold ph-arrow-right"></i></button>
+                </div>
+                <div id="recent-tx-list" class="space-y-3">
+                    <!-- Dinámico -->
+                </div>
+            </div>
+        </section>
+
+        <!-- VISTA: HISTORIAL (REDESIGN COMPLETO) -->
+        <section id="view-history" class="hidden animate-fade-in relative pb-6">
+            <h2 class="text-lg font-black text-text uppercase tracking-wide border-b border-border pb-3 mb-4">Explorador de Movimientos</h2>
+            
+            <!-- Resumen de Filtro Activo -->
+            <div class="bg-card border border-border rounded-3xl p-5 mb-5 shadow-soft">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xs font-bold text-muted uppercase tracking-widest">Resumen del Filtro</h3>
+                    <i class="ph-fill ph-chart-line-up text-brand text-xl"></i>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <p class="text-[10px] text-muted font-bold uppercase">Entradas</p>
+                        <p class="text-xl font-black text-money" id="hist-sum-in">$0.00</p>
+                    </div>
+                    <div>
+                        <p class="text-[10px] text-muted font-bold uppercase">Salidas</p>
+                        <p class="text-xl font-black text-brand" id="hist-sum-out">$0.00</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filtros -->
+            <div class="flex items-center gap-2 overflow-x-auto hide-scrollbar mb-6 pb-2">
+                <button onclick="App.ui.filterHistory('all')" class="filter-pill active shrink-0" data-filter="all">Todos</button>
+                <button onclick="App.ui.filterHistory('income')" class="filter-pill shrink-0" data-filter="income">Ingresos</button>
+                <button onclick="App.ui.filterHistory('expense')" class="filter-pill shrink-0" data-filter="expense">Gastos</button>
+            </div>
+
+            <!-- Lista de Movimientos -->
+            <div id="full-history-list" class="space-y-6">
+                <!-- Dinámico -->
+            </div>
+        </section>
+
+        <!-- VISTA: PAGOS Y DEUDAS -->
+        <section id="view-payments" class="hidden space-y-8 animate-fade-in pb-6">
+            
+            <!-- Deudas a Plazos -->
+            <div>
+                <div class="flex items-center justify-between border-b border-border pb-3 mb-4">
+                    <h2 class="text-sm font-black text-text uppercase tracking-wide flex items-center gap-2"><i class="ph-bold ph-chart-bar-horizontal text-horizon"></i> Deudas a Plazos</h2>
+                    <button onclick="App.ui.modals.open('debt')" class="bg-bg border border-border text-text px-3 py-1.5 rounded-lg font-bold text-xs flex items-center gap-1 hover:bg-border"><i class="ph-bold ph-plus"></i> Nuevo</button>
+                </div>
+                <div id="debts-list" class="grid grid-cols-1 gap-4"></div>
+            </div>
+
+            <!-- Pagos Fijos -->
+            <div>
+                <div class="flex items-center justify-between border-b border-border pb-3 mb-4">
+                    <h2 class="text-sm font-black text-text uppercase tracking-wide flex items-center gap-2"><i class="ph-bold ph-calendar-check text-brand"></i> Pagos Fijos (Mes)</h2>
+                    <button onclick="App.ui.modals.open('fixed')" class="bg-bg border border-border text-text px-3 py-1.5 rounded-lg font-bold text-xs flex items-center gap-1 hover:bg-border"><i class="ph-bold ph-plus"></i> Nuevo</button>
+                </div>
+                <div id="fixed-list" class="space-y-6"></div>
+            </div>
+
+            <!-- Préstamos Personales -->
+            <div>
+                <div class="flex items-center justify-between border-b border-border pb-3 mb-4">
+                    <h2 class="text-sm font-black text-text uppercase tracking-wide flex items-center gap-2"><i class="ph-bold ph-handshake text-money"></i> Préstamos</h2>
+                    <button onclick="App.ui.modals.open('loan')" class="bg-bg border border-border text-text px-3 py-1.5 rounded-lg font-bold text-xs flex items-center gap-1 hover:bg-border"><i class="ph-bold ph-plus"></i> Nuevo</button>
+                </div>
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div class="bg-card border border-border p-4 rounded-xl text-center shadow-sm">
+                        <p class="text-[10px] text-muted uppercase font-black mb-1">Me deben</p>
+                        <p class="text-lg font-black text-money" id="loans-owed">$0.00</p>
+                    </div>
+                    <div class="bg-card border border-border p-4 rounded-xl text-center shadow-sm">
+                        <p class="text-[10px] text-muted uppercase font-black mb-1">Debo</p>
+                        <p class="text-lg font-black text-brand" id="loans-owe">$0.00</p>
+                    </div>
+                </div>
+                <div id="loans-list" class="space-y-3"></div>
+            </div>
+        </section>
+
+        <!-- VISTA: AJUSTES -->
+        <section id="view-settings" class="hidden space-y-6 animate-fade-in pb-6">
+            <h2 class="text-lg font-black text-text uppercase tracking-wide border-b border-border pb-3">Configuración</h2>
+            
+            <!-- Perfil -->
+            <div class="bg-card border border-border p-5 rounded-3xl shadow-soft">
+                <div class="flex items-center gap-4 mb-5 pb-5 border-b border-border">
+                    <div class="w-12 h-12 bg-bg rounded-full flex items-center justify-center border border-border text-muted">
+                        <i class="ph-bold ph-user text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-black text-text" id="set-user-name">Usuario</h3>
+                        <p class="text-xs text-muted font-medium" id="set-user-email">email@correo.com</p>
+                    </div>
+                </div>
+                <button onclick="App.auth.logout()" class="w-full py-3 bg-red-500/10 text-brand border border-red-500/20 text-xs font-bold rounded-xl uppercase tracking-widest hover:bg-red-500/20">Cerrar Sesión</button>
+            </div>
+
+            <!-- Finanzas Config -->
+            <div class="bg-card border border-border p-5 rounded-3xl shadow-soft space-y-5">
+                <h3 class="font-bold text-text text-sm flex items-center gap-2 uppercase tracking-wide"><i class="ph-bold ph-sliders-horizontal text-brand"></i> Parámetros Financieros</h3>
+                
+                <div>
+                    <label class="text-[10px] text-muted font-black uppercase block mb-2">Frecuencia de Ingresos</label>
+                    <select id="set-freq" class="input-gp" onchange="App.ui.settings.toggleFreq()">
+                        <option value="biweekly">Quincenal (15 y 30/31)</option>
+                        <option value="biweekly-custom">Quincenal (Personalizada)</option>
+                        <option value="monthly">Mensual</option>
+                    </select>
+                </div>
+                
+                <!-- Opciones Mensuales -->
+                <div id="set-monthly-box" class="hidden">
+                    <label class="text-[10px] text-muted font-black uppercase block mb-2">Día de Pago (Mensual)</label>
+                    <select id="set-payday" class="input-gp"></select>
+                </div>
+
+                <!-- Opciones Quincenal Personalizada -->
+                <div id="set-custom-box" class="hidden grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-[10px] text-muted font-black uppercase block mb-2">Primer Pago</label>
+                        <select id="set-payday-1" class="input-gp"></select>
+                    </div>
+                    <div>
+                        <label class="text-[10px] text-muted font-black uppercase block mb-2">Segundo Pago</label>
+                        <select id="set-payday-2" class="input-gp"></select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="text-[10px] text-muted font-black uppercase block mb-2">Porcentaje Ahorro Forzoso</label>
+                    <select id="set-savings" class="input-gp">
+                        <option value="0">Desactivado (0%)</option>
+                        <option value="10">10%</option>
+                        <option value="15">15%</option>
+                        <option value="20">20%</option>
+                        <option value="25">25%</option>
+                        <option value="30">30%</option>
+                    </select>
+                    <p class="text-[10px] text-muted mt-1">Oculta visualmente este porcentaje de tu balance total.</p>
+                </div>
+
+                <div>
+                    <label class="text-[10px] text-muted font-black uppercase block mb-2">Ingreso Base (Modo Horizonte)</label>
+                    <div class="relative">
+                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-muted font-bold">$</span>
+                        <input type="number" id="set-base-income" class="input-gp pl-8" placeholder="Ej. 10000">
+                    </div>
+                </div>
+
+                <!-- SECCIÓN NUEVA: LÍMITE MANUAL -->
+                <div class="mt-4 pt-4 border-t border-border">
+                    <label class="flex items-center justify-between cursor-pointer mb-2">
+                        <span class="text-[10px] text-muted font-black uppercase flex items-center gap-1"><i class="ph-fill ph-push-pin text-brand"></i> Fijar Límite Diario Manual</span>
+                        <input type="checkbox" id="set-manual-limit-active" class="w-4 h-4 accent-brand" onchange="App.ui.settings.toggleManualLimit()">
+                    </label>
+                    <div id="set-manual-limit-box" class="hidden relative mt-2">
+                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-muted font-bold">$</span>
+                        <input type="number" id="set-manual-limit-amount" class="input-gp pl-8" placeholder="Ej. 500">
+                        <p class="text-[10px] text-muted mt-2 leading-tight">Al activar esto, la app dejará de calcular el límite diario basado en tu balance y días. <strong class="text-brand">Siempre se usará este monto fijo como base diaria.</strong></p>
+                    </div>
+                </div>
+
+                <button onclick="App.logic.saveSettings()" class="btn-brand w-full py-3 rounded-xl text-xs mt-4">Guardar Cambios</button>
+            </div>
+            
+            <!-- Datos -->
+            <div class="bg-card border border-border p-5 rounded-3xl shadow-soft">
+                <h3 class="font-bold text-text text-sm mb-4 uppercase tracking-wide">Gestión de Datos</h3>
+                <div class="grid grid-cols-2 gap-3 mb-6">
+                    <button onclick="App.db.exportData()" class="bg-bg border border-border py-3 rounded-xl text-xs font-bold text-text hover:bg-border transition-colors flex flex-col items-center justify-center gap-1"><i class="ph-bold ph-download-simple text-lg"></i> Exportar (JSON)</button>
+                    <button onclick="document.getElementById('import-file').click()" class="bg-bg border border-border py-3 rounded-xl text-xs font-bold text-text hover:bg-border transition-colors flex flex-col items-center justify-center gap-1"><i class="ph-bold ph-upload-simple text-lg"></i> Importar (JSON)</button>
+                    <input type="file" id="import-file" accept=".json" class="hidden" onchange="App.db.importData(this)">
+                </div>
+                <button onclick="App.db.dangerReset()" class="w-full py-3 border border-red-500 bg-red-500/10 text-brand text-xs font-bold rounded-xl uppercase tracking-widest hover:bg-brand hover:text-white transition-colors">Borrar todos los datos</button>
+            </div>
+        </section>
+    </main>
+
+    <!-- BARRA NAVEGACIÓN INFERIOR -->
+    <nav class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[92%] max-w-[400px] bg-card/90 backdrop-blur-xl border border-border rounded-2xl h-16 grid grid-cols-5 z-40 shadow-2xl items-center px-2">
+        <button onclick="App.ui.switchTab('dashboard')" class="nav-btn flex flex-col items-center text-text transition-colors gap-1" data-tab="dashboard">
+            <i class="ph-fill ph-squares-four text-2xl"></i>
+        </button>
+        <button onclick="App.ui.switchTab('history')" class="nav-btn flex flex-col items-center text-muted hover:text-text transition-colors gap-1" data-tab="history">
+             <i class="ph-fill ph-list-dashes text-2xl"></i>
+        </button>
+        
+        <!-- Botón Central ADD -->
+        <div class="relative flex justify-center items-center pointer-events-none -top-6">
+            <button onclick="App.ui.modals.openMobileMenu()" class="pointer-events-auto w-14 h-14 bg-brand rounded-full flex items-center justify-center text-white shadow-glow hover:scale-105 active:scale-95 transition-transform border-4 border-bg">
+                <i class="ph-bold ph-plus text-2xl"></i>
+            </button>
+        </div>
+
+        <button onclick="App.ui.switchTab('payments')" class="nav-btn flex flex-col items-center text-muted hover:text-text transition-colors gap-1" data-tab="payments">
+             <i class="ph-fill ph-receipt text-2xl"></i>
+        </button>
+        <button onclick="App.ui.switchTab('settings')" class="nav-btn flex flex-col items-center text-muted hover:text-text transition-colors gap-1" data-tab="settings">
+             <i class="ph-fill ph-gear text-2xl"></i>
+        </button>
+    </nav>
+
+    <!-- MENÚ ACCIONES MÓVIL CENTRAL -->
+    <div id="mobile-add-menu" class="fixed inset-0 z-[1500] bg-bg/80 backdrop-blur-sm hidden flex-col justify-end pb-28 px-6" onclick="App.ui.modals.closeMobileMenu()">
+        <div class="flex flex-col gap-3 transform translate-y-10 opacity-0 transition-all duration-300" id="mobile-add-content" onclick="event.stopPropagation()">
+            <button onclick="App.ui.modals.openTx('income')" class="w-full bg-card border border-money text-money p-4 rounded-2xl font-bold flex items-center justify-between shadow-soft hover:bg-money hover:text-white transition-colors">
+                <span class="tracking-widest uppercase text-sm">Registrar Ingreso</span>
+                <i class="ph-bold ph-arrow-down-left text-xl"></i>
+            </button>
+            <button onclick="App.ui.modals.openTx('expense')" class="w-full bg-card border border-brand text-brand p-4 rounded-2xl font-bold flex items-center justify-between shadow-soft hover:bg-brand hover:text-white transition-colors">
+                <span class="tracking-widest uppercase text-sm">Registrar Gasto</span>
+                <i class="ph-bold ph-minus text-xl"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- MODALES DE FORMULARIOS -->
+    
+    <!-- Modal: Transacción -->
+    <div id="modal-tx" class="modal-overlay">
+        <div class="modal-content">
+             <div class="flex justify-between items-center mb-6 border-b border-border pb-3">
+                <h3 class="font-black text-text text-lg uppercase tracking-wide" id="m-tx-title">Nuevo</h3>
+                <button onclick="App.ui.modals.close('tx')" class="text-muted hover:text-text"><i class="ph-bold ph-x text-xl"></i></button>
+             </div>
+             <form onsubmit="App.db.saveTx(event)" class="space-y-5">
+                <input type="hidden" id="m-tx-id">
+                <input type="hidden" id="m-tx-type">
+                <input type="hidden" id="m-tx-fixedId">
+                
+                <div class="text-center bg-bg p-4 rounded-2xl border border-border">
+                    <label class="text-[10px] uppercase font-bold text-muted block mb-1">Monto</label>
+                    <div class="relative inline-block w-full">
+                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-2xl font-bold text-muted">$</span>
+                        <input type="number" id="m-tx-amount" step="0.01" class="w-full bg-transparent text-4xl font-black text-text py-2 pl-10 pr-2 text-center focus:outline-none" placeholder="0.00" required>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="text-[10px] uppercase font-bold text-muted block mb-2 text-center">Categoría</label>
+                    <div class="flex flex-wrap gap-2 justify-center" id="m-tx-chips"></div>
+                    <input type="hidden" id="m-tx-category" required>
+                </div>
+                
+                <div class="space-y-3">
+                    <input type="text" id="m-tx-desc" class="input-gp" placeholder="Concepto / Descripción">
+                    <input type="datetime-local" id="m-tx-date" class="input-gp" required>
+                </div>
+                
+                <label class="flex items-center gap-3 p-3 bg-bg border border-border rounded-xl cursor-pointer">
+                    <input type="checkbox" id="m-tx-ignore" class="w-4 h-4 accent-brand">
+                    <span class="text-xs font-bold text-text">Ignorar del Presupuesto Diario</span>
+                </label>
+
+                <div class="flex gap-3 pt-2">
+                    <button type="button" id="m-tx-btn-del" onclick="App.db.deleteTx()" class="hidden py-3 px-4 border border-brand text-brand font-bold text-xs rounded-xl uppercase hover:bg-brand/10"><i class="ph-bold ph-trash"></i></button>
+                    <button type="submit" class="flex-1 btn-brand py-3 rounded-xl text-xs">Guardar</button>
+                </div>
+             </form>
+        </div>
+    </div>
+
+    <!-- Modal: Ajuste Balance -->
+    <div id="modal-adjust" class="modal-overlay">
+        <div class="modal-content text-center">
+            <div class="flex justify-between items-center mb-4 border-b border-border pb-3">
+                <h3 class="font-black text-text uppercase">Ajustar Saldo</h3>
+                <button onclick="App.ui.modals.close('adjust')" class="text-muted"><i class="ph-bold ph-x text-xl"></i></button>
+            </div>
+            <p class="text-[10px] uppercase font-bold text-muted mb-1">Saldo en Sistema</p>
+            <p class="text-3xl font-black text-text mb-6" id="m-adj-sys">$0.00</p>
+            
+            <form onsubmit="App.db.saveAdjust(event)">
+                <div class="mb-6">
+                    <label class="text-[10px] uppercase font-bold text-muted block mb-2">Saldo Real Físico/Banco</label>
+                    <input type="number" id="m-adj-real" step="0.01" class="input-gp text-2xl text-center" placeholder="0.00" required>
+                </div>
+                <button type="submit" class="btn-brand w-full py-3 rounded-xl text-xs">Aplicar Corrección</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Pago Fijo -->
+    <div id="modal-fixed" class="modal-overlay">
+        <div class="modal-content">
+             <div class="flex justify-between items-center mb-6 border-b border-border pb-3">
+                <h3 class="font-black text-text uppercase">Pago Fijo</h3>
+                <button onclick="App.ui.modals.close('fixed')" class="text-muted hover:text-text"><i class="ph-bold ph-x text-xl"></i></button>
+             </div>
+             <form onsubmit="App.db.saveFixed(event)" class="space-y-4">
+                <input type="text" id="m-fix-title" class="input-gp" placeholder="Servicio (Ej. Renta, Netflix)" required>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="text-[10px] text-muted font-bold uppercase mb-1 block">Monto</label>
+                        <input type="number" id="m-fix-amount" step="0.01" class="input-gp" placeholder="0.00" required>
+                    </div>
+                    <div>
+                        <label class="text-[10px] text-muted font-bold uppercase mb-1 block">Día del mes</label>
+                        <select id="m-fix-day" class="input-gp"></select>
+                    </div>
+                </div>
+                <label class="flex items-center gap-3 p-3 bg-bg border border-border rounded-xl cursor-pointer">
+                    <input type="checkbox" id="m-fix-ignore" class="w-4 h-4 accent-brand">
+                    <span class="text-xs font-bold text-text">No descontar del diario</span>
+                </label>
+                <button type="submit" class="btn-brand w-full py-3 rounded-xl text-xs mt-2">Guardar</button>
+             </form>
+        </div>
+    </div>
+
+    <!-- Modal: Deuda -->
+    <div id="modal-debt" class="modal-overlay">
+        <div class="modal-content">
+             <div class="flex justify-between items-center mb-6 border-b border-border pb-3">
+                <h3 class="font-black text-text uppercase">Deuda a Plazos</h3>
+                <button onclick="App.ui.modals.close('debt')" class="text-muted hover:text-text"><i class="ph-bold ph-x text-xl"></i></button>
+             </div>
+             <form onsubmit="App.db.saveDebt(event)" class="space-y-4">
+                <input type="hidden" id="m-debt-id">
+                <input type="text" id="m-debt-title" class="input-gp" placeholder="Concepto (Ej. Celular)" required>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="text-[10px] text-muted font-bold uppercase mb-1 block">Monto Total</label>
+                        <input type="number" id="m-debt-amount" step="0.01" class="input-gp" placeholder="0.00" required>
+                    </div>
+                    <div>
+                        <label class="text-[10px] text-muted font-bold uppercase mb-1 block">Plazos</label>
+                        <input type="number" id="m-debt-installments" class="input-gp" placeholder="12" required>
+                    </div>
+                </div>
+                <div class="flex gap-3 pt-2">
+                    <button type="button" id="m-debt-btn-del" onclick="App.db.deleteDebt()" class="hidden py-3 px-4 border border-brand text-brand font-bold text-xs rounded-xl uppercase hover:bg-brand/10"><i class="ph-bold ph-trash"></i></button>
+                    <button type="submit" class="flex-1 btn-brand py-3 rounded-xl text-xs">Guardar</button>
+                </div>
+             </form>
+        </div>
+    </div>
+
+    <!-- Modal: Préstamo -->
+    <div id="modal-loan" class="modal-overlay">
+        <div class="modal-content">
+             <div class="flex justify-between items-center mb-6 border-b border-border pb-3">
+                <h3 class="font-black text-text uppercase">Préstamo Personal</h3>
+                <button onclick="App.ui.modals.close('loan')" class="text-muted hover:text-text"><i class="ph-bold ph-x text-xl"></i></button>
+             </div>
+             <form onsubmit="App.db.saveLoan(event)" class="space-y-4">
+                <input type="hidden" id="m-loan-id">
+                
+                <div class="flex bg-bg rounded-xl p-1 border border-border">
+                    <button type="button" onclick="App.ui.modals.setLoanType('lent')" id="m-loan-btn-lent" class="flex-1 py-2 text-xs font-bold rounded-lg bg-card text-money shadow-sm transition-all">ME DEBEN</button>
+                    <button type="button" onclick="App.ui.modals.setLoanType('borrowed')" id="m-loan-btn-borr" class="flex-1 py-2 text-xs font-bold text-muted transition-all">DEBO</button>
+                </div>
+                <input type="hidden" id="m-loan-type" value="lent">
+                
+                <input type="text" id="m-loan-person" class="input-gp" placeholder="Nombre de la persona" required>
+                <input type="number" id="m-loan-amount" step="0.01" class="input-gp" placeholder="Monto $0.00" required>
+                
+                <div class="flex gap-3 pt-2">
+                    <button type="button" id="m-loan-btn-del" onclick="App.db.deleteLoan()" class="hidden py-3 px-4 border border-brand text-brand font-bold text-xs rounded-xl uppercase hover:bg-brand/10"><i class="ph-bold ph-trash"></i></button>
+                    <button type="submit" class="flex-1 btn-brand py-3 rounded-xl text-xs">Guardar</button>
+                </div>
+             </form>
+        </div>
+    </div>
+
+    <!-- Toast UI -->
+    <div id="toast" class="fixed top-6 left-1/2 -translate-x-1/2 bg-text text-bg px-6 py-3 rounded-full shadow-2xl z-[2000] font-bold text-xs flex items-center gap-2 transform -translate-y-20 opacity-0 transition-all duration-300">
+        <i class="ph-bold ph-check-circle text-lg text-bg"></i>
+        <span id="toast-msg">Hecho</span>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInWithCustomToken, signInAnonymously, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // APP NAMESPACE
+        window.App = {
+            db: null, auth: null, fbAuth: null,
+            state: { user: null, txs: [], fixed: [], debts: [], loans: [], settings: { frequency: 'biweekly', payday: null, payday1: null, payday2: null, savings: 0, baseIncome: 0, manualDailyLimitActive: false, manualDailyLimitAmount: 0 }, horizon: false, unsubs: [] },
+            constants: {
+                catExp: [{id:'Comida',i:'ph-hamburger'},{id:'Transporte',i:'ph-car'},{id:'Hogar',i:'ph-house'},{id:'Ocio',i:'ph-film-strip'},{id:'Salud',i:'ph-heartbeat'},{id:'Servicios',i:'ph-lightning'},{id:'Ropa',i:'ph-t-shirt'},{id:'Ajuste',i:'ph-scales'},{id:'Otro',i:'ph-dots-three-circle'}],
+                catInc: [{id:'Nómina',i:'ph-money'},{id:'Negocio',i:'ph-storefront'},{id:'Regalo',i:'ph-gift'},{id:'Ajuste',i:'ph-scales'},{id:'Otro',i:'ph-dots-three-circle'}],
+                appId: typeof __app_id !== 'undefined' ? __app_id : 'godsplan-v3'
+            }
+        };
+
+        // UTILIDADES
+        App.utils = {
+            fmtCur: (v) => new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(v || 0),
+            esc: (str) => {
+                if(!str) return '';
+                const div = document.createElement('div');
+                div.textContent = str;
+                return div.innerHTML;
+            },
+            toast: (msg) => {
+                const t = document.getElementById('toast');
+                document.getElementById('toast-msg').textContent = msg;
+                t.classList.remove('-translate-y-20', 'opacity-0');
+                setTimeout(() => t.classList.add('-translate-y-20', 'opacity-0'), 3000);
+            },
+            getCat: (id, type) => {
+                const list = type === 'income' ? App.constants.catInc : App.constants.catExp;
+                return list.find(c => c.id === id) || { i: 'ph-circle' };
+            }
+        };
+
+        // UI & RENDERING
+        App.ui = {
+            currentTab: 'dashboard',
+            historyFilter: 'all',
+            init: () => {
+                // Theme
+                const savedTheme = localStorage.getItem('theme') || 'dark';
+                if(savedTheme === 'light') document.documentElement.classList.remove('dark');
+                else document.documentElement.classList.add('dark');
+                App.ui.updateThemeIcon();
+
+                // Fecha Header
+                const d = new Date();
+                const str = d.toLocaleDateString('es-ES', { month: 'short', year: 'numeric' });
+                document.getElementById('header-date').textContent = str;
+
+                // Selects populate
+                ['m-fix-day', 'set-payday', 'set-payday-1', 'set-payday-2'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if(el) { el.innerHTML = ''; for(let i=1; i<=31; i++) el.innerHTML += `<option value="${i}">${i}</option>`; }
+                });
+            },
+            toggleTheme: () => {
+                document.documentElement.classList.toggle('dark');
+                const isDark = document.documentElement.classList.contains('dark');
+                localStorage.setItem('theme', isDark ? 'dark' : 'light');
+                App.ui.updateThemeIcon();
+            },
+            updateThemeIcon: () => {
+                const i = document.getElementById('theme-icon');
+                if(document.documentElement.classList.contains('dark')) { i.className = 'ph-bold ph-sun'; } else { i.className = 'ph-bold ph-moon'; }
+            },
+            switchTab: (tabId) => {
+                App.ui.currentTab = tabId;
+                document.querySelectorAll('section[id^="view-"]').forEach(el => el.classList.add('hidden'));
+                document.getElementById(`view-${tabId}`).classList.remove('hidden');
+                
+                document.querySelectorAll('.nav-btn').forEach(btn => {
+                    if(btn.dataset.tab === tabId) { btn.classList.add('text-text'); btn.classList.remove('text-muted'); } 
+                    else { btn.classList.add('text-muted'); btn.classList.remove('text-text'); }
+                });
+                App.ui.renderAll();
+            },
+            filterHistory: (f) => {
+                App.ui.historyFilter = f;
+                document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
+                document.querySelector(`.filter-pill[data-filter="${f}"]`).classList.add('active');
+                App.ui.renderHistory();
+            },
+            renderAll: () => {
+                if(App.ui.currentTab === 'dashboard') App.ui.renderDashboard();
+                if(App.ui.currentTab === 'history') App.ui.renderHistory();
+                if(App.ui.currentTab === 'payments') { App.ui.renderFixed(); App.ui.renderDebts(); App.ui.renderLoans(); }
+                if(App.ui.currentTab === 'settings') App.ui.settings.load();
+            },
+            renderDashboard: () => {
+                const s = App.state;
+                const now = new Date();
+                const m = now.getMonth(); const y = now.getFullYear();
+                
+                // Balances Cents
+                let incTC=0, expTC=0, incMC=0, expMC=0;
+                s.txs.forEach(t => {
+                    const c = Math.round(t.amount * 100);
+                    const isM = (new Date(t.date).getMonth() === m && new Date(t.date).getFullYear() === y);
+                    if(t.type==='income') { incTC+=c; if(isM) incMC+=c; }
+                    else { expTC+=c; if(isM) expMC+=c; }
+                });
+
+                const balReal = (incTC - expTC)/100;
+                const savingsPct = s.settings.savings || 0;
+                const balVisible = balReal * (1 - (savingsPct/100));
+
+                document.getElementById('dash-balance').textContent = App.utils.fmtCur(balVisible);
+                document.getElementById('dash-income').textContent = App.utils.fmtCur(incMC/100);
+                document.getElementById('dash-expense').textContent = App.utils.fmtCur(expMC/100);
+
+                // Deudas & Prestamos Netos
+                let debtTotal = 0;
+                s.debts.forEach(d => {
+                    const paid = d.payments.filter(Boolean).length;
+                    const instAmt = d.totalAmount / d.installments;
+                    debtTotal += (d.totalAmount - (paid * instAmt));
+                });
+                document.getElementById('dash-debt-total').textContent = App.utils.fmtCur(debtTotal);
+
+                let loanNet = 0;
+                s.loans.forEach(l => { if(l.type==='lent') loanNet+=l.amount; else loanNet-=l.amount; });
+                const lEl = document.getElementById('dash-loan-net');
+                lEl.textContent = App.utils.fmtCur(Math.abs(loanNet));
+                lEl.className = `text-xl font-black ${loanNet < 0 ? 'text-brand' : 'text-text'}`;
+                
+                // Actividad Reciente
+                const list = document.getElementById('recent-tx-list');
+                const recent = [...s.txs].filter(t => new Date(t.date).getMonth() === m && new Date(t.date).getFullYear()===y).sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,5);
+                if(recent.length===0) list.innerHTML = `<p class="text-xs text-muted italic text-center py-2">Sin actividad reciente</p>`;
+                else {
+                    list.innerHTML = recent.map(t => {
+                        const isInc = t.type==='income';
+                        const cat = App.utils.getCat(t.category, t.type);
+                        return `
+                        <div class="flex items-center justify-between bg-card border border-border p-3 rounded-2xl hover:bg-bg cursor-pointer transition-colors" onclick="App.ui.modals.editTx('${t.id}')">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl flex items-center justify-center ${isInc?'bg-money/10 text-money':'bg-bg border border-border text-muted'}"><i class="ph-fill ${cat.i} text-lg"></i></div>
+                                <div>
+                                    <p class="text-xs font-bold text-text uppercase tracking-wide truncate w-[150px]">${App.utils.esc(t.title)}</p>
+                                    <p class="text-[10px] text-muted font-bold">${t.category}</p>
+                                </div>
+                            </div>
+                            <span class="text-xs font-black ${isInc?'text-money':'text-text'}">${isInc?'+':'-'}${App.utils.fmtCur(t.amount)}</span>
+                        </div>`;
+                    }).join('');
+                }
+
+                App.logic.updateDailyFormula(balVisible);
+            },
+            renderHistory: () => {
+                const list = document.getElementById('full-history-list');
+                const sumInEl = document.getElementById('hist-sum-in');
+                const sumOutEl = document.getElementById('hist-sum-out');
+                
+                let txs = [...App.state.txs].sort((a,b) => new Date(b.date) - new Date(a.date));
+                if(App.ui.historyFilter !== 'all') txs = txs.filter(t => t.type === App.ui.historyFilter);
+
+                let totalIn = 0, totalOut = 0;
+                
+                if(txs.length === 0) {
+                    list.innerHTML = '<div class="text-center bg-card border border-border rounded-3xl p-8"><i class="ph-fill ph-ghost text-4xl text-muted mb-2"></i><p class="text-muted text-xs font-bold uppercase tracking-widest">Nada por aquí</p></div>';
+                    sumInEl.textContent = "$0.00"; sumOutEl.textContent = "$0.00";
+                    return;
+                }
+
+                // Agrupamiento estilo Banking App
+                let grouped = {};
+                txs.forEach(t => {
+                    if(!t.date) return;
+                    if(t.type === 'income') totalIn += t.amount; else totalOut += t.amount;
+                    const d = new Date(t.date); d.setHours(0,0,0,0);
+                    const dk = d.toISOString().split('T')[0];
+                    if(!grouped[dk]) grouped[dk] = [];
+                    grouped[dk].push(t);
+                });
+
+                sumInEl.textContent = App.utils.fmtCur(totalIn);
+                sumOutEl.textContent = App.utils.fmtCur(totalOut);
+
+                let html = '';
+                const today = new Date(); today.setHours(0,0,0,0);
+                const yesterday = new Date(today); yesterday.setDate(yesterday.getDate() - 1);
+
+                Object.keys(grouped).sort((a,b) => new Date(b) - new Date(a)).forEach(dateKey => {
+                    const dObj = new Date(dateKey + 'T12:00:00');
+                    let lbl = '';
+                    if(dObj.getTime() === today.getTime()) lbl = "Hoy";
+                    else if (dObj.getTime() === yesterday.getTime()) lbl = "Ayer";
+                    else lbl = dObj.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
+
+                    const rows = grouped[dateKey].map(t => {
+                        const isInc = t.type === 'income';
+                        const cat = App.utils.getCat(t.category, t.type);
+                        const timeStr = new Date(t.date).toLocaleTimeString('es-ES', {hour: '2-digit', minute:'2-digit'});
+                        
+                        return `
+                        <div class="flex justify-between items-center p-3 rounded-2xl bg-card border border-border hover:bg-bg cursor-pointer transition-all shadow-sm" onclick="App.ui.modals.editTx('${t.id}')">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl flex items-center justify-center ${isInc?'bg-money/10 text-money':'bg-bg border border-border text-muted'}"><i class="ph-fill ${cat.i} text-lg"></i></div>
+                                <div>
+                                    <h4 class="text-xs font-bold text-text uppercase tracking-wide truncate w-[140px]">${App.utils.esc(t.title)}</h4>
+                                    <p class="text-[10px] text-muted font-bold">${t.category} • ${timeStr}</p>
+                                </div>
+                            </div>
+                            <span class="font-black text-xs ${isInc?'text-money':'text-text'} bg-bg border border-border px-2 py-1 rounded-lg">
+                                ${isInc?'+':'-'}${App.utils.fmtCur(t.amount)}
+                            </span>
+                        </div>`;
+                    }).join('');
+
+                    html += `
+                    <div>
+                        <h3 class="text-[10px] font-black text-muted uppercase tracking-widest mb-3 pl-2 border-l-2 border-brand">${lbl}</h3>
+                        <div class="space-y-2">${rows}</div>
+                    </div>`;
+                });
+
+                list.innerHTML = html;
+            },
+            renderFixed: () => {
+                const list = document.getElementById('fixed-list');
+                const fixed = [...App.state.fixed].sort((a,b)=>parseInt(a.day)-parseInt(b.day));
+                if(fixed.length===0) { list.innerHTML = '<div class="text-center bg-card border border-border rounded-3xl p-8"><p class="text-muted text-xs font-bold uppercase tracking-widest">Sin pagos fijos configurados</p></div>'; return;}
+                
+                const html = fixed.map(f => {
+                    const isPaid = App.logic.isFixedPaidThisMonth(f.id);
+                    const isIgnored = f.ignoreDaily;
+                    const bgClass = isPaid ? "bg-money/10 border-money/30" : "bg-card border-border";
+                    const btnHtml = isPaid ? `<div class="w-8 h-8 rounded-lg flex items-center justify-center text-money"><i class="ph-bold ph-check-circle text-xl"></i></div>` : `<button onclick="App.db.payFixed('${f.id}')" class="w-8 h-8 rounded-lg bg-bg border border-border flex items-center justify-center text-muted hover:text-text hover:bg-border transition-colors"><i class="ph-bold ph-check"></i></button>`;
+
+                    return `
+                    <div class="${bgClass} border p-4 rounded-2xl flex justify-between items-center shadow-soft mb-3">
+                        <div class="flex-1 cursor-pointer" onclick="App.ui.modals.openFixed('${f.id}')">
+                            <p class="font-bold text-text text-xs uppercase">${App.utils.esc(f.title)} ${isIgnored?'<i class="ph-fill ph-eye-slash text-muted" title="No resta diario"></i>':''}</p>
+                            <p class="text-[10px] text-muted font-bold uppercase"><i class="ph-bold ph-calendar-blank"></i> Día ${f.day} • ${App.utils.fmtCur(f.amount)}</p>
+                        </div>
+                        <div class="flex gap-2">${btnHtml}</div>
+                    </div>`;
+                }).join('');
+                list.innerHTML = html;
+            },
+            renderDebts: () => {
+                const list = document.getElementById('debts-list');
+                if(App.state.debts.length===0) { list.innerHTML = '<div class="text-center bg-card border border-border rounded-3xl p-8"><p class="text-muted text-xs font-bold uppercase tracking-widest">Libre de Deudas</p></div>'; return; }
+                
+                list.innerHTML = App.state.debts.map(d => {
+                    const inst = d.installments;
+                    const instAmt = d.totalAmount / inst;
+                    const paidCount = d.payments.filter(Boolean).length;
+                    const remain = d.totalAmount - (paidCount * instAmt);
+                    const prog = (paidCount/inst)*100;
+                    
+                    let bubs = '';
+                    for(let i=0;i<inst;i++){
+                        const cls = d.payments[i] ? 'paid' : '';
+                        bubs += `<div onclick="event.stopPropagation(); App.db.toggleDebt('${d.id}',${i})" class="debt-bubble ${cls}">${i+1}</div>`;
+                    }
+
+                    return `
+                    <div class="bg-card border border-border p-4 rounded-2xl shadow-soft group">
+                        <div class="flex justify-between items-start mb-3 cursor-pointer" onclick="App.ui.modals.openDebt('${d.id}')">
+                            <div>
+                                <h3 class="font-bold text-text text-xs uppercase">${App.utils.esc(d.title)}</h3>
+                                <p class="text-[10px] text-muted font-bold">Pago: ${App.utils.fmtCur(instAmt)}/mes</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="font-black text-brand text-sm">${App.utils.fmtCur(remain)}</p>
+                            </div>
+                        </div>
+                        <div class="flex flex-wrap gap-1.5 mb-3">${bubs}</div>
+                        <div class="w-full bg-bg h-1.5 rounded-full overflow-hidden border border-border">
+                            <div class="bg-brand h-full" style="width: ${prog}%"></div>
+                        </div>
+                    </div>`;
+                }).join('');
+            },
+            renderLoans: () => {
+                const list = document.getElementById('loans-list');
+                if(App.state.loans.length===0) { list.innerHTML = '<div class="text-center bg-card border border-border rounded-3xl p-8"><p class="text-muted text-xs font-bold uppercase tracking-widest">Sin préstamos activos</p></div>'; return; }
+                
+                let oMe=0, iOw=0;
+                list.innerHTML = App.state.loans.map(l => {
+                    const isLent = l.type==='lent';
+                    if(isLent) oMe+=l.amount; else iOw+=l.amount;
+                    return `
+                    <div class="bg-card border border-border p-3 rounded-2xl flex justify-between items-center shadow-soft cursor-pointer hover:bg-bg" onclick="App.ui.modals.openLoan('${l.id}')">
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-lg flex items-center justify-center border border-border ${isLent?'bg-money/10 text-money':'bg-brand/10 text-brand'}"><i class="ph-bold ${isLent?'ph-arrow-up-right':'ph-arrow-down-left'} text-lg"></i></div>
+                            <div>
+                                <p class="font-bold text-text text-xs uppercase">${App.utils.esc(l.person)}</p>
+                            </div>
+                        </div>
+                        <p class="font-black ${isLent?'text-money':'text-brand'} text-xs">${App.utils.fmtCur(l.amount)}</p>
+                    </div>`;
+                }).join('');
+                document.getElementById('loans-owed').textContent = App.utils.fmtCur(oMe);
+                document.getElementById('loans-owe').textContent = App.utils.fmtCur(iOw);
+            },
+            settings: {
+                load: () => {
+                    const s = App.state.settings;
+                    document.getElementById('set-freq').value = s.frequency || 'biweekly';
+                    if(s.payday) document.getElementById('set-payday').value = s.payday;
+                    if(s.payday1) document.getElementById('set-payday-1').value = s.payday1;
+                    if(s.payday2) document.getElementById('set-payday-2').value = s.payday2;
+                    if(s.savings !== undefined) document.getElementById('set-savings').value = s.savings;
+                    if(s.baseIncome !== undefined) document.getElementById('set-base-income').value = s.baseIncome;
+                    
+                    document.getElementById('set-manual-limit-active').checked = s.manualDailyLimitActive || false;
+                    document.getElementById('set-manual-limit-amount').value = s.manualDailyLimitAmount || '';
+                    
+                    App.ui.settings.toggleFreq();
+                    App.ui.settings.toggleManualLimit();
+                },
+                toggleFreq: () => {
+                    const v = document.getElementById('set-freq').value;
+                    const bMonth = document.getElementById('set-monthly-box');
+                    const bCustom = document.getElementById('set-custom-box');
+                    
+                    bMonth.classList.add('hidden');
+                    bCustom.classList.add('hidden');
+                    
+                    if(v === 'monthly') bMonth.classList.remove('hidden');
+                    if(v === 'biweekly-custom') bCustom.classList.remove('hidden');
+                },
+                toggleManualLimit: () => {
+                    const isActive = document.getElementById('set-manual-limit-active').checked;
+                    const box = document.getElementById('set-manual-limit-box');
+                    if(isActive) box.classList.remove('hidden');
+                    else box.classList.add('hidden');
+                }
+            },
+            modals: {
+                open: (id) => { document.getElementById('modal-'+id).classList.add('is-open'); },
+                close: (id) => { document.getElementById('modal-'+id).classList.remove('is-open'); },
+                openMobileMenu: () => {
+                    const m = document.getElementById('mobile-add-menu');
+                    const c = document.getElementById('mobile-add-content');
+                    m.classList.remove('hidden'); m.classList.add('flex');
+                    setTimeout(() => { c.classList.remove('translate-y-10','opacity-0'); }, 10);
+                },
+                closeMobileMenu: () => {
+                    const m = document.getElementById('mobile-add-menu');
+                    const c = document.getElementById('mobile-add-content');
+                    c.classList.add('translate-y-10','opacity-0');
+                    setTimeout(() => { m.classList.add('hidden'); m.classList.remove('flex'); }, 300);
+                },
+                renderChips: (type) => {
+                    const container = document.getElementById('m-tx-chips');
+                    container.innerHTML = (type==='expense'?App.constants.catExp:App.constants.catInc).map(c=>`<div class="chip flex items-center gap-1" data-id="${c.id}" onclick="App.ui.modals.selectChip('${c.id}')"><i class="ph-fill ${c.i}"></i> ${c.id}</div>`).join('');
+                },
+                selectChip: (id) => {
+                    document.querySelectorAll('#m-tx-chips .chip').forEach(c=>c.classList.remove('active'));
+                    const el = document.querySelector(`#m-tx-chips .chip[data-id="${id}"]`);
+                    if(el) el.classList.add('active');
+                    document.getElementById('m-tx-category').value = id;
+                },
+                openTx: (type, fixedId=null) => {
+                    App.ui.modals.closeMobileMenu();
+                    document.getElementById('m-tx-id').value = '';
+                    document.getElementById('m-tx-type').value = type;
+                    document.getElementById('m-tx-fixedId').value = fixedId||'';
+                    document.getElementById('m-tx-title').textContent = type==='expense'?'Nuevo Gasto':'Nuevo Ingreso';
+                    document.getElementById('m-tx-amount').value = '';
+                    document.getElementById('m-tx-desc').value = '';
+                    
+                    const now = new Date();
+                    document.getElementById('m-tx-date').value = new Date(now.getTime() - now.getTimezoneOffset()*60000).toISOString().slice(0,16);
+                    document.getElementById('m-tx-ignore').checked = false;
+                    document.getElementById('m-tx-btn-del').classList.add('hidden');
+                    
+                    App.ui.modals.renderChips(type);
+                    App.ui.modals.open('tx');
+                },
+                editTx: (id) => {
+                    const t = App.state.txs.find(x=>x.id===id); if(!t) return;
+                    document.getElementById('m-tx-id').value = t.id;
+                    document.getElementById('m-tx-type').value = t.type;
+                    document.getElementById('m-tx-fixedId').value = t.fixedPaymentId||'';
+                    document.getElementById('m-tx-title').textContent = 'Editar '+ (t.type==='expense'?'Gasto':'Ingreso');
+                    document.getElementById('m-tx-amount').value = t.amount;
+                    document.getElementById('m-tx-desc').value = t.title;
+                    document.getElementById('m-tx-date').value = t.date.length===10 ? t.date+"T12:00" : t.date.substring(0,16);
+                    document.getElementById('m-tx-ignore').checked = !!t.ignoreDaily;
+                    document.getElementById('m-tx-btn-del').classList.remove('hidden');
+                    
+                    App.ui.modals.renderChips(t.type);
+                    App.ui.modals.selectChip(t.category);
+                    App.ui.modals.open('tx');
+                },
+                openFixed: (id=null) => {
+                    const f = id ? App.state.fixed.find(x=>x.id===id) : null;
+                    document.getElementById('m-fix-title').value = f ? f.title : '';
+                    document.getElementById('m-fix-amount').value = f ? f.amount : '';
+                    if(f) document.getElementById('m-fix-day').value = f.day;
+                    document.getElementById('m-fix-ignore').checked = f ? !!f.ignoreDaily : false;
+                    
+                    document.getElementById('m-fix-title').dataset.id = id||'';
+                    App.ui.modals.open('fixed');
+                },
+                openDebt: (id=null) => {
+                    const d = id ? App.state.debts.find(x=>x.id===id) : null;
+                    document.getElementById('m-debt-id').value = id||'';
+                    document.getElementById('m-debt-title').value = d?d.title:'';
+                    document.getElementById('m-debt-amount').value = d?d.totalAmount:'';
+                    document.getElementById('m-debt-installments').value = d?d.installments:'';
+                    
+                    if(id) document.getElementById('m-debt-btn-del').classList.remove('hidden');
+                    else document.getElementById('m-debt-btn-del').classList.add('hidden');
+                    
+                    App.ui.modals.open('debt');
+                },
+                openLoan: (id=null) => {
+                    const l = id ? App.state.loans.find(x=>x.id===id) : null;
+                    document.getElementById('m-loan-id').value = id||'';
+                    document.getElementById('m-loan-person').value = l?l.person:'';
+                    document.getElementById('m-loan-amount').value = l?l.amount:'';
+                    App.ui.modals.setLoanType(l ? l.type : 'lent');
+                    
+                    if(id) document.getElementById('m-loan-btn-del').classList.remove('hidden');
+                    else document.getElementById('m-loan-btn-del').classList.add('hidden');
+                    App.ui.modals.open('loan');
+                },
+                setLoanType: (t) => {
+                    document.getElementById('m-loan-type').value = t;
+                    const bL = document.getElementById('m-loan-btn-lent');
+                    const bB = document.getElementById('m-loan-btn-borr');
+                    if(t==='lent'){
+                        bL.className="flex-1 py-2 text-xs font-bold rounded-lg bg-card text-money shadow-sm transition-all";
+                        bB.className="flex-1 py-2 text-xs font-bold text-muted transition-all";
+                    } else {
+                        bB.className="flex-1 py-2 text-xs font-bold rounded-lg bg-card text-brand shadow-sm transition-all";
+                        bL.className="flex-1 py-2 text-xs font-bold text-muted transition-all";
+                    }
+                }
+            }
+        };
+
+        // LÓGICA DE NEGOCIO Y CÁLCULOS
+        App.logic = {
+            isFixedPaidThisMonth: (fixedId) => {
+                const n=new Date(); const m=n.getMonth(); const y=n.getFullYear();
+                return App.state.txs.some(t => {
+                    if(!t.date) return false;
+                    const d = new Date(t.date);
+                    return t.fixedPaymentId===fixedId && d.getMonth()===m && d.getFullYear()===y;
+                });
+            },
+            getNextPayday: () => {
+                const today = new Date(); today.setHours(0,0,0,0);
+                const s = App.state.settings;
+                let c = [];
+                for(let m=0;m<=1;m++){
+                    let mI = today.getMonth() + m; let y = today.getFullYear();
+                    if(mI>11) {mI-=12;y++;}
+                    
+                    if(s.frequency==='biweekly'){
+                        c.push(new Date(y,mI,Math.min(15,new Date(y,mI+1,0).getDate())));
+                        c.push(new Date(y,mI,new Date(y,mI+1,0).getDate())); 
+                    } else if(s.frequency==='biweekly-custom' && s.payday1 && s.payday2) {
+                        c.push(new Date(y,mI,Math.min(parseInt(s.payday1),new Date(y,mI+1,0).getDate())));
+                        c.push(new Date(y,mI,Math.min(parseInt(s.payday2),new Date(y,mI+1,0).getDate())));
+                    } else if(s.frequency==='monthly' && s.payday){
+                        c.push(new Date(y,mI,Math.min(parseInt(s.payday),new Date(y,mI+1,0).getDate())));
+                    }
+                }
+                
+                // Adjust business day
+                c = c.map(d => {
+                    let d2 = new Date(d);
+                    while(d2.getDay()===0||d2.getDay()===6) d2.setDate(d2.getDate()+1);
+                    return d2;
+                }).sort((a,b)=>a-b);
+                
+                for(let d of c) { d.setHours(0,0,0,0); if(d >= today) return d; }
+                return c[0] || new Date();
+            },
+            getPendingFixed: (targetDate) => {
+                let p = 0; let cur = new Date(); cur.setHours(0,0,0,0); cur.setDate(cur.getDate()+1);
+                const end = new Date(targetDate); end.setHours(0,0,0,0);
+                const tm = new Date().getMonth(); const ty = new Date().getFullYear();
+                
+                while(cur<=end) {
+                    const dn = cur.getDate();
+                    const isM = (cur.getMonth()===tm && cur.getFullYear()===ty);
+                    App.state.fixed.forEach(f => {
+                        if(f.ignoreDaily) return;
+                        if(parseInt(f.day)===dn) {
+                            if(isM && App.logic.isFixedPaidThisMonth(f.id)) return;
+                            p+=parseFloat(f.amount);
+                        }
+                    });
+                    cur.setDate(cur.getDate()+1);
+                }
+                return p;
+            },
+            getNextCycleFixed: (nextPd, days) => {
+                let p=0; let cur=new Date(nextPd); cur.setHours(0,0,0,0);
+                let end=new Date(cur); end.setDate(end.getDate()+days);
+                while(cur<end){
+                    const dn = cur.getDate();
+                    App.state.fixed.forEach(f=>{ if(!f.ignoreDaily && parseInt(f.day)===dn) p+=parseFloat(f.amount); });
+                    cur.setDate(cur.getDate()+1);
+                }
+                return p;
+            },
+            toggleHorizon: () => {
+                App.state.horizon = !App.state.horizon;
+                const b = document.getElementById('btn-horizon');
+                if(App.state.horizon) { b.textContent="DESACTIVAR"; b.className="bg-blue-500 text-white font-black px-3 py-1 rounded-lg text-[10px]"; }
+                else { b.textContent="ACTIVAR"; b.className="bg-white/50 dark:bg-black/50 text-horizon border border-blue-500/30 px-3 py-1 rounded-lg text-[10px] font-black uppercase"; }
+                App.ui.renderDashboard();
+            },
+            updateDailyFormula: (bal) => {
+                const nextPd = App.logic.getNextPayday();
+                const today = new Date(); today.setHours(0,0,0,0);
+                const diff = Math.ceil((nextPd - today) / 86400000);
+                
+                const bEl = document.getElementById('dash-payday-badge');
+                bEl.textContent = diff<=0 ? "Hoy" : `${diff} Días`;
+                
+                let spentT = 0;
+                App.state.txs.forEach(t=>{
+                    if(t.type==='expense' && t.date && !t.ignoreDaily){
+                        let td = new Date(t.date); td.setHours(0,0,0,0);
+                        if(td.getTime()===today.getTime()) spentT+=parseFloat(t.amount);
+                    }
+                });
+
+                const cLimit = new Date(nextPd); cLimit.setDate(cLimit.getDate()-1);
+                const pFixed = App.logic.getPendingFixed(cLimit);
+                document.getElementById('dash-pending-fixed').textContent = "-"+App.utils.fmtCur(pFixed);
+
+                const effBal = (bal + spentT) - pFixed;
+                const dLbl = document.getElementById('dash-daily-limit');
+                const expl = document.getElementById('dash-formula-expl');
+
+                const hCtrl = document.getElementById('horizon-controls');
+                
+                const isManual = App.state.settings.manualDailyLimitActive;
+                const manualAmount = parseFloat(App.state.settings.manualDailyLimitAmount) || 0;
+
+                // Si es modo manual, forzamos esa lógica e ignoramos lo demás
+                if (isManual) {
+                    hCtrl.classList.add('hidden'); // Ocultar controles horizonte
+                    bEl.textContent = "MANUAL";
+                    
+                    const rem = manualAmount - spentT;
+                    expl.innerHTML = `<span class="text-brand font-bold"><i class="ph-fill ph-push-pin"></i> Límite Manual</span> • Base: <strong>${App.utils.fmtCur(manualAmount)}</strong> • Gastado: <strong>-${App.utils.fmtCur(spentT)}</strong>`;
+                    dLbl.textContent = App.utils.fmtCur(rem);
+                    dLbl.className = `font-black text-3xl tracking-tight ${rem<0?'text-brand':'text-text'}`;
+                    return;
+                }
+
+                // Lógica Estándar / Horizonte
+                if(diff<=1) hCtrl.classList.remove('hidden'); else { hCtrl.classList.add('hidden'); if(App.state.horizon) App.logic.toggleHorizon(); }
+
+                if(App.state.horizon && diff<=1) {
+                    const base = App.state.settings.baseIncome || 0;
+                    if(base===0) { expl.innerHTML=`<span class="text-brand font-bold">Configura tu "Ingreso Base" en Ajustes</span>`; dLbl.textContent="---"; return;}
+                    const cd = App.state.settings.frequency==='monthly'?30:15;
+                    const ncf = App.logic.getNextCycleFixed(nextPd, cd);
+                    const pool = effBal + base - ncf;
+                    const hBudg = pool / (diff + cd);
+                    const rem = hBudg - spentT;
+                    
+                    expl.innerHTML = `<span class="text-horizon font-bold">Modo Horizonte</span> • Fondo Proyectado: ${App.utils.fmtCur(pool)}`;
+                    dLbl.textContent = App.utils.fmtCur(rem);
+                    dLbl.className = `font-black text-3xl tracking-tight ${rem<0?'text-brand':'text-text'}`;
+                } else {
+                    const div = diff<=0?1:diff;
+                    const budg = effBal / div;
+                    const rem = budg - spentT;
+                    
+                    expl.innerHTML = `Base segura: <strong>${App.utils.fmtCur(budg)}/día</strong> • Gastado hoy: <strong>-${App.utils.fmtCur(spentT)}</strong>`;
+                    dLbl.textContent = App.utils.fmtCur(rem);
+                    dLbl.className = `font-black text-3xl tracking-tight ${rem<0?'text-brand':'text-text'}`;
+                }
+            },
+            saveSettings: async () => {
+                if(!App.state.user) return;
+                const data = {
+                    frequency: document.getElementById('set-freq').value,
+                    payday: document.getElementById('set-payday').value,
+                    payday1: document.getElementById('set-payday-1').value,
+                    payday2: document.getElementById('set-payday-2').value,
+                    savings: parseInt(document.getElementById('set-savings').value)||0,
+                    baseIncome: parseFloat(document.getElementById('set-base-income').value)||0,
+                    manualDailyLimitActive: document.getElementById('set-manual-limit-active').checked,
+                    manualDailyLimitAmount: parseFloat(document.getElementById('set-manual-limit-amount').value)||0
+                };
+                await setDoc(doc(App.db.ref, 'artifacts', App.constants.appId, 'users', App.state.user.uid, 'settings', 'config'), data, {merge:true});
+                App.utils.toast('Ajustes Guardados');
+            }
+        };
+
+        // FIREBASE E INTERACCIONES BD
+        App.db = {
+            ref: null,
+            initListeners: () => {
+                const uid = App.state.user.uid; const c = App.constants.appId;
+                App.state.unsubs.forEach(u=>u()); App.state.unsubs=[];
+                const path = `artifacts/${c}/users/${uid}`;
+
+                App.state.unsubs.push(onSnapshot(collection(App.db.ref, `${path}/transactions`), snap => {
+                    App.state.txs = snap.docs.map(d=>({id:d.id, ...d.data()})); App.ui.renderAll();
+                }));
+                App.state.unsubs.push(onSnapshot(collection(App.db.ref, `${path}/fixed`), snap => {
+                    App.state.fixed = snap.docs.map(d=>({id:d.id, ...d.data()})); App.ui.renderAll();
+                }));
+                App.state.unsubs.push(onSnapshot(collection(App.db.ref, `${path}/debts`), snap => {
+                    App.state.debts = snap.docs.map(d=>({id:d.id, ...d.data()})); App.ui.renderAll();
+                }));
+                App.state.unsubs.push(onSnapshot(collection(App.db.ref, `${path}/loans`), snap => {
+                    App.state.loans = snap.docs.map(d=>({id:d.id, ...d.data()})); App.ui.renderAll();
+                }));
+                App.state.unsubs.push(onSnapshot(doc(App.db.ref, `${path}/settings/config`), snap => {
+                    if(snap.exists()) { App.state.settings = {...App.state.settings, ...snap.data()}; App.ui.renderAll(); }
+                }));
+            },
+            saveTx: async (e) => {
+                e.preventDefault(); if(!App.state.user) return;
+                const id = document.getElementById('m-tx-id').value;
+                const d = {
+                    type: document.getElementById('m-tx-type').value,
+                    amount: parseFloat(document.getElementById('m-tx-amount').value),
+                    category: document.getElementById('m-tx-category').value || 'General',
+                    title: document.getElementById('m-tx-desc').value || 'Movimiento',
+                    date: document.getElementById('m-tx-date').value,
+                    ignoreDaily: document.getElementById('m-tx-ignore').checked
+                };
+                const fid = document.getElementById('m-tx-fixedId').value; if(fid) d.fixedPaymentId = fid;
+
+                const coll = collection(App.db.ref, `artifacts/${App.constants.appId}/users/${App.state.user.uid}/transactions`);
+                if(id) await updateDoc(doc(coll, id), d); else { d.createdAt=new Date().toISOString(); await addDoc(coll, d); }
+                App.ui.modals.close('tx'); App.utils.toast('Movimiento Guardado');
+            },
+            deleteTx: async () => {
+                const id = document.getElementById('m-tx-id').value; if(!id) return;
+                if(confirm('¿Eliminar registro?')) {
+                    await deleteDoc(doc(App.db.ref, `artifacts/${App.constants.appId}/users/${App.state.user.uid}/transactions`, id));
+                    App.ui.modals.close('tx'); App.utils.toast('Eliminado');
+                }
+            },
+            saveAdjust: async (e) => {
+                e.preventDefault(); if(!App.state.user) return;
+                const real = parseFloat(document.getElementById('m-adj-real').value);
+                const sysTxt = document.getElementById('dash-balance').textContent.replace(/[^0-9.-]+/g,"");
+                const sys = parseFloat(sysTxt);
+                const diff = (Math.round(real*100) - Math.round(sys*100))/100;
+                
+                if(Math.abs(diff)<0.01) { App.ui.modals.close('adjust'); return; }
+                
+                await addDoc(collection(App.db.ref, `artifacts/${App.constants.appId}/users/${App.state.user.uid}/transactions`), {
+                    type: diff>0?'income':'expense', amount: Math.abs(diff), title:'Ajuste Manual Físico', category:'Ajuste', date: new Date().toISOString().slice(0,16), ignoreDaily:false, createdAt: new Date().toISOString()
+                });
+                App.ui.modals.close('adjust'); App.utils.toast('Saldo Ajustado');
+            },
+            saveFixed: async (e) => {
+                e.preventDefault(); if(!App.state.user) return;
+                const id = document.getElementById('m-fix-title').dataset.id;
+                const d = { title: document.getElementById('m-fix-title').value, amount: parseFloat(document.getElementById('m-fix-amount').value), day: document.getElementById('m-fix-day').value, ignoreDaily: document.getElementById('m-fix-ignore').checked };
+                
+                const c = collection(App.db.ref, `artifacts/${App.constants.appId}/users/${App.state.user.uid}/fixed`);
+                if(id) await updateDoc(doc(c, id), d); else await addDoc(c, d);
+                App.ui.modals.close('fixed'); App.utils.toast('Pago Fijo Guardado');
+            },
+            payFixed: (id) => {
+                const f = App.state.fixed.find(x=>x.id===id); if(!f) return;
+                App.ui.modals.openTx('expense', id);
+                document.getElementById('m-tx-amount').value = f.amount;
+                document.getElementById('m-tx-desc').value = f.title;
+                App.ui.modals.selectChip('Servicios');
+            },
+            saveDebt: async (e) => {
+                e.preventDefault(); if(!App.state.user) return;
+                const id = document.getElementById('m-debt-id').value;
+                const inst = parseInt(document.getElementById('m-debt-installments').value);
+                const d = { title: document.getElementById('m-debt-title').value, totalAmount: parseFloat(document.getElementById('m-debt-amount').value), installments: inst };
+                
+                const c = collection(App.db.ref, `artifacts/${App.constants.appId}/users/${App.state.user.uid}/debts`);
+                if(id) {
+                    const old = App.state.debts.find(x=>x.id===id);
+                    d.payments = (inst !== old.installments) ? new Array(inst).fill(false) : old.payments;
+                    await updateDoc(doc(c, id), d);
+                } else {
+                    d.payments = new Array(inst).fill(false); d.createdAt=new Date().toISOString(); await addDoc(c, d);
+                }
+                App.ui.modals.close('debt'); App.utils.toast('Deuda Guardada');
+            },
+            deleteDebt: async () => {
+                const id=document.getElementById('m-debt-id').value;
+                if(confirm('¿Borrar Deuda?')) { await deleteDoc(doc(App.db.ref, `artifacts/${App.constants.appId}/users/${App.state.user.uid}/debts`, id)); App.ui.modals.close('debt'); App.utils.toast('Eliminado'); }
+            },
+            toggleDebt: async (id, idx) => {
+                const d = App.state.debts.find(x=>x.id===id); if(!d) return;
+                const np = [...d.payments]; np[idx] = !np[idx];
+                await updateDoc(doc(App.db.ref, `artifacts/${App.constants.appId}/users/${App.state.user.uid}/debts`, id), {payments: np});
+            },
+            saveLoan: async (e) => {
+                e.preventDefault(); if(!App.state.user) return;
+                const id = document.getElementById('m-loan-id').value;
+                const d = { type: document.getElementById('m-loan-type').value, person: document.getElementById('m-loan-person').value, amount: parseFloat(document.getElementById('m-loan-amount').value) };
+                const c = collection(App.db.ref, `artifacts/${App.constants.appId}/users/${App.state.user.uid}/loans`);
+                if(id) await updateDoc(doc(c,id), d); else { d.createdAt=new Date().toISOString(); await addDoc(c, d); }
+                App.ui.modals.close('loan'); App.utils.toast('Préstamo Guardado');
+            },
+            deleteLoan: async () => {
+                const id=document.getElementById('m-loan-id').value;
+                if(confirm('¿Borrar Préstamo?')) { await deleteDoc(doc(App.db.ref, `artifacts/${App.constants.appId}/users/${App.state.user.uid}/loans`, id)); App.ui.modals.close('loan'); App.utils.toast('Eliminado'); }
+            },
+            exportData: () => {
+                if(!App.state.user) return;
+                const data = {
+                    transactions: App.state.txs,
+                    fixed: App.state.fixed,
+                    debts: App.state.debts,
+                    loans: App.state.loans,
+                    settings: App.state.settings
+                };
+                const blob = new Blob([JSON.stringify(data)], {type: "application/json"});
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = `GodsPlan_Backup_${new Date().toISOString().split('T')[0]}.json`;
+                a.click();
+            },
+            importData: (input) => {
+                const file = input.files[0];
+                if(!file || !App.state.user) return;
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                    try {
+                        const j = JSON.parse(e.target.result);
+                        const bPath = `artifacts/${App.constants.appId}/users/${App.state.user.uid}`;
+                        if(j.transactions) j.transactions.forEach(t => { delete t.id; addDoc(collection(App.db.ref, `${bPath}/transactions`), t); });
+                        if(j.fixed) j.fixed.forEach(t => { delete t.id; addDoc(collection(App.db.ref, `${bPath}/fixed`), t); });
+                        if(j.debts) j.debts.forEach(t => { delete t.id; addDoc(collection(App.db.ref, `${bPath}/debts`), t); });
+                        if(j.loans) j.loans.forEach(t => { delete t.id; addDoc(collection(App.db.ref, `${bPath}/loans`), t); });
+                        if(j.settings) await setDoc(doc(App.db.ref, `${bPath}/settings/config`), j.settings, {merge:true});
+                        App.utils.toast('Datos Importados');
+                    } catch (err) { alert('Archivo JSON inválido.'); }
+                };
+                reader.readAsText(file);
+                input.value = ''; // reset
+            },
+            dangerReset: async () => {
+                if(!App.state.user) return;
+                if(prompt('Escribe "BORRAR" para confirmar la eliminación de todos los datos.') === 'BORRAR') {
+                    const bPath = `artifacts/${App.constants.appId}/users/${App.state.user.uid}`;
+                    App.state.txs.forEach(t=>deleteDoc(doc(App.db.ref, `${bPath}/transactions`, t.id)));
+                    App.state.fixed.forEach(t=>deleteDoc(doc(App.db.ref, `${bPath}/fixed`, t.id)));
+                    App.state.debts.forEach(t=>deleteDoc(doc(App.db.ref, `${bPath}/debts`, t.id)));
+                    App.state.loans.forEach(t=>deleteDoc(doc(App.db.ref, `${bPath}/loans`, t.id)));
+                    App.utils.toast('Datos eliminados');
+                }
+            }
+        };
+
+        // AUTENTICACIÓN
+        App.auth = {
+            isReg: false,
+            toggleMode: (m) => {
+                App.auth.isReg = m==='register';
+                document.getElementById('field-name').classList[App.auth.isReg?'remove':'add']('hidden');
+                document.getElementById('auth-btn-text').textContent = App.auth.isReg?'CREAR CUENTA':'INICIAR SESIÓN';
+                document.getElementById('tab-login').className = App.auth.isReg ? "flex-1 py-2 text-xs font-bold text-muted transition-all" : "flex-1 py-2 text-xs font-bold rounded-lg bg-card text-text shadow-sm transition-all";
+                document.getElementById('tab-register').className = !App.auth.isReg ? "flex-1 py-2 text-xs font-bold text-muted transition-all" : "flex-1 py-2 text-xs font-bold rounded-lg bg-card text-text shadow-sm transition-all";
+                document.getElementById('auth-error').classList.add('hidden');
+            },
+            submit: async (e) => {
+                e.preventDefault();
+                const btn = document.getElementById('auth-btn'); btn.disabled=true; btn.innerHTML='<i class="ph-bold ph-spinner animate-spin"></i>';
+                const em = document.getElementById('auth-email').value.trim(); const pw = document.getElementById('auth-pass').value; const nm = document.getElementById('auth-name').value;
+                try {
+                    if(App.auth.isReg) {
+                        const cr = await createUserWithEmailAndPassword(App.fbAuth, em, pw);
+                        await updateProfile(cr.user, {displayName: nm||'Usuario'});
+                    } else await signInWithEmailAndPassword(App.fbAuth, em, pw);
+                } catch(err) {
+                    document.getElementById('auth-error').textContent = 'Error: Verifica tus datos.';
+                    document.getElementById('auth-error').classList.remove('hidden');
+                    btn.disabled=false; btn.innerHTML='<span id="auth-btn-text">REINTENTAR</span> <i class="ph-bold ph-arrow-right"></i>';
+                }
+            },
+            logout: () => { if(confirm('¿Salir?')) signOut(App.fbAuth); }
+        };
+
+        // INICIALIZACIÓN MAIN
+        window.onload = async () => {
+            App.ui.init();
+            
+            // Usamos EXACAMENTE tu configuración fija
+            const firebaseConfig = {
+                apiKey: "AIzaSyC-cUzYmh5G9y_W2RXbO1Uma4DlKKmnnss",
+                authDomain: "godsplan-adherencia.firebaseapp.com",
+                projectId: "godsplan-adherencia",
+                storageBucket: "godsplan-adherencia.firebasestorage.app",
+                messagingSenderId: "660801277434",
+                appId: "1:660801277434:web:3a37ece56538dc2b22a843"
+            };
+            
+            const app = initializeApp(firebaseConfig);
+            App.fbAuth = getAuth(app);
+            App.db.ref = getFirestore(app);
+
+            // Auth flow strict requirement para mantener soporte en el Canvas si es que existe el token
+            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                try { await signInWithCustomToken(App.fbAuth, __initial_auth_token); } catch(e){}
+            }
+
+            onAuthStateChanged(App.fbAuth, (user) => {
+                setTimeout(() => document.getElementById('loading-screen').classList.add('opacity-0', 'pointer-events-none'), 500);
+                if(user) {
+                    App.state.user = user;
+                    document.getElementById('login-view').classList.add('hidden');
+                    document.getElementById('global-nav').classList.remove('hidden');
+                    document.getElementById('main-container').classList.remove('hidden');
+                    
+                    document.getElementById('set-user-name').textContent = App.utils.esc(user.displayName) || 'Anónimo';
+                    document.getElementById('set-user-email').textContent = App.utils.esc(user.email) || user.uid.slice(0,10);
+                    
+                    App.db.initListeners();
+                } else {
+                    App.state.user = null;
+                    document.getElementById('login-view').classList.remove('hidden');
+                    document.getElementById('global-nav').classList.add('hidden');
+                    document.getElementById('main-container').classList.add('hidden');
+                }
+            });
+        };
+    </script>
+    <footer data-gp-credit style="flex:none;width:100%;text-align:center;padding:3px 8px;font:500 10px/1.4 system-ui,sans-serif;letter-spacing:.04em;opacity:.55;color:inherit"><a href="https://godsplan.dev" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">© 2026 God's Plan · godsplan.dev</a></footer>
+</body>
+</html>

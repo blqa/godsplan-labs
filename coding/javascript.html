@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GodsPlan | JavaScript Master Course</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Iconos Lucide -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        neutral: {
+                            850: '#171717',
+                            900: '#0a0a0a',
+                            950: '#000000',
+                        },
+                        red: {
+                            400: '#f87171',
+                            500: '#ef4444',
+                            600: '#dc2626',
+                            900: '#7f1d1d',
+                        },
+                        yellow: { 
+                            400: '#facc15', // JS Yellow Accent
+                            500: '#eab308',
+                            600: '#ca8a04',
+                            900: '#713f12',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Fira Code', 'monospace'],
+                    },
+                    animation: {
+                        'pulse-glow': 'pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'shake': 'shake 0.5s cubic-bezier(.36,.07,.19,.97) both',
+                        'slide-down': 'slideDown 0.3s ease-out forwards',
+                        'blink': 'blink 1s step-end infinite',
+                    },
+                    keyframes: {
+                        'pulse-glow': {
+                            '0%, 100%': { opacity: 1, boxShadow: '0 0 10px rgba(220, 38, 38, 0.5)' },
+                            '50%': { opacity: .5, boxShadow: '0 0 20px rgba(220, 38, 38, 0.1)' },
+                        },
+                        shake: {
+                            '10%, 90%': { transform: 'translate3d(-1px, 0, 0)' },
+                            '20%, 80%': { transform: 'translate3d(2px, 0, 0)' },
+                            '30%, 50%, 70%': { transform: 'translate3d(-4px, 0, 0)' },
+                            '40%, 60%': { transform: 'translate3d(4px, 0, 0)' }
+                        },
+                        slideDown: {
+                            '0%': { opacity: 0, transform: 'translateY(-10px)' },
+                            '100%': { opacity: 1, transform: 'translateY(0)' }
+                        },
+                        blink: {
+                            '0%, 100%': { opacity: 1 },
+                            '50%': { opacity: 0 }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap');
+        
+        body { font-family: 'Inter', sans-serif; background-color: #000000; color: #e5e5e5; }
+        .font-mono { font-family: 'Fira Code', monospace; }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #000000; }
+        ::-webkit-scrollbar-thumb { background: #262626; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #dc2626; }
+
+        /* JS Syntax Highlighting Simulation */
+        .token-keyword { color: #f87171; font-weight: bold; } /* const, let, function (Red) */
+        .token-func { color: #facc15; } /* console.log, alert (Yellow) */
+        .token-string { color: #a3e635; } /* Strings (Green) */
+        .token-comment { color: #525252; font-style: italic; }
+        .token-number { color: #fbbf24; }
+
+        .code-editor-area {
+            background-image: radial-gradient(#262626 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        .nav-item.active {
+            background: linear-gradient(to right, rgba(234, 179, 8, 0.15), transparent);
+            border-left: 3px solid #eab308;
+            color: #facc15;
+        }
+        
+        textarea:focus { outline: none; }
+        
+        /* Certificate Pattern */
+        .cert-pattern {
+            background-color: #ffffff;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23eab308' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+
+        .concept-card {
+            background: rgba(23, 23, 23, 0.6);
+            border: 1px solid rgba(64, 64, 64, 0.5);
+            border-radius: 0.75rem;
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+        .concept-title {
+            color: #facc15;
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .code-snippet {
+            font-family: 'Fira Code', monospace;
+            background: #0a0a0a;
+            padding: 0.2rem 0.4rem;
+            border-radius: 0.25rem;
+            color: #fef08a;
+            font-size: 0.85em;
+            border: 1px solid #404040;
+        }
+        .block-code {
+            font-family: 'Fira Code', monospace;
+            background: #050505;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            color: #a3a3a3;
+            font-size: 0.85rem;
+            border: 1px solid #262626;
+            margin: 1rem 0;
+            overflow-x: auto;
+        }
+        .text-content p { margin-bottom: 1rem; line-height: 1.7; color: #d4d4d4; }
+        .text-content ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1rem; color: #d4d4d4; }
+        
+        .terminal-cursor::after {
+            content: "█";
+            animation: blink 1s step-end infinite;
+            color: #facc15;
+            margin-left: 2px;
+        }
+    </style>
+    <link rel="icon" type="image/svg+xml" data-gp href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2064%2064'%3E%3Crect%20width='64'%20height='64'%20rx='14'%20fill='%230a0a0a'/%3E%3Cpath%20d='M28%2010h8v16h16v8H36v22h-8V34H12v-8h16z'%20fill='%238a0303'/%3E%3C/svg%3E">
+    <meta name="theme-color" content="#0a0a0a" data-gp>
+</head>
+<body class="h-screen flex flex-col overflow-hidden selection:bg-yellow-500/30 selection:text-yellow-200">
+
+    <!-- Header -->
+    <header class="h-16 border-b border-neutral-800 bg-neutral-950 flex items-center justify-between px-4 md:px-6 z-50 shrink-0 relative">
+        <div class="absolute bottom-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-yellow-600/50 to-transparent"></div>
+
+        <div class="flex items-center gap-4">
+            <button onclick="toggleSidebar()" class="lg:hidden p-2 text-neutral-400 hover:text-white transition-colors">
+                <i data-lucide="menu" class="w-6 h-6"></i>
+            </button>
+            
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-yellow-600 to-yellow-800 flex items-center justify-center shadow-[0_0_15px_rgba(234,179,8,0.4)] group relative overflow-hidden">
+                    <div class="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+                    <i data-lucide="zap" class="text-white w-6 h-6 relative z-10"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-white tracking-tight leading-none text-lg">
+                        GodsPlan | <span class="text-yellow-500">JS Master</span>
+                    </h1>
+                    <div class="flex items-center gap-2">
+                        <span class="text-[10px] text-neutral-500 uppercase tracking-widest font-semibold" id="user-rank">Iniciado</span>
+                        <div class="h-1 w-1 rounded-full bg-neutral-700"></div>
+                        <span class="text-[10px] text-yellow-400 font-mono font-bold" id="user-xp">0 XP</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-4 md:gap-6">
+            <button onclick="toggleGlossary()" class="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-neutral-900 border border-neutral-800 text-xs font-medium text-neutral-400 hover:text-white hover:border-yellow-500/30 transition-all group">
+                <i data-lucide="book" class="w-3 h-3 group-hover:text-yellow-500 transition-colors"></i> Cheat Sheet
+            </button>
+
+            <div class="hidden md:flex flex-col items-end w-32 lg:w-48">
+                <div class="flex items-center gap-2 text-[10px] font-bold uppercase text-neutral-500 mb-1">
+                    <span>Progreso</span>
+                    <span id="progress-text" class="text-yellow-500">0%</span>
+                </div>
+                <div class="w-full h-1.5 bg-neutral-900 rounded-full overflow-hidden border border-neutral-800">
+                    <div id="progress-bar" class="h-full bg-gradient-to-r from-yellow-800 to-yellow-500 w-0 transition-all duration-700 ease-out shadow-[0_0_10px_rgba(234,179,8,0.5)]"></div>
+                </div>
+            </div>
+
+            <a href="/coding/" onclick="window.location.reload()" class="group relative px-4 py-2 bg-neutral-900 border border-neutral-800 hover:border-red-500/50 rounded-lg transition-all duration-300 flex items-center gap-2 text-sm text-neutral-400 hover:text-white hover:-translate-y-0.5 shadow-lg hover:shadow-red-500/10">
+                <i data-lucide="log-out" class="w-4 h-4 group-hover:text-red-500 transition-colors"></i>
+            </a>
+        </div>
+    </header>
+
+    <!-- Layout -->
+    <div class="flex-1 flex overflow-hidden relative bg-black">
+        <div id="mobile-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/90 z-30 opacity-0 pointer-events-none transition-opacity duration-300 lg:hidden backdrop-blur-sm"></div>
+
+        <aside class="w-80 bg-neutral-950/95 border-r border-neutral-800 flex flex-col shrink-0 transition-transform duration-300 absolute lg:relative z-40 h-full -translate-x-full lg:translate-x-0 backdrop-blur-md" id="sidebar">
+            <div class="p-5 border-b border-neutral-800/50 flex justify-between items-center">
+                <h2 class="text-xs font-bold text-neutral-500 uppercase tracking-widest flex items-center gap-2">
+                    <i data-lucide="map" class="w-3 h-3"></i> Roadmap Web
+                </h2>
+                <button onclick="toggleSidebar()" class="lg:hidden text-neutral-400 hover:text-red-500"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <nav id="module-list" class="flex-1 overflow-y-auto py-2 space-y-1 px-2 custom-scrollbar"></nav>
+            <div class="p-4 border-t border-neutral-800/50 bg-neutral-950 space-y-2">
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="exportData()" class="text-[10px] text-neutral-400 hover:text-white flex items-center justify-center gap-1 py-2 border border-neutral-800 rounded hover:bg-neutral-900">
+                        <i data-lucide="download" class="w-3 h-3"></i> Backup
+                    </button>
+                    <button onclick="importData()" class="text-[10px] text-neutral-400 hover:text-white flex items-center justify-center gap-1 py-2 border border-neutral-800 rounded hover:bg-neutral-900">
+                        <i data-lucide="upload" class="w-3 h-3"></i> Restore
+                    </button>
+                </div>
+                <button onclick="resetProgress()" class="w-full text-[10px] text-neutral-500 hover:text-red-400 flex items-center justify-center gap-2 py-2 border border-neutral-800 rounded hover:bg-neutral-900 hover:border-red-900/30">
+                    <i data-lucide="trash-2" class="w-3 h-3"></i> Reiniciar Sistema
+                </button>
+            </div>
+        </aside>
+
+        <main class="flex-1 flex flex-col lg:flex-row min-w-0 bg-black relative">
+            <section class="flex-1 overflow-y-auto scroll-smooth custom-scrollbar relative" id="scroll-container">
+                <div class="max-w-4xl mx-auto p-6 lg:p-8 pb-32">
+                    <div id="lesson-content" class="mb-10 animate-[fadeIn_0.3s_ease-out] text-content"></div>
+
+                    <div id="workspace-area" class="hidden space-y-6">
+                        <div class="rounded-xl overflow-hidden border border-neutral-800 bg-[#0a0a0a] shadow-2xl ring-1 ring-white/5">
+                            <div class="bg-neutral-900/80 backdrop-blur px-4 py-2 flex justify-between items-center border-b border-neutral-800">
+                                <div class="flex items-center gap-3">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-2 h-2 rounded-full bg-yellow-500 animate-pulse shadow-[0_0_8px_rgba(234,179,8,0.8)]"></div>
+                                        <span class="text-xs font-bold text-neutral-300 uppercase tracking-wider">Editor JS</span>
+                                    </div>
+                                    <span id="difficulty-badge" class="px-2 py-0.5 rounded text-[10px] font-bold bg-neutral-800 text-neutral-400 border border-neutral-700 uppercase">Script</span>
+                                </div>
+                                <div class="flex gap-2">
+                                    <button onclick="resetCode()" title="Limpiar Buffer" class="p-1.5 text-neutral-400 hover:text-white hover:bg-neutral-800 rounded transition-colors"><i data-lucide="eraser" class="w-4 h-4"></i></button>
+                                </div>
+                            </div>
+
+                            <div class="bg-neutral-900/40 p-4 border-b border-neutral-800/50">
+                                <div class="flex items-start gap-3 mb-2">
+                                    <div class="mt-1 min-w-[20px]"><i data-lucide="terminal" class="w-4 h-4 text-yellow-500"></i></div>
+                                    <p id="exercise-instruction" class="text-neutral-300 text-sm leading-relaxed font-medium"></p>
+                                </div>
+                                <!-- HINT BOX -->
+                                <div id="hint-box" class="hidden mt-3 p-3 bg-yellow-500/10 border border-yellow-500/30 rounded text-xs text-yellow-200 flex items-start gap-2 animate-slide-down">
+                                    <i data-lucide="lightbulb" class="w-4 h-4 mt-0.5 shrink-0 text-yellow-400"></i>
+                                    <div>
+                                        <strong class="block text-yellow-400 mb-1">TIP DE DEBUGGING:</strong>
+                                        <span id="hint-text"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="relative code-editor-area group">
+                                <textarea id="code-input" spellcheck="false" class="w-full h-64 bg-transparent p-5 font-mono text-sm text-neutral-200 resize-y border-none focus:ring-0 leading-relaxed tab-size-4 placeholder-neutral-700" placeholder="// Escribe tu lógica aquí..."></textarea>
+                            </div>
+
+                            <div class="p-4 bg-neutral-900 border-t border-neutral-800 flex flex-col sm:flex-row justify-between items-center gap-4">
+                                <div id="feedback-msg" class="w-full sm:w-auto text-xs font-medium px-3 py-2 rounded transition-all opacity-0 text-center sm:text-left border border-transparent flex items-center gap-2"></div>
+                                <div class="flex gap-3 w-full sm:w-auto">
+                                    <button onclick="toggleHint()" id="btn-help" class="px-4 py-2 bg-neutral-800 hover:bg-neutral-700 text-neutral-400 hover:text-white border border-neutral-700 rounded-lg transition-all text-xs font-bold uppercase tracking-wide items-center justify-center gap-2 flex">
+                                        <i data-lucide="life-buoy" class="w-3 h-3"></i> Ayuda
+                                    </button>
+                                    <button onclick="validateCode()" class="flex-1 sm:flex-none px-6 py-2.5 bg-yellow-600 hover:bg-yellow-500 text-white text-xs font-bold uppercase tracking-widest rounded-lg shadow-[0_0_15px_rgba(234,179,8,0.3)] hover:shadow-[0_0_20px_rgba(234,179,8,0.5)] transition-all flex items-center justify-center gap-2 transform active:scale-95 group border border-yellow-500">
+                                        <i data-lucide="play" class="w-3 h-3 fill-current group-hover:translate-x-0.5 transition-transform"></i> Ejecutar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="quiz-container" class="hidden bg-neutral-900/30 border border-neutral-800 rounded-xl p-6 relative overflow-hidden transition-all duration-500">
+                            <div class="absolute -right-10 -top-10 w-40 h-40 bg-yellow-600/5 rounded-full blur-3xl"></div>
+                            <div class="flex items-start gap-4 relative z-10">
+                                <div class="w-10 h-10 rounded-lg bg-neutral-800 flex items-center justify-center shrink-0 text-yellow-500 border border-neutral-700"><i data-lucide="cpu" class="w-5 h-5"></i></div>
+                                <div class="flex-1">
+                                    <h3 class="text-sm font-bold text-white mb-2 uppercase tracking-wide text-yellow-400">Prueba Lógica</h3>
+                                    <p id="quiz-question" class="text-neutral-300 mb-5 text-sm font-medium"></p>
+                                    <div id="quiz-options" class="grid grid-cols-1 gap-2"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-12 flex justify-between items-center pt-8 border-t border-neutral-800/50">
+                        <button onclick="prevLesson()" id="btn-prev" class="group px-4 py-2 text-neutral-500 hover:text-yellow-400 transition-colors flex items-center gap-2 text-sm font-medium disabled:opacity-30 disabled:pointer-events-none">
+                            <i data-lucide="arrow-left" class="w-4 h-4 group-hover:-translate-x-1 transition-transform"></i> Anterior
+                        </button>
+                        <button onclick="nextLesson()" id="btn-next" class="px-6 py-2.5 bg-neutral-800 text-white rounded-lg transition-all flex items-center gap-2 text-sm font-bold border border-neutral-700 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed hover:border-neutral-500">
+                            Siguiente <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- RIGHT PANEL: CONSOLE -->
+            <section class="hidden lg:flex w-[45%] xl:w-[40%] flex-col border-l border-neutral-800 bg-[#0c0c0c] relative z-10">
+                <div class="h-8 bg-[#1a1a1a] border-b border-neutral-800 flex items-center px-3 gap-2 shrink-0">
+                    <div class="flex gap-1.5 opacity-60">
+                        <div class="w-2.5 h-2.5 rounded-full bg-red-500/50"></div>
+                        <div class="w-2.5 h-2.5 rounded-full bg-yellow-500/50"></div>
+                        <div class="w-2.5 h-2.5 rounded-full bg-green-500/50"></div>
+                    </div>
+                    <div class="ml-2 text-[10px] text-neutral-500 font-mono flex items-center gap-1">
+                        <i data-lucide="terminal" class="w-3 h-3"></i> node@godsplan:~
+                    </div>
+                </div>
+                
+                <!-- Terminal Output Area -->
+                <div id="terminal-output" class="flex-1 p-4 font-mono text-xs text-neutral-300 overflow-y-auto custom-scrollbar leading-loose bg-black/50">
+                    <div class="mb-4 text-neutral-500">Node.js v20.1.0 [GodsPlan Kernel] <br>Type "help" for more information.</div>
+                    <div id="console-logs"></div>
+                    <div class="text-yellow-500 mt-2 flex items-center terminal-cursor">_ </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Glosario Modal -->
+    <div id="glossary-modal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/90 backdrop-blur-sm" onclick="toggleGlossary()"></div>
+        <div class="bg-neutral-900 border border-neutral-800 w-full max-w-3xl max-h-[80vh] flex flex-col relative z-10 rounded-xl overflow-hidden shadow-2xl animate-[modal-in_0.3s_ease-out]">
+            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-yellow-600 via-yellow-400 to-yellow-600"></div>
+            <div class="p-6 border-b border-neutral-800 flex justify-between items-center bg-neutral-900/50">
+                <h2 class="text-xl font-bold text-white flex items-center gap-2"><i data-lucide="book-open" class="text-yellow-500"></i> JS Cheat Sheet</h2>
+                <button onclick="toggleGlossary()" class="text-neutral-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <div class="p-6 overflow-y-auto custom-scrollbar">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="glossary-content"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Certificado -->
+    <div id="certificate-modal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/90 backdrop-blur-md" onclick="closeCertModal()"></div>
+        <div class="bg-white text-neutral-900 w-full max-w-2xl relative z-10 rounded-xl overflow-hidden shadow-2xl transform scale-95 opacity-0 transition-all duration-700 cert-pattern" id="cert-content">
+            <div class="border-8 border-double border-yellow-500/20 m-2 p-8 text-center relative">
+                <div class="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none"><i data-lucide="zap" class="w-96 h-96"></i></div>
+                <div class="w-24 h-24 bg-yellow-500 mx-auto rounded-full flex items-center justify-center mb-6 shadow-xl text-white"><i data-lucide="award" class="w-12 h-12"></i></div>
+                <h2 class="text-4xl font-serif font-bold text-neutral-800 mb-2">Certificado de Maestría</h2>
+                <p class="text-neutral-500 uppercase tracking-widest text-xs font-bold mb-8">GodsPlan Coding Academy</p>
+                <p class="text-lg text-neutral-600 mb-2">El Operador ha demostrado competencia en</p>
+                <h3 class="text-3xl font-bold text-yellow-600 mb-6 font-mono" id="cert-name">JavaScript Developer</h3>
+                <p class="text-neutral-600 max-w-lg mx-auto leading-relaxed mb-8">
+                    Dominio de sintaxis ES6+, manipulación del DOM, lógica asíncrona y desarrollo de interactividad web moderna.
+                </p>
+                <div class="flex justify-between items-end border-t border-neutral-200 pt-6 mt-6">
+                    <div class="text-left"><div class="font-bold text-lg text-neutral-800 tracking-tighter mb-1">BLQA</div><p class="text-xs text-neutral-400 uppercase mt-1">Instructor Principal</p></div>
+                    <div class="text-right"><p class="text-xs text-neutral-400 uppercase">Fecha</p><p class="text-sm font-mono font-bold text-neutral-700" id="cert-date">12/12/2025</p></div>
+                </div>
+            </div>
+            <div class="bg-neutral-900 p-4 flex justify-center gap-4">
+                <button onclick="window.print()" class="px-6 py-2 bg-white text-neutral-900 rounded font-bold hover:bg-neutral-200 transition flex items-center gap-2"><i data-lucide="printer" class="w-4 h-4"></i> Imprimir</button>
+                <button onclick="closeCertModal()" class="px-6 py-2 border border-neutral-700 text-neutral-300 rounded hover:text-white transition">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JS Logic -->
+    <script>
+        // --- AUDIO SYSTEM ---
+        let audioCtx;
+        function playTone(type) {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
+            if (type === 'success') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+                osc.frequency.linearRampToValueAtTime(1000, audioCtx.currentTime + 0.1);
+                gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gainNode.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.3);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+            } else if (type === 'error') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(100, audioCtx.currentTime);
+                gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gainNode.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.3);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+            } else if (type === 'click') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+                gainNode.gain.setValueAtTime(0.02, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.05);
+            }
+        }
+
+        // --- JS CURRICULUM (30 MODULES) ---
+        const curriculum = [
+            // FASE 1: SINTAXIS BÁSICA
+            {
+                id: "j01", title: "1. Console.log", desc: "Habla con la máquina.",
+                content: `<div class="mb-4"><span class="badge-mod">Fase 1: Syntax</span></div><h1 class="text-3xl font-bold text-white mb-6">Hola Consola</h1><p>En JS, usamos <code>console.log()</code> para imprimir mensajes. Es tu mejor herramienta de depuración.</p><div class="concept-card"><div class="code-snippet">console.log("Mensaje");</div></div>`,
+                codeRef: `console.log("Sistema listo...");`,
+                exercise: { instruction: "Imprime 'Hola JS' en la consola.", placeholder: "// Tu código", difficulty: "Básico", hint: "console.log(\"Hola JS\");",
+                    validate: (code) => { 
+                        if(code.includes('console.log') && code.includes('Hola JS')) return {valid:true, msg:"¡Conexión establecida!", output: "Hola JS"};
+                        return {valid:false, msg:"Usa console.log(\"Hola JS\")"};
+                    }
+                }, quiz: { q: "¿Dónde ves el output?", options: ["En la pantalla", "En la consola", "En la impresora"], correct: 1 }
+            },
+            {
+                id: "j02", title: "2. Variables", desc: "Let & Const.",
+                content: `<div class="mb-4"><span class="badge-mod">Fase 1: Syntax</span></div><h1 class="text-3xl font-bold text-white mb-6">Almacenamiento</h1><p>Usa <code>let</code> para valores que cambian y <code>const</code> para los que no.</p><div class="block-code">let edad = 25;\nconst PI = 3.1416;</div>`,
+                codeRef: `let nombre = "Alex";\nnombre = "Max"; // OK`,
+                exercise: { instruction: "Declara una variable 'puntos' con valor 100 usando let.", difficulty: "Fácil", hint: "let puntos = 100;",
+                    validate: (code) => { 
+                        if(code.match(/let\s+puntos\s*=\s*100/)) return {valid:true, msg:"¡Variable guardada!", output: "undefined"};
+                        return {valid:false, msg:"Usa: let puntos = 100;"};
+                    }
+                }, quiz: { q: "¿Se puede reasignar una const?", options: ["Sí", "No", "A veces"], correct: 1 }
+            },
+            {
+                id: "j03", title: "3. Tipos de Datos", desc: "Primitivos.",
+                content: `<div class="mb-4"><span class="badge-mod">Fase 1: Syntax</span></div><h1 class="text-3xl font-bold text-white mb-6">Tipos Básicos</h1><p>String ("Texto"), Number (123), Boolean (true/false).</p>`,
+                codeRef: `let esVerdad = true;\nlet precio = 9.99;`,
+                exercise: { instruction: "Declara 'user' como 'Neo' y 'activo' como true.", difficulty: "Fácil", hint: "let user = 'Neo'; let activo = true;",
+                    validate: (code) => { 
+                        if(code.match(/user\s*=\s*['"]Neo['"]/) && code.includes('true')) return {valid:true, msg:"¡Datos tipados!", output: "Guardado."};
+                        return {valid:false, msg:"Revisa los valores."};
+                    }
+                }, quiz: { q: "¿Qué tipo es '5'?", options: ["Number", "String", "Boolean"], correct: 1 }
+            },
+            {
+                id: "j04", title: "4. Operadores", desc: "Matemáticas.",
+                content: `<div class="mb-4"><span class="badge-mod">Fase 1: Syntax</span></div><h1 class="text-3xl font-bold text-white mb-6">Aritmética</h1><p>Suma (+), Resta (-), Multiplicación (*), División (/).</p>`,
+                codeRef: `let total = 10 * 2;`,
+                exercise: { instruction: "Calcula 50 menos 10 en una variable 'resta'.", difficulty: "Fácil", hint: "let resta = 50 - 10;",
+                    validate: (code) => { 
+                        if(code.match(/resta\s*=\s*50\s*-\s*10/)) return {valid:true, msg:"¡Cálculo exacto!", output: "40"};
+                        return {valid:false, msg:"Usa el operador -."};
+                    }
+                }, quiz: { q: "¿Operador de residuo?", options: ["%", "/", "#"], correct: 0 }
+            },
+            {
+                id: "j05", title: "5. Template Literals", desc: "Backticks.",
+                content: `<div class="mb-4"><span class="badge-mod">Fase 1: Syntax</span></div><h1 class="text-3xl font-bold text-white mb-6">Strings Modernos</h1><p>Usa comillas invertidas (\`) para insertar variables con <code>\${variable}</code>.</p>`,
+                codeRef: `let n = "Mundo";\nconsole.log(\`Hola \${n}\`);`,
+                exercise: { instruction: "Usa backticks para imprimir 'Soy [tuNombre]'.", difficulty: "Intermedio", hint: "console.log(`Soy Alex`);",
+                    validate: (code) => { 
+                        if(code.includes('`')) return {valid:true, msg:"¡Interpolación correcta!", output: "Soy..."};
+                        return {valid:false, msg:"Usa las comillas invertidas ` `."};
+                    }
+                }, quiz: { q: "¿Símbolo para variables?", options: ["$", "${}", "{{}}"], correct: 1 }
+            },
+            {
+                id: "j06", title: "6. Funciones", desc: "Lógica encapsulada.",
+                content: `<div class="mb-4"><span class="badge-mod bg-yellow-900/30 text-yellow-300">Fase 2: Logic</span></div><h1 class="text-3xl font-bold text-white mb-6">Funciones</h1><p>Bloques de código reutilizables.</p><div class="code-snippet">function saludar() { console.log("Hi"); }</div>`,
+                codeRef: `function sumar(a, b) {\n  return a + b;\n}`,
+                exercise: { instruction: "Crea una función llamada 'test' que retorne 1.", difficulty: "Intermedio", hint: "function test() { return 1; }",
+                    validate: (code) => { 
+                        if(code.match(/function\s+test\s*\(/) && code.includes('return 1')) return {valid:true, msg:"¡Función definida!", output: "f() test"};
+                        return {valid:false, msg:"Sintaxis: function nombre() { ... }"};
+                    }
+                }, quiz: { q: "¿Qué palabra devuelve un valor?", options: ["get", "return", "output"], correct: 1 }
+            },
+            {
+                id: "j07", title: "7. Arrow Functions", desc: "ES6.",
+                content: `<div class="mb-4"><span class="badge-mod bg-yellow-900/30 text-yellow-300">Fase 2: Logic</span></div><h1 class="text-3xl font-bold text-white mb-6">Flecha Gorda</h1><p>Sintaxis moderna y corta para funciones.</p><div class="code-snippet">const hola = () => console.log("Hi");</div>`,
+                codeRef: `const suma = (a, b) => a + b;`,
+                exercise: { instruction: "Crea una constante 'saludo' que sea una arrow function vacía.", difficulty: "Intermedio", hint: "const saludo = () => {};",
+                    validate: (code) => { 
+                        if(code.match(/const\s+saludo\s*=\s*\(\)\s*=>/)) return {valid:true, msg:"¡Moderna!", output: "() => {}"};
+                        return {valid:false, msg:"Usa () => {}"};
+                    }
+                }, quiz: { q: "¿Arrow function tiene 'this' propio?", options: ["Sí", "No"], correct: 1 }
+            },
+            {
+                id: "j08", title: "8. Condicionales", desc: "If/Else.",
+                content: `<div class="mb-4"><span class="badge-mod bg-yellow-900/30 text-yellow-300">Fase 2: Logic</span></div><h1 class="text-3xl font-bold text-white mb-6">Toma de Decisiones</h1><p>Ejecuta código solo si se cumple la condición.</p>`,
+                codeRef: `if (x > 10) {\n  console.log("Mayor");\n} else {\n  console.log("Menor");\n}`,
+                exercise: { instruction: "Escribe un if que chequee si 10 > 5 e imprima 'Si'.", difficulty: "Fácil", hint: "if (10 > 5) { console.log('Si'); }",
+                    validate: (code) => { 
+                        if(code.includes('if') && code.includes('10 > 5') && code.includes('Si')) return {valid:true, msg:"¡Lógica booleana!", output: "Si"};
+                        return {valid:false, msg:"Falta la estructura if (...)."};
+                    }
+                }, quiz: { q: "¿Qué envuelve la condición?", options: ["{}", "[]", "()"], correct: 2 }
+            },
+            {
+                id: "j09", title: "9. Arrays", desc: "Listas.",
+                content: `<div class="mb-4"><span class="badge-mod bg-yellow-900/30 text-yellow-300">Fase 2: Logic</span></div><h1 class="text-3xl font-bold text-white mb-6">Arreglos</h1><p>Colecciones ordenadas de datos. Usan corchetes <code>[]</code>.</p>`,
+                codeRef: `let frutas = ["Manzana", "Pera"];\nconsole.log(frutas[0]); // Manzana`,
+                exercise: { instruction: "Crea un array 'nums' con los valores 1, 2, 3.", difficulty: "Fácil", hint: "let nums = [1, 2, 3];",
+                    validate: (code) => { 
+                        if(code.match(/nums\s*=\s*\[1,\s*2,\s*3\]/)) return {valid:true, msg:"¡Array creado!", output: "[1, 2, 3]"};
+                        return {valid:false, msg:"Usa corchetes [ ]."};
+                    }
+                }, quiz: { q: "¿Índice del primer elemento?", options: ["1", "0"], correct: 1 }
+            },
+            {
+                id: "j10", title: "10. Objetos", desc: "JSON Style.",
+                content: `<div class="mb-4"><span class="badge-mod bg-yellow-900/30 text-yellow-300">Fase 2: Logic</span></div><h1 class="text-3xl font-bold text-white mb-6">Objetos Literales</h1><p>Colecciones clave-valor. Usan llaves <code>{}</code>.</p>`,
+                codeRef: `const persona = {\n  nombre: "Alex",\n  edad: 30\n};`,
+                exercise: { instruction: "Crea un objeto 'auto' con propiedad 'color': 'rojo'.", difficulty: "Intermedio", hint: "const auto = { color: 'rojo' };",
+                    validate: (code) => { 
+                        if(code.match(/auto\s*=\s*\{/) && code.includes('color') && code.includes('rojo')) return {valid:true, msg:"¡Objeto instanciado!", output: "{ color: 'rojo' }"};
+                        return {valid:false, msg:"Sintaxis: { key: value }"};
+                    }
+                }, quiz: { q: "¿Cómo acceder a una propiedad?", options: ["obj.prop", "obj(prop)"], correct: 0 }
+            },
+            {
+                id: "j11", title: "11. Bucle For", desc: "Iteración.",
+                content: `<div class="mb-4"><span class="badge-mod bg-yellow-900/30 text-yellow-300">Fase 2: Logic</span></div><h1 class="text-3xl font-bold text-white mb-6">Ciclos</h1><p>Repite código. Estructura: <code>for (inicio; condición; paso)</code>.</p>`,
+                codeRef: `for (let i = 0; i < 5; i++) {\n  console.log(i);\n}`,
+                exercise: { instruction: "Crea un bucle for que itere 3 veces (i < 3).", difficulty: "Intermedio", hint: "for (let i=0; i<3; i++) { }",
+                    validate: (code) => { 
+                        if(code.includes('for') && code.includes('let i') && code.includes('i < 3') && code.includes('i++')) return {valid:true, msg:"¡Bucle rodando!", output: "0, 1, 2"};
+                        return {valid:false, msg:"Sintaxis for incorrecta."};
+                    }
+                }, quiz: { q: "¿Qué hace i++?", options: ["Suma 1", "Resta 1"], correct: 0 }
+            },
+            
+            // FASE 3: DOM & INTERACTIVIDAD (15-20)
+            {
+                id: "j15", title: "15. DOM Select", desc: "QuerySelector.",
+                content: `<div class="mb-4"><span class="badge-mod text-blue-400 border-blue-500/30 bg-blue-500/10">Fase 3: DOM</span></div><h1 class="text-3xl font-bold text-white mb-6">Seleccionar Elementos</h1><p>Para controlar el HTML, primero debes seleccionarlo.</p><div class="code-snippet">const btn = document.querySelector('.boton');</div>`,
+                codeRef: `const titulo = document.getElementById('main-title');`,
+                exercise: { instruction: "Selecciona el body usando document.querySelector y guárdalo en 'cuerpo'.", difficulty: "Intermedio", hint: "const cuerpo = document.querySelector('body');",
+                    validate: (code) => { 
+                        if(code.includes('document.querySelector') && code.includes('body')) return {valid:true, msg:"¡Elemento capturado!", output: "HTMLBodyElement"};
+                        return {valid:false, msg:"Usa document.querySelector('body')"};
+                    }
+                }, quiz: { q: "¿Qué devuelve si no encuentra nada?", options: ["null", "error", "undefined"], correct: 0 }
+            },
+            {
+                id: "j16", title: "16. Eventos", desc: "Listeners.",
+                content: `<div class="mb-4"><span class="badge-mod text-blue-400 border-blue-500/30 bg-blue-500/10">Fase 3: DOM</span></div><h1 class="text-3xl font-bold text-white mb-6">Escuchar Acciones</h1><p><code>addEventListener</code> permite reaccionar a clics, teclas, etc.</p>`,
+                codeRef: `btn.addEventListener('click', () => {\n  alert('Click!');\n});`,
+                exercise: { instruction: "Escribe código para escuchar un 'click' en un elemento 'btn'.", difficulty: "Avanzado", hint: "btn.addEventListener('click', func);",
+                    validate: (code) => { 
+                        if(code.includes('.addEventListener') && code.includes('click')) return {valid:true, msg:"¡Escucha activa!", output: "Listener attached"};
+                        return {valid:false, msg:"Falta addEventListener."};
+                    }
+                }, quiz: { q: "¿Primer argumento de addEventListener?", options: ["Función", "Evento (string)"], correct: 1 }
+            },
+            
+            // FASE 4: FINAL (30)
+            {
+                id: "j30", title: "30. Proyecto Final", desc: "Master.",
+                content: `<div class="mb-4"><span class="badge-mod bg-yellow-600 text-white animate-pulse">PROYECTO FINAL</span></div><h1 class="text-3xl font-bold text-white mb-6">Calculadora de Propinas</h1><p>Crea una función que reciba el total y devuelva total + 10%.</p><div class="concept-card"><ul class="list-disc pl-4 text-sm text-neutral-300"><li>Función flecha.</li><li>Cálculo matemático.</li><li>Retorno de valor.</li></ul></div>`,
+                codeRef: `const calc = (monto) => monto * 1.1;`,
+                exercise: { instruction: "Crea una función 'propina' que reciba 'total' y retorne total * 1.1.", placeholder: "// Tu solución", difficulty: "Dios", hint: "const propina = (total) => total * 1.1;",
+                    validate: (code) => { 
+                        if(code.includes('=>') && code.includes('* 1.1')) return {valid:true, msg:"¡SISTEMA OPERATIVO!", output: "Retorna 110 de 100"};
+                        return {valid:false, msg:"Lógica incorrecta."};
+                    }
+                }, quiz: { q: "¿Listo para React?", options: ["¡SÍ!", "Por supuesto"], correct: 0 }
+            }
+        ];
+
+        // --- GLOSARIO DATA ---
+        const glossaryData = [
+            { tag: "console.log()", desc: "Imprime en consola." },
+            { tag: "let / const", desc: "Declaración de variables." },
+            { tag: "function", desc: "Define una función." },
+            { tag: "=>", desc: "Arrow Function." },
+            { tag: "if / else", desc: "Condicionales." },
+            { tag: "for / while", desc: "Bucles." },
+            { tag: "array[]", desc: "Lista de datos." },
+            { tag: "object{}", desc: "Estructura clave-valor." },
+            { tag: "document", desc: "Acceso al DOM (HTML)." },
+            { tag: ".querySelector()", desc: "Busca un elemento." },
+            { tag: ".addEventListener()", desc: "Escucha eventos." },
+            { tag: "return", desc: "Devuelve un resultado." },
+            { tag: "JSON", desc: "Formato de datos." },
+            { tag: "async/await", desc: "Manejo de promesas." }
+        ];
+
+        // --- STATE LOGIC ---
+        const STORAGE_KEY = 'godsplan_js_v1';
+        let state = { currentIdx: 0, completed: [], xp: 0 };
+        const ranks = ["Iniciado", "Scripter", "Frontend", "Fullstack", "Arquitecto", "JS Master"];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadState();
+            renderSidebar();
+            loadLesson(state.currentIdx);
+            updateUI();
+            lucide.createIcons();
+            renderGlossary();
+            
+            document.getElementById('code-input').addEventListener('keydown', function(e) {
+                if(e.key == 'Tab') {
+                    e.preventDefault();
+                    var start = this.selectionStart;
+                    var end = this.selectionEnd;
+                    this.value = this.value.substring(0, start) + "\t" + this.value.substring(end);
+                    this.selectionStart = this.selectionEnd = start + 1;
+                }
+            });
+        });
+
+        function loadState() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if(saved) {
+                try { 
+                    state = JSON.parse(saved); 
+                    if(state.currentIdx >= curriculum.length) state.currentIdx = curriculum.length - 1;
+                } catch(e) { console.error(e); }
+            }
+        }
+
+        function saveState() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+            updateUI();
+        }
+        
+        function exportData() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state));
+            const node = document.createElement('a');
+            node.setAttribute("href", dataStr);
+            node.setAttribute("download", "godsplan_js_backup.json");
+            document.body.appendChild(node);
+            node.click();
+            node.remove();
+            playTone('success');
+        }
+        
+        function importData() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = e => {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                reader.readAsText(file, "UTF-8");
+                reader.onload = readerEvent => {
+                    try {
+                        const content = JSON.parse(readerEvent.target.result);
+                        if(content.xp !== undefined) {
+                            state = content;
+                            saveState();
+                            loadLesson(state.currentIdx);
+                            playTone('success');
+                            alert('Sistema restaurado.');
+                        }
+                    } catch(err) { playTone('error'); }
+                }
+            }
+            input.click();
+        }
+
+        function updateUI() {
+            const rankIdx = Math.min(Math.floor(state.xp / 600), ranks.length - 1);
+            document.getElementById('user-rank').innerText = ranks[rankIdx];
+            document.getElementById('user-xp').innerText = state.xp + " XP";
+            const pct = Math.round((state.completed.length / curriculum.length) * 100);
+            document.getElementById('progress-bar').style.width = `${pct}%`;
+            document.getElementById('progress-text').innerText = `${pct}%`;
+            const btnNext = document.getElementById('btn-next');
+            const isCompleted = state.completed.includes(state.currentIdx);
+            document.getElementById('btn-prev').disabled = state.currentIdx === 0;
+            if(isCompleted) {
+                btnNext.disabled = false;
+                btnNext.classList.add('bg-yellow-600', 'border-yellow-500', 'hover:bg-yellow-500');
+                btnNext.classList.remove('bg-neutral-800');
+            } else {
+                btnNext.disabled = true;
+                btnNext.classList.remove('bg-yellow-600', 'border-yellow-500', 'hover:bg-yellow-500');
+                btnNext.classList.add('bg-neutral-800');
+            }
+            renderSidebar();
+        }
+
+        function renderSidebar() {
+            const list = document.getElementById('module-list');
+            list.innerHTML = curriculum.map((mod, i) => {
+                const done = state.completed.includes(i);
+                const active = i === state.currentIdx;
+                const activeClass = active ? 'active bg-neutral-900' : 'text-neutral-400 hover:text-neutral-200 hover:bg-neutral-900/50 border-transparent';
+                const statusIcon = done 
+                    ? `<i data-lucide="check-circle" class="w-4 h-4 text-yellow-500"></i>` 
+                    : `<span class="text-[10px] font-mono w-4 text-center opacity-50">${i+1}</span>`;
+                return `<button onclick="loadLesson(${i})" class="nav-item w-full text-left px-3 py-2.5 rounded-md mb-1 flex items-center gap-3 text-sm font-medium transition-all border-l-[3px] group ${activeClass}">${statusIcon}<div class="flex-1 truncate"><span class="${active ? 'text-white' : ''}">${mod.title}</span></div>${active ? '<i data-lucide="chevron-right" class="w-3 h-3 text-yellow-500"></i>' : ''}</button>`;
+            }).join('');
+            lucide.createIcons();
+        }
+
+        function renderGlossary() {
+            const container = document.getElementById('glossary-content');
+            container.innerHTML = glossaryData.map(item => `
+                <div class="p-3 bg-neutral-900/50 rounded border border-neutral-800 hover:border-yellow-500/30 transition-colors">
+                    <code class="text-yellow-400 font-bold">${item.tag}</code>
+                    <p class="text-sm text-neutral-400 mt-1">${item.desc}</p>
+                </div>
+            `).join('');
+        }
+
+        function toggleGlossary() {
+            const modal = document.getElementById('glossary-modal');
+            modal.classList.toggle('hidden');
+            modal.classList.toggle('flex');
+        }
+
+        function loadLesson(idx) {
+            state.currentIdx = idx;
+            saveState();
+            const mod = curriculum[idx];
+            document.getElementById('lesson-content').innerHTML = mod.content;
+            document.getElementById('exercise-instruction').innerText = mod.exercise.instruction;
+            document.getElementById('difficulty-badge').innerText = mod.exercise.difficulty;
+            const editor = document.getElementById('code-input');
+            editor.value = "";
+            editor.placeholder = mod.exercise.placeholder || "// Tu código aquí...";
+            document.getElementById('workspace-area').classList.remove('hidden');
+            document.getElementById('feedback-msg').style.opacity = '0';
+            document.getElementById('feedback-msg').className = ""; 
+            document.getElementById('hint-box').classList.add('hidden');
+            document.getElementById('btn-help').classList.remove('hidden'); 
+            document.getElementById('quiz-container').classList.add('hidden');
+            document.getElementById('console-logs').innerHTML = ""; 
+            document.getElementById('scroll-container').scrollTop = 0;
+            if(window.innerWidth < 1024) {
+                document.getElementById('sidebar').classList.add('-translate-x-full');
+                document.getElementById('mobile-overlay').classList.remove('opacity-100', 'pointer-events-auto');
+            }
+            lucide.createIcons();
+        }
+
+        function validateCode() {
+            const mod = curriculum[state.currentIdx];
+            const code = document.getElementById('code-input').value;
+            const fb = document.getElementById('feedback-msg');
+            playTone('click');
+            
+            const result = mod.exercise.validate(code);
+            
+            // Console Sim
+            const consoleDiv = document.getElementById('console-logs');
+            consoleDiv.innerHTML = ""; 
+            if(result.output) {
+                const line = document.createElement('div');
+                line.className = result.valid ? "text-green-400" : "text-red-400";
+                line.innerText = "> " + result.output;
+                consoleDiv.appendChild(line);
+            }
+
+            fb.innerText = result.msg;
+            fb.style.opacity = '1';
+            
+            if(result.valid) {
+                playTone('success');
+                fb.className = "text-xs font-bold px-4 py-2 rounded bg-green-500/10 text-green-400 border border-green-500/20 flex items-center gap-2 w-full sm:w-auto animate-[pulse-glow_1s]";
+                fb.innerHTML = `<i data-lucide="check" class="w-4 h-4"></i> ${result.msg}`;
+                showQuiz(mod.quiz);
+                lucide.createIcons();
+                confetti({ particleCount: 50, spread: 60, origin: { y: 0.7 }, colors: ['#facc15', '#eab308'] });
+            } else {
+                playTone('error');
+                fb.className = "text-xs font-bold px-4 py-2 rounded bg-red-500/10 text-red-400 border border-red-500/20 flex items-center gap-2 w-full sm:w-auto animate-shake";
+                fb.innerHTML = `<i data-lucide="alert-triangle" class="w-4 h-4"></i> ${result.msg}`;
+                lucide.createIcons();
+            }
+        }
+
+        function showQuiz(quiz) {
+            const container = document.getElementById('quiz-container');
+            container.classList.remove('hidden');
+            document.getElementById('quiz-question').innerText = quiz.q;
+            const isDone = state.completed.includes(state.currentIdx);
+            document.getElementById('quiz-options').innerHTML = quiz.options.map((opt, i) => {
+                let colorClass = "bg-neutral-800 text-neutral-300 hover:bg-neutral-700 hover:text-white border-neutral-700";
+                if(isDone) {
+                    if(i === quiz.correct) colorClass = "bg-green-500/20 border-green-500 text-green-400";
+                    else colorClass = "bg-neutral-800/50 text-neutral-500 border-neutral-800 opacity-50";
+                }
+                return `<button onclick="checkQuiz(this, ${i}, ${quiz.correct})" ${isDone ? 'disabled' : ''} class="w-full text-left p-3 rounded-lg text-sm border transition-all flex justify-between items-center ${colorClass}">${opt}${isDone && i === quiz.correct ? '<i data-lucide="check" class="w-4 h-4"></i>' : ''}</button>`;
+            }).join('');
+            lucide.createIcons();
+            setTimeout(() => { container.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
+        }
+
+        function checkQuiz(btn, selected, correct) {
+            if(selected === correct) {
+                if(!state.completed.includes(state.currentIdx)) {
+                    state.completed.push(state.currentIdx);
+                    state.xp += 100;
+                    playTone('success');
+                    confetti({ particleCount: 150, spread: 100, colors: ['#facc15', '#ffffff'] });
+                    if(state.completed.length === curriculum.length) setTimeout(showCertificate, 1500);
+                }
+                saveState();
+                showQuiz(curriculum[state.currentIdx].quiz); 
+            } else {
+                playTone('error');
+                btn.classList.add('bg-red-500/20', 'border-red-500', 'text-red-400', 'animate-shake');
+            }
+        }
+
+        function toggleHint() {
+            const hintBox = document.getElementById('hint-box');
+            const hintText = document.getElementById('hint-text');
+            const currentMod = curriculum[state.currentIdx];
+            if (hintBox.classList.contains('hidden')) {
+                hintText.innerText = currentMod.exercise.hint || "Sin pistas.";
+                hintBox.classList.remove('hidden');
+                playTone('click');
+            } else { hintBox.classList.add('hidden'); }
+        }
+
+        function nextLesson() { if(state.currentIdx < curriculum.length - 1) loadLesson(state.currentIdx + 1); }
+        function prevLesson() { if(state.currentIdx > 0) loadLesson(state.currentIdx - 1); }
+        function resetCode() { document.getElementById('code-input').value = ""; document.getElementById('code-input').focus(); }
+        function resetProgress() { if(confirm("¿Estás seguro?")) { localStorage.removeItem(STORAGE_KEY); location.reload(); } }
+        function toggleSidebar() {
+            const sb = document.getElementById('sidebar');
+            const ov = document.getElementById('mobile-overlay');
+            const isClosed = sb.classList.contains('-translate-x-full');
+            if(isClosed) { sb.classList.remove('-translate-x-full'); ov.classList.add('opacity-100', 'pointer-events-auto'); } 
+            else { sb.classList.add('-translate-x-full'); ov.classList.remove('opacity-100', 'pointer-events-auto'); }
+        }
+        
+        function showCertificate() {
+            playTone('success');
+            const modal = document.getElementById('certificate-modal');
+            const content = document.getElementById('cert-content');
+            const name = prompt("Nombre para Certificado:", "Operador");
+            document.getElementById('cert-name').innerText = name || "Anónimo";
+            const today = new Date();
+            document.getElementById('cert-date').innerText = today.toLocaleDateString('es-ES');
+            modal.classList.remove('hidden'); modal.classList.add('flex');
+            setTimeout(() => { content.classList.remove('scale-95', 'opacity-0'); content.classList.add('scale-100', 'opacity-100'); }, 50);
+        }
+        function closeCertModal() { document.getElementById('certificate-modal').classList.add('hidden'); document.getElementById('certificate-modal').classList.remove('flex'); }
+    </script>
+    
+    <!-- Helper Styles -->
+    <style>
+        .badge-mod {
+            display: inline-block; padding: 4px 8px; background: rgba(234, 179, 8, 0.1); color: #facc15; border: 1px solid rgba(234, 179, 8, 0.2); border-radius: 4px; font-family: 'Fira Code', monospace; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; letter-spacing: 0.1em;
+        }
+        @keyframes modal-in { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+    <footer data-gp-credit style="flex:none;width:100%;text-align:center;padding:3px 8px;font:500 10px/1.4 system-ui,sans-serif;letter-spacing:.04em;opacity:.55;color:inherit"><a href="https://godsplan.dev" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">© 2026 God's Plan · godsplan.dev</a></footer>
+</body>
+</html>

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Godsplan | Autenticación</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = { darkMode: 'class', theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] } } } }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link rel="icon" type="image/svg+xml" data-gp href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2064%2064'%3E%3Crect%20width='64'%20height='64'%20rx='14'%20fill='%230a0a0a'/%3E%3Cpath%20d='M28%2010h8v16h16v8H36v22h-8V34H12v-8h16z'%20fill='%238a0303'/%3E%3C/svg%3E">
+</head>
+<body class="bg-gray-50 text-gray-900 dark:bg-zinc-950 dark:text-zinc-100 min-h-screen flex items-center justify-center p-6 transition-colors duration-300">
+
+    <div class="w-full max-w-md bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-3xl p-8 shadow-2xl relative overflow-hidden">
+        
+        <!-- Loader de Redirección (Oculto por defecto) -->
+        <div id="redirect-loader" class="absolute inset-0 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm z-50 hidden flex-col items-center justify-center">
+            <i class="ph-bold ph-spinner animate-spin text-4xl text-blue-500 mb-4"></i>
+            <p class="font-mono text-sm">Desencriptando bóveda...</p>
+        </div>
+
+        <div class="flex items-center gap-3 mb-8 justify-center">
+            <div class="w-10 h-10 bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 rounded-xl flex items-center justify-center font-bold text-xl">G</div>
+            <a href="https://godsplan.dev" class="font-bold text-xl tracking-tight">Godsplan.</a>
+        </div>
+
+        <h2 id="auth-title" class="text-2xl font-bold text-center mb-6">Acceso Restringido</h2>
+        
+        <form id="auth-form" class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium mb-1 text-zinc-600 dark:text-zinc-400">Credencial (Email)</label>
+                <input type="email" id="email" required class="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 focus:outline-none focus:border-blue-500 transition-colors">
+            </div>
+            <div>
+                <label class="block text-sm font-medium mb-1 text-zinc-600 dark:text-zinc-400">Llave de Paso (Contraseña)</label>
+                <input type="password" id="password" required class="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 focus:outline-none focus:border-blue-500 transition-colors">
+            </div>
+            
+            <p id="auth-error" class="text-red-500 text-sm font-medium text-center hidden"></p>
+
+            <button type="submit" id="auth-submit-btn" class="w-full py-3 mt-4 rounded-xl bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 font-bold hover:scale-[1.02] transition-transform shadow-lg">
+                Autenticar
+            </button>
+        </form>
+
+        <div class="mt-6 text-center text-sm">
+            <span class="text-zinc-500">¿No tienes bóveda?</span>
+            <button id="toggle-auth-mode" class="font-bold text-blue-500 hover:underline ml-1">Inicializar nueva</button>
+        </div>
+        <div class="mt-6 text-center">
+            <a href="index.html" class="text-xs text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors"><i class="ph-bold ph-arrow-left"></i> Volver a la presentación</a>
+        </div>
+    </div>
+
+    <!-- SCRIPT DE FIREBASE -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } 
+        from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyB9eeepHd1fcRBQbS17fyRWsO1ba734dbw",
+            authDomain: "capital-gp.firebaseapp.com",
+            projectId: "capital-gp",
+            storageBucket: "capital-gp.firebasestorage.app",
+            messagingSenderId: "14321430221",
+            appId: "1:14321430221:web:7c827dc99b8d9446ae8384"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        const authForm = document.getElementById('auth-form');
+        const loader = document.getElementById('redirect-loader');
+        let isLoginMode = true;
+
+        // VIGILANTE: Si ya hay sesión, mandarlo al dashboard sin preguntar
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                loader.style.display = 'flex'; // Mostrar pantalla de carga
+                window.location.href = 'dashboard.html'; // REDIRECCIÓN REAL
+            }
+        });
+
+        authForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const btn = document.getElementById('auth-submit-btn');
+            const errorP = document.getElementById('auth-error');
+            
+            errorP.classList.add('hidden');
+            btn.disabled = true;
+            btn.textContent = "Procesando...";
+
+            if (isLoginMode) {
+                signInWithEmailAndPassword(auth, email, password)
+                    .catch(err => {
+                        errorP.textContent = "Acceso denegado. Verifica tus credenciales.";
+                        errorP.classList.remove('hidden');
+                        btn.disabled = false;
+                        btn.textContent = "Autenticar";
+                    });
+            } else {
+                createUserWithEmailAndPassword(auth, email, password)
+                    .catch(err => {
+                        errorP.textContent = err.code === 'auth/weak-password' ? "Mínimo 6 caracteres." : "Error al crear bóveda.";
+                        errorP.classList.remove('hidden');
+                        btn.disabled = false;
+                        btn.textContent = "Inicializar";
+                    });
+            }
+        });
+
+        // Alternar UI entre Login / Registro
+        document.getElementById('toggle-auth-mode').addEventListener('click', (e) => {
+            isLoginMode = !isLoginMode;
+            document.getElementById('auth-title').textContent = isLoginMode ? "Acceso Restringido" : "Nueva Bóveda";
+            document.getElementById('auth-submit-btn').textContent = isLoginMode ? "Autenticar" : "Inicializar";
+            e.target.textContent = isLoginMode ? "Inicializar nueva" : "Ingresar";
+            e.target.previousElementSibling.textContent = isLoginMode ? "¿No tienes bóveda?" : "¿Ya tienes una?";
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>God's Plan | Coding - Conocimiento Libre</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #000000;
+            color: #e5e5e5;
+        }
+
+        h1, h2, h3, .font-display {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        /* Fondo de cuadrícula tecnológica */
+        .bg-grid-pattern {
+            background-size: 40px 40px;
+            background-image: linear-gradient(to right, rgba(50, 50, 50, 0.1) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(50, 50, 50, 0.1) 1px, transparent 1px);
+        }
+
+        .gradient-text {
+            background: linear-gradient(to right, #ef4444, #ffffff, #ef4444);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradient-flow 3s linear infinite;
+        }
+
+        @keyframes gradient-flow {
+            to { background-position: 200% center; }
+        }
+
+        .glass {
+            background: rgba(10, 10, 10, 0.7);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .glass-card {
+            background: rgba(20, 20, 20, 0.6);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Scrollbar personalizada */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0a0a0a; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #333; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #ef4444; 
+        }
+    </style>
+    <link rel="icon" type="image/svg+xml" data-gp href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2064%2064'%3E%3Crect%20width='64'%20height='64'%20rx='14'%20fill='%230a0a0a'/%3E%3Cpath%20d='M28%2010h8v16h16v8H36v22h-8V34H12v-8h16z'%20fill='%238a0303'/%3E%3C/svg%3E">
+    <meta name="theme-color" content="#0a0a0a" data-gp>
+</head>
+<body class="overflow-x-hidden min-h-screen flex flex-col bg-grid-pattern selection:bg-red-500/30 selection:text-red-200">
+
+    <!-- Navegación -->
+    <nav class="fixed top-0 w-full z-50 glass">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <div class="flex items-center gap-3 cursor-pointer group" onclick="window.location.reload()">
+                <div class="p-2.5 bg-red-600 rounded-lg shadow-[0_0_15px_rgba(220,38,38,0.5)] group-hover:bg-red-500 transition-all duration-300">
+                    <i data-lucide="code-2" class="text-white w-6 h-6"></i>
+                </div>
+                <div class="flex flex-col leading-none">
+                    <span class="text-lg font-bold tracking-tight text-white">
+                        God's Plan
+                    </span>
+                    <span class="text-xs font-mono text-red-500 uppercase tracking-[0.2em]">Coding</span>
+                </div>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                <a href="#cursos" class="text-sm font-medium text-neutral-400 hover:text-white transition-colors hidden sm:block">
+                    Tecnologías
+                </a>
+                <a href="#filosofia" class="text-sm font-medium text-neutral-400 hover:text-white transition-colors hidden sm:block">
+                    Manifiesto
+                </a>
+                <a href="https://github.com" target="_blank" class="p-2 rounded-lg hover:bg-neutral-800 text-neutral-400 hover:text-white transition-colors" title="Ver en GitHub">
+                    <i data-lucide="github" class="w-5 h-5"></i>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="relative pt-40 pb-20 overflow-hidden flex-grow flex items-center justify-center">
+        <!-- Efectos de luz de fondo (Rojos) -->
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full pointer-events-none -z-10">
+            <div class="absolute top-[-20%] left-[20%] w-[500px] h-[500px] bg-red-600/10 blur-[120px] rounded-full mix-blend-screen animate-pulse duration-[4s]"></div>
+            <div class="absolute bottom-[-10%] right-[10%] w-[400px] h-[400px] bg-rose-900/20 blur-[100px] rounded-full"></div>
+        </div>
+
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative text-center z-10">
+            <!-- Badge -->
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-red-950/30 border border-red-900/50 text-red-400 text-xs font-bold tracking-widest mb-8 hover:bg-red-900/20 transition-colors cursor-default backdrop-blur-md">
+                <i data-lucide="unlock" class="w-3 h-3"></i>
+                <span>SIN REGISTROS · SIN PAGOS · SIN BARRERAS</span>
+            </div>
+            
+            <h1 class="text-5xl md:text-7xl font-display font-extrabold tracking-tight mb-8 leading-tight text-white">
+                Programación de Elite.<br />
+                <span class="gradient-text">Acceso Universal.</span>
+            </h1>
+            
+            <p class="max-w-2xl mx-auto text-lg md:text-xl text-neutral-400 mb-10 leading-relaxed font-light">
+                Creemos que la educación no debería tener muros. 
+                <strong class="text-neutral-200">God's Plan | Coding</strong> te entrega el conocimiento puro, directo y sin pedirte nada a cambio. Solo tu compromiso de aprender.
+            </p>
+
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4 animate-in fade-in slide-in-from-bottom-4 duration-1000 fill-mode-forwards">
+                <a href="#cursos" class="w-full sm:w-auto px-8 py-4 bg-red-600 text-white rounded-xl font-bold hover:bg-red-500 transition-all flex items-center justify-center gap-2 group shadow-[0_0_20px_rgba(220,38,38,0.4)] hover:shadow-[0_0_30px_rgba(220,38,38,0.6)] hover:-translate-y-1">
+                    <span>Empezar a Aprender</span>
+                    <i data-lucide="arrow-down" class="w-5 h-5 group-hover:translate-y-1 transition-transform"></i>
+                </a>
+                <div class="flex items-center gap-2 text-neutral-500 text-sm px-4">
+                    <i data-lucide="check-circle-2" class="w-4 h-4 text-green-500"></i>
+                    <span>No requiere cuenta</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sección de Cursos -->
+    <section id="cursos" class="py-24 bg-neutral-950/50 border-t border-neutral-900 relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-end mb-12 gap-4">
+                <div>
+                    <h2 class="text-3xl md:text-4xl font-bold mb-3 text-white">Biblioteca de Conocimiento</h2>
+                    <p class="text-neutral-400">Elige tu herramienta y accede al contenido inmediatamente.</p>
+                </div>
+                <!-- Decoración -->
+                <div class="h-1 w-32 bg-gradient-to-r from-red-600 to-transparent rounded-full hidden md:block"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                
+                <!-- 1. HTML5 & CSS (ACTIVO) -->
+                <a href="html5.html" class="group glass-card rounded-2xl p-6 hover:border-orange-500/50 transition-all duration-300 hover:-translate-y-2 relative overflow-hidden block">
+                    <!-- Glow Effect -->
+                    <div class="absolute -inset-1 bg-gradient-to-r from-orange-600 to-orange-400 rounded-2xl blur opacity-0 group-hover:opacity-20 transition duration-500"></div>
+                    
+                    <div class="relative flex flex-col h-full">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="w-12 h-12 rounded-xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-orange-500 group-hover:scale-110 transition-transform duration-300">
+                                <i data-lucide="layout-template" class="w-6 h-6"></i>
+                            </div>
+                            <span class="px-2.5 py-1 rounded-md text-[10px] font-bold bg-green-500/10 text-green-400 border border-green-500/20 uppercase tracking-wide">
+                                Disponible
+                            </span>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2 group-hover:text-orange-400 transition-colors">HTML5 & CSS3</h3>
+                        <p class="text-neutral-400 text-sm mb-6 leading-relaxed">
+                            La base de todo. Estructura semántica y diseño responsivo.
+                        </p>
+                        <div class="mt-auto pt-4 border-t border-neutral-800 flex items-center justify-between text-sm text-orange-400 font-medium">
+                            <span>Frontend Core</span>
+                            <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- 2. Python (ACTIVO) -->
+                <a href="python.html" class="group glass-card rounded-2xl p-6 hover:border-blue-500/50 transition-all duration-300 hover:-translate-y-2 relative overflow-hidden block">
+                    <!-- Glow Effect -->
+                    <div class="absolute -inset-1 bg-gradient-to-r from-blue-600 to-blue-400 rounded-2xl blur opacity-0 group-hover:opacity-20 transition duration-500"></div>
+                    
+                    <div class="relative flex flex-col h-full">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-500 group-hover:scale-110 transition-transform duration-300">
+                                <i data-lucide="terminal-square" class="w-6 h-6"></i>
+                            </div>
+                            <span class="px-2.5 py-1 rounded-md text-[10px] font-bold bg-green-500/10 text-green-400 border border-green-500/20 uppercase tracking-wide">
+                                Disponible
+                            </span>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2 group-hover:text-blue-400 transition-colors">Python</h3>
+                        <p class="text-neutral-400 text-sm mb-6 leading-relaxed">
+                            Lógica de backend, scripts y automatización.
+                        </p>
+                        <div class="mt-auto pt-4 border-t border-neutral-800 flex items-center justify-between text-sm text-blue-400 font-medium">
+                            <span>Backend Logic</span>
+                            <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- 3. JavaScript (ACTIVO) -->
+                <a href="javascript.html" class="group glass-card rounded-2xl p-6 hover:border-yellow-500/50 transition-all duration-300 hover:-translate-y-2 relative overflow-hidden block">
+                    <!-- Glow Effect -->
+                    <div class="absolute -inset-1 bg-gradient-to-r from-yellow-600 to-yellow-400 rounded-2xl blur opacity-0 group-hover:opacity-20 transition duration-500"></div>
+                    
+                    <div class="relative flex flex-col h-full">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="w-12 h-12 rounded-xl bg-yellow-500/10 border border-yellow-500/20 flex items-center justify-center text-yellow-500 group-hover:scale-110 transition-transform duration-300">
+                                <i data-lucide="zap" class="w-6 h-6"></i>
+                            </div>
+                            <span class="px-2.5 py-1 rounded-md text-[10px] font-bold bg-green-500/10 text-green-400 border border-green-500/20 uppercase tracking-wide">
+                                Disponible
+                            </span>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2 group-hover:text-yellow-400 transition-colors">JavaScript</h3>
+                        <p class="text-neutral-400 text-sm mb-6 leading-relaxed">
+                            Interactividad real. El motor que mueve la web moderna.
+                        </p>
+                        <div class="mt-auto pt-4 border-t border-neutral-800 flex items-center justify-between text-sm text-yellow-400 font-medium">
+                            <span>Fullstack Web</span>
+                            <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- 4. SQL (ACTIVO) -->
+                <a href="sql.html" class="group glass-card rounded-2xl p-6 hover:border-purple-500/50 transition-all duration-300 hover:-translate-y-2 relative overflow-hidden block">
+                    <!-- Glow Effect -->
+                    <div class="absolute -inset-1 bg-gradient-to-r from-purple-600 to-purple-400 rounded-2xl blur opacity-0 group-hover:opacity-20 transition duration-500"></div>
+                    
+                    <div class="relative flex flex-col h-full">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-500 group-hover:scale-110 transition-transform duration-300">
+                                <i data-lucide="database" class="w-6 h-6"></i>
+                            </div>
+                            <span class="px-2.5 py-1 rounded-md text-[10px] font-bold bg-green-500/10 text-green-400 border border-green-500/20 uppercase tracking-wide">
+                                Disponible
+                            </span>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2 group-hover:text-purple-400 transition-colors">SQL</h3>
+                        <p class="text-neutral-400 text-sm mb-6 leading-relaxed">
+                            Dominio de datos. Consultas y bases de datos relacionales.
+                        </p>
+                        <div class="mt-auto pt-4 border-t border-neutral-800 flex items-center justify-between text-sm text-purple-400 font-medium">
+                            <span>Data Mastery</span>
+                            <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
+                        </div>
+                    </div>
+                </a>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Sección Manifiesto / Filosofía -->
+    <section id="filosofia" class="py-20 bg-black relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-full h-full bg-grid-pattern opacity-50 pointer-events-none"></div>
+        <div class="max-w-4xl mx-auto px-4 text-center relative z-10">
+            <h2 class="text-3xl md:text-4xl font-bold mb-4 text-white">El Manifiesto</h2>
+            <p class="text-neutral-400 max-w-2xl mx-auto mb-12">No es caridad. Es justicia. Creemos en un internet donde el conocimiento fluye sin peajes.</p>
+            
+            <div class="grid md:grid-cols-3 gap-8 text-left">
+                <div class="p-6 rounded-2xl border border-neutral-800 bg-neutral-900/50 backdrop-blur-sm group hover:border-red-900/50 transition-colors">
+                    <i data-lucide="scale" class="w-8 h-8 text-red-600 mb-4 group-hover:scale-110 transition-transform"></i>
+                    <h3 class="font-bold text-lg text-white mb-3">Talento vs. Circunstancia</h3>
+                    <p class="text-sm text-neutral-400 leading-relaxed">
+                        El talento está distribuido equitativamente por el mundo; las oportunidades no. Esta plataforma existe para equilibrar esa balanza. Tu código vale lo mismo sin importar de dónde vengas.
+                    </p>
+                </div>
+                <div class="p-6 rounded-2xl border border-neutral-800 bg-neutral-900/50 backdrop-blur-sm group hover:border-red-900/50 transition-colors">
+                    <i data-lucide="heart-handshake" class="w-8 h-8 text-red-600 mb-4 group-hover:scale-110 transition-transform"></i>
+                    <h3 class="font-bold text-lg text-white mb-3">El Honor de Enseñar</h3>
+                    <p class="text-sm text-neutral-400 leading-relaxed">
+                        El conocimiento real no debería ser una mercancía. Cuando cobras por lo básico, creas clientes. Cuando enseñas gratis, creas colegas. Aquí no queremos tu dinero, queremos tu excelencia.
+                    </p>
+                </div>
+                <div class="p-6 rounded-2xl border border-neutral-800 bg-neutral-900/50 backdrop-blur-sm group hover:border-red-900/50 transition-colors">
+                    <i data-lucide="sword" class="w-8 h-8 text-red-600 mb-4 group-hover:scale-110 transition-transform"></i>
+                    <h3 class="font-bold text-lg text-white mb-3">Tu Lucha, Tu Victoria</h3>
+                    <p class="text-sm text-neutral-400 leading-relaxed">
+                        Nadie te va a regalar el éxito, pero tampoco deberían cobrarte por las herramientas para construirlo. Te damos la espada y el escudo; la batalla por tu futuro la peleas tú.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-16 border-t border-neutral-900 bg-black text-center relative overflow-hidden">
+        <!-- Luz sutil en el footer -->
+        <div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-[300px] h-[100px] bg-red-900/10 blur-[80px] rounded-full pointer-events-none"></div>
+        
+        <div class="relative z-10 flex flex-col items-center justify-center gap-4">
+            <i data-lucide="code-2" class="w-6 h-6 text-neutral-600"></i>
+            
+            <div class="space-y-1">
+                <p class="text-neutral-500 text-xs tracking-widest uppercase">Diseño, Arquitectura & Desarrollo por</p>
+                <p class="text-2xl font-bold text-white tracking-tighter hover:text-red-500 transition-colors">
+                    <a href="https://godsplan.dev" target="_blank" rel="noopener" data-gp>God\'s Plan</a>
+                </p>
+            </div>
+            
+            <p class="text-neutral-800 text-[10px] mt-4 font-mono">
+                God's Plan | Coding © 2026
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // Inicializar Lucide Icons
+        lucide.createIcons();
+    </script>
+</body>
+</html>
