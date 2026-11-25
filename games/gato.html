@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Gato | God's Plan Games</title>
+<meta name="theme-color" content="#0b0a0a">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2064%2064'%3E%3Crect%20width='64'%20height='64'%20rx='14'%20fill='%230b0a0a'/%3E%3Cpath%20d='M28%2010h8v16h16v8H36v22h-8V34H12v-8h16z'%20fill='%23ef5058'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/games.css">
+<style>
+  .ttt { display: grid; grid-template-columns: repeat(3, 1fr); gap: .5rem; width: min(22rem, 86vw); }
+  .t { aspect-ratio: 1; border: 0; border-radius: var(--gp-radius-md); background: var(--gp-bg-3); cursor: pointer; display: grid; place-items: center; font-family: var(--gp-font-display); font-weight: 900; font-size: clamp(2.5rem, 14vw, 4.5rem); line-height: 1; }
+  .t:hover:not(:disabled) { background: #2a2323; }
+  .t:disabled { cursor: default; }
+  .t.x { color: var(--gp-crimson-400); } .t.o { color: var(--gp-text-1); }
+  .t.x, .t.o { animation: g-pop .18s ease-out; }
+  .t.win { background: var(--gp-crimson-tint); box-shadow: inset 0 0 0 2px var(--gp-line-accent); }
+  .turn { color: var(--gp-text-2); margin: 0; min-height: 1.5em; }
+</style>
+</head>
+<body>
+<header class="g-bar">
+  <a class="g-back" href="index.html">← Juegos</a>
+  <h1 class="g-title">Ga<b>to</b></h1>
+  <div class="g-bar__end">
+    <button class="btn btn--sm" data-mode="facil">Fácil</button>
+    <button class="btn btn--sm" data-mode="dificil">Imposible</button>
+    <button class="btn btn--sm" data-mode="2p">2 jugadores</button>
+  </div>
+</header>
+<main class="g-main">
+  <div class="g-stats">
+    <div class="g-stat"><span id="lx">tú (X)</span><strong id="sx">0</strong></div>
+    <div class="g-stat"><span>empates</span><strong id="sd">0</strong></div>
+    <div class="g-stat"><span id="lo">cpu (O)</span><strong id="so">0</strong></div>
+  </div>
+  <p class="turn" id="turn"></p>
+  <div class="g-board"><div class="ttt" id="ttt"></div></div>
+  <div class="g-actions"><button class="btn btn--primary" id="again">Otra ronda</button></div>
+  <p class="g-help">Tres en línea. En "Imposible" la computadora nunca pierde: lo mejor que puedes sacar es empate.</p>
+</main>
+<script src="assets/games.js"></script>
+<script>
+(function () {
+  var LINES = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+  var mode = GP.get('gato_mode') || 'dificil', b, turn, over, starter = 'X', sc = { X: 0, O: 0, D: 0 };
+  var el = document.getElementById('ttt'), turnEl = document.getElementById('turn');
+  for (var i = 0; i < 9; i++) { var c = document.createElement('button'); c.className = 't'; c.dataset.i = i; c.setAttribute('aria-label', 'Casilla ' + (i + 1)); el.appendChild(c); }
+
+  function winner(s) { for (var k = 0; k < 8; k++) { var l = LINES[k]; if (s[l[0]] && s[l[0]] === s[l[1]] && s[l[0]] === s[l[2]]) return { p: s[l[0]], line: l }; } return s.indexOf(null) < 0 ? { p: 'D' } : null; }
+  function minimax(s, player) {
+    var w = winner(s); if (w) return { score: w.p === 'O' ? 10 : w.p === 'X' ? -10 : 0 };
+    var best = { score: player === 'O' ? -99 : 99 };
+    for (var i = 0; i < 9; i++) if (!s[i]) {
+      s[i] = player; var r = minimax(s, player === 'O' ? 'X' : 'O'); s[i] = null;
+      r.score += r.score > 0 ? -1 : r.score < 0 ? 1 : 0;
+      if (player === 'O' ? r.score > best.score : r.score < best.score) best = { score: r.score, i: i };
+    }
+    return best;
+  }
+  function cpu() {
+    var free = []; b.forEach(function (v, i) { if (!v) free.push(i); });
+    var i = (mode === 'facil' && Math.random() < .65) ? free[Math.floor(Math.random() * free.length)] : minimax(b.slice(), 'O').i;
+    setTimeout(function () { play(i); }, 320);
+  }
+  function labels() {
+    document.getElementById('lx').textContent = mode === '2p' ? 'jugador X' : 'tú (X)';
+    document.getElementById('lo').textContent = mode === '2p' ? 'jugador O' : 'cpu (O)';
+    document.querySelectorAll('[data-mode]').forEach(function (x) { x.setAttribute('aria-pressed', x.dataset.mode === mode); });
+  }
+  function round() {
+    b = Array(9).fill(null); over = false; turn = starter; starter = starter === 'X' ? 'O' : 'X';
+    el.querySelectorAll('.t').forEach(function (c) { c.textContent = ''; c.className = 't'; c.disabled = false; });
+    status(); if (mode !== '2p' && turn === 'O') cpu();
+  }
+  function status() { turnEl.textContent = over ? '' : mode === '2p' ? 'Turno de ' + turn : turn === 'X' ? 'Tu turno' : 'Pensando…'; }
+  function play(i) {
+    if (over || b[i]) return;
+    b[i] = turn; var c = el.children[i]; c.textContent = turn; c.classList.add(turn.toLowerCase()); c.disabled = true;
+    var w = winner(b);
+    if (w) {
+      over = true; sc[w.p]++; ['X', 'O', 'D'].forEach(function (k) { document.getElementById('s' + k.toLowerCase()).textContent = sc[k]; });
+      if (w.line) w.line.forEach(function (k) { el.children[k].classList.add('win'); });
+      el.querySelectorAll('.t').forEach(function (x) { x.disabled = true; });
+      turnEl.textContent = w.p === 'D' ? 'Empate' : mode === '2p' ? 'Ganó ' + w.p : w.p === 'X' ? '¡Ganaste!' : 'Ganó la computadora';
+      if (w.p === 'X' && mode !== '2p') GP.best('gato_' + mode, sc.X, true);
+      GP.played('gato');
+      return;
+    }
+    turn = turn === 'X' ? 'O' : 'X'; status();
+    if (mode !== '2p' && turn === 'O') cpu();
+  }
+  el.addEventListener('click', function (e) { var c = e.target.closest('.t'); if (!c) return; if (mode !== '2p' && turn !== 'X') return; play(+c.dataset.i); });
+  document.getElementById('again').onclick = round;
+  document.querySelectorAll('[data-mode]').forEach(function (x) { x.onclick = function () { mode = x.dataset.mode; GP.set('gato_mode', mode); sc = { X: 0, O: 0, D: 0 }; ['x','o','d'].forEach(function (k) { document.getElementById('s' + k).textContent = 0; }); starter = 'X'; labels(); round(); }; });
+  labels(); round();
+})();
+</script>
+</body>
+</html>

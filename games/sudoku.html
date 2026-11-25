@@ -161,7 +161,7 @@
         ::-webkit-scrollbar-track { background: #050000; }
         ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
     </style>
-    <link rel="icon" type="image/svg+xml" data-gp href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2064%2064'%3E%3Crect%20width='64'%20height='64'%20rx='14'%20fill='%230a0a0a'/%3E%3Cpath%20d='M28%2010h8v16h16v8H36v22h-8V34H12v-8h16z'%20fill='%238a0303'/%3E%3C/svg%3E">
+    <link rel="icon" type="image/svg+xml" data-gp href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2064%2064'%3E%3Crect%20width='64'%20height='64'%20rx='14'%20fill='%230b0a0a'/%3E%3Cpath%20d='M28%2010h8v16h16v8H36v22h-8V34H12v-8h16z'%20fill='%23ef5058'/%3E%3C/svg%3E">
     <meta name="theme-color" content="#0a0a0a" data-gp>
 </head>
 <body class="flex flex-col min-h-screen overflow-hidden">
@@ -360,7 +360,7 @@
                     <span class="relative bg-[#141416] px-2 text-[10px] text-zinc-500 font-bold uppercase tracking-widest">O accede con</span>
                 </div>
                 <button onclick="window.app.loginGoogle()" class="w-full bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/30 text-white font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-3 group cursor-pointer">
-                    <i class="ph-bold ph-google-logo text-xl group-hover:text-brand transition-colors"></i> <span>Google Account</span>
+                    <i class="ph-bold ph-google-logo text-xl group-hover:text-brand transition-colors"></i> <span>Cuenta de Google</span>
                 </button>
             </div>
         </div>
@@ -946,7 +946,7 @@
                                     <div className="flex gap-1 mb-1">
                                         {[0,1,2].map(i => <div key={i} className={`w-1.5 h-1.5 rounded-full ${i < mistakes ? 'bg-red-500 shadow-[0_0_4px_red]' : 'bg-zinc-800'}`}></div>)}
                                     </div>
-                                    <span className="text-[10px] text-zinc-500 uppercase tracking-wider">Mistakes</span>
+                                    <span className="text-[10px] text-zinc-500 uppercase tracking-wider">Errores</span>
                                 </div>
                                 <div className="text-sm font-mono font-bold bg-zinc-900 px-3 py-1.5 rounded border border-zinc-800 min-w-[60px] text-center text-white">
                                     {formatTime(time)}
@@ -961,7 +961,7 @@
                             <div className="glass-panel bg-black/90 p-4 rounded-xl border border-yellow-500/30 flex items-center gap-4 shadow-[0_0_30px_rgba(234,179,8,0.2)]">
                                 <div className="w-10 h-10 rounded-full bg-yellow-900/30 flex items-center justify-center text-yellow-400"><i className={`ph-fill ${newUnlock.icon} text-xl`}></i></div>
                                 <div className="flex flex-col">
-                                    <span className="text-[10px] font-bold text-yellow-500 uppercase tracking-widest">Achievement Unlocked</span>
+                                    <span className="text-[10px] font-bold text-yellow-500 uppercase tracking-widest">Logro desbloqueado</span>
                                     <span className="text-white font-bold">{newUnlock.title}</span>
                                 </div>
                             </div>
@@ -973,7 +973,7 @@
                         <div className="fixed z-[60] inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center" onClick={() => setShowAchievements(false)}>
                             <div className="glass-panel p-0 rounded-2xl w-[90%] max-w-[400px] overflow-hidden flex flex-col max-h-[80vh]" onClick={e => e.stopPropagation()}>
                                 <div className="p-6 border-b border-white/10 bg-black/40">
-                                    <h3 className="text-white text-xl font-black uppercase tracking-wider flex items-center gap-2"><i className="ph-fill ph-trophy text-yellow-500"></i> Trophies</h3>
+                                    <h3 className="text-white text-xl font-black uppercase tracking-wider flex items-center gap-2"><i className="ph-fill ph-trophy text-yellow-500"></i> Trofeos</h3>
                                     <p className="text-zinc-500 text-xs mt-1">Unlocked: {unlocked.size} / {ACHIEVEMENTS.length}</p>
                                 </div>
                                 <div className="flex-1 overflow-y-auto p-4 space-y-2">
@@ -992,7 +992,7 @@
                                     })}
                                 </div>
                                 <div className="p-4 border-t border-white/10 bg-black/40">
-                                     <button onClick={() => setShowAchievements(false)} className="w-full bg-zinc-800 hover:bg-zinc-700 py-3 rounded text-xs uppercase font-bold text-white transition-colors">Close</button>
+                                     <button onClick={() => setShowAchievements(false)} className="w-full bg-zinc-800 hover:bg-zinc-700 py-3 rounded text-xs uppercase font-bold text-white transition-colors">Cerrar</button>
                                 </div>
                             </div>
                         </div>
@@ -1019,7 +1019,7 @@
                                         </button>
                                     </div>
                                 </div>
-                                <button onClick={() => setShowSettings(false)} className="w-full mt-6 bg-zinc-800 hover:bg-zinc-700 py-2 rounded text-xs uppercase font-bold text-white transition-colors">Close</button>
+                                <button onClick={() => setShowSettings(false)} className="w-full mt-6 bg-zinc-800 hover:bg-zinc-700 py-2 rounded text-xs uppercase font-bold text-white transition-colors">Cerrar</button>
                             </div>
                         </div>
                     )}
@@ -1036,24 +1036,24 @@
                                 <div className="absolute inset-0 bg-yellow-900/10 group-hover:bg-yellow-900/20 transition-colors"></div>
                                 <div className="relative p-4 flex items-center justify-between">
                                     <div className="flex flex-col">
-                                        <span className="text-[10px] text-yellow-500 font-bold uppercase tracking-widest mb-1">Daily Challenge</span>
+                                        <span className="text-[10px] text-yellow-500 font-bold uppercase tracking-widest mb-1">Reto diario</span>
                                         <span className="text-white font-bold text-lg">{new Date().toLocaleDateString('en-US', {weekday:'short', day:'numeric'})}</span>
                                     </div>
                                     <button onClick={() => startNewGame('medium', true)} disabled={dailyCompleted} className={`w-12 h-12 rounded-full flex items-center justify-center border transition-all ${dailyCompleted ? 'bg-zinc-800 border-zinc-700 text-zinc-500' : 'bg-yellow-500 text-black border-yellow-400 hover:scale-105 shadow-[0_0_15px_rgba(234,179,8,0.4)]'}`}><i className={`ph-fill ${dailyCompleted ? 'ph-check' : 'ph-play'} text-xl`}></i></button>
                                 </div>
-                                {dailyCompleted && <div className="absolute inset-0 flex items-center justify-center bg-black/60 backdrop-blur-[1px] text-emerald-500 font-bold tracking-widest uppercase text-sm">Completed</div>}
+                                {dailyCompleted && <div className="absolute inset-0 flex items-center justify-center bg-black/60 backdrop-blur-[1px] text-emerald-500 font-bold tracking-widest uppercase text-sm">Completado</div>}
                             </div>
                             <div className="w-full flex items-center justify-between mb-4 px-1">
-                                <span className="text-xs text-zinc-500 font-bold uppercase tracking-widest">New Session</span>
-                                <button onClick={() => setShowAchievements(true)} className="flex items-center gap-1 text-[10px] text-zinc-400 hover:text-white transition-colors"><i className="ph-fill ph-trophy text-yellow-600"></i> View Trophies</button>
+                                <span className="text-xs text-zinc-500 font-bold uppercase tracking-widest">Nueva partida</span>
+                                <button onClick={() => setShowAchievements(true)} className="flex items-center gap-1 text-[10px] text-zinc-400 hover:text-white transition-colors"><i className="ph-fill ph-trophy text-yellow-600"></i> Ver logros</button>
                             </div>
                             <div className="grid grid-cols-2 gap-2 w-full">
-                                <button onClick={() => startNewGame('easy')} className="bg-zinc-800 hover:bg-emerald-900/40 hover:border-emerald-500/50 border border-white/5 py-4 rounded-lg text-xs font-bold uppercase tracking-widest transition-all flex flex-col items-center gap-1 group"><i className="ph-bold ph-smiley text-emerald-500 text-lg mb-1 group-hover:scale-110 transition-transform"></i><span>Easy</span></button>
-                                <button onClick={() => startNewGame('medium')} className="bg-zinc-800 hover:bg-yellow-900/40 hover:border-yellow-500/50 border border-white/5 py-4 rounded-lg text-xs font-bold uppercase tracking-widest transition-all flex flex-col items-center gap-1 group"><i className="ph-bold ph-brain text-yellow-500 text-lg mb-1 group-hover:scale-110 transition-transform"></i><span>Medium</span></button>
-                                <button onClick={() => startNewGame('hard')} className="bg-zinc-800 hover:bg-red-900/40 hover:border-red-500/50 border border-white/5 py-4 rounded-lg text-xs font-bold uppercase tracking-widest transition-all flex flex-col items-center gap-1 group"><i className="ph-bold ph-fire text-red-500 text-lg mb-1 group-hover:scale-110 transition-transform"></i><span>Hard</span></button>
-                                <button onClick={() => startNewGame('insane')} className="bg-zinc-800 hover:bg-purple-900/40 hover:border-purple-500/50 border border-white/5 py-4 rounded-lg text-xs font-bold uppercase tracking-widest transition-all flex flex-col items-center gap-1 group"><i className="ph-bold ph-skull text-purple-500 text-lg mb-1 group-hover:scale-110 transition-transform"></i><span>Insane</span></button>
+                                <button onClick={() => startNewGame('easy')} className="bg-zinc-800 hover:bg-emerald-900/40 hover:border-emerald-500/50 border border-white/5 py-4 rounded-lg text-xs font-bold uppercase tracking-widest transition-all flex flex-col items-center gap-1 group"><i className="ph-bold ph-smiley text-emerald-500 text-lg mb-1 group-hover:scale-110 transition-transform"></i><span>Fácil</span></button>
+                                <button onClick={() => startNewGame('medium')} className="bg-zinc-800 hover:bg-yellow-900/40 hover:border-yellow-500/50 border border-white/5 py-4 rounded-lg text-xs font-bold uppercase tracking-widest transition-all flex flex-col items-center gap-1 group"><i className="ph-bold ph-brain text-yellow-500 text-lg mb-1 group-hover:scale-110 transition-transform"></i><span>Medio</span></button>
+                                <button onClick={() => startNewGame('hard')} className="bg-zinc-800 hover:bg-red-900/40 hover:border-red-500/50 border border-white/5 py-4 rounded-lg text-xs font-bold uppercase tracking-widest transition-all flex flex-col items-center gap-1 group"><i className="ph-bold ph-fire text-red-500 text-lg mb-1 group-hover:scale-110 transition-transform"></i><span>Difícil</span></button>
+                                <button onClick={() => startNewGame('insane')} className="bg-zinc-800 hover:bg-purple-900/40 hover:border-purple-500/50 border border-white/5 py-4 rounded-lg text-xs font-bold uppercase tracking-widest transition-all flex flex-col items-center gap-1 group"><i className="ph-bold ph-skull text-purple-500 text-lg mb-1 group-hover:scale-110 transition-transform"></i><span>Experto</span></button>
                             </div>
-                            {grid.length > 0 && <button onClick={() => setGameState('playing')} className="mt-6 w-full py-3 border-t border-white/10 text-zinc-400 hover:text-white text-xs tracking-wider uppercase font-bold transition-colors">Resume Current Game</button>}
+                            {grid.length > 0 && <button onClick={() => setGameState('playing')} className="mt-6 w-full py-3 border-t border-white/10 text-zinc-400 hover:text-white text-xs tracking-wider uppercase font-bold transition-colors">Continuar partida</button>}
                         </div>
                     )}
 
@@ -1061,7 +1061,7 @@
                     {gameState === 'paused' && (
                         <div className="fixed inset-0 z-40 bg-black/80 backdrop-blur-md flex items-center justify-center animate-pop">
                             <div className="glass-panel p-8 rounded-2xl flex flex-col items-center w-[90%] max-w-sm">
-                                <h2 className="text-4xl font-black text-white mb-8 tracking-widest italic">PAUSED</h2>
+                                <h2 className="text-4xl font-black text-white mb-8 tracking-widest italic">PAUSA</h2>
                                 
                                 {/* Settings Controls */}
                                 <div className="w-full flex flex-col gap-3 mb-8">
@@ -1100,8 +1100,8 @@
                                 <i className="ph-fill ph-trophy text-yellow-500 text-7xl mb-6 drop-shadow-[0_0_35px_rgba(234,179,8,0.6)] animate-bounce"></i>
                                 <h2 className="text-5xl font-black text-white mb-2 italic tracking-tighter">VICTORY</h2>
                                 <div className="h-1 w-20 bg-gradient-to-r from-transparent via-yellow-500 to-transparent mb-6"></div>
-                                <p className="text-zinc-300 mb-8 font-mono text-sm">Protocol Completed<br/>Time: <span className="text-white font-bold">{formatTime(time)}</span></p>
-                                <button onClick={() => setGameState('menu')} className="px-10 py-3 bg-zinc-800 hover:bg-white hover:text-black border border-white/20 rounded-full text-xs font-bold uppercase tracking-widest transition-all">Continue</button>
+                                <p className="text-zinc-300 mb-8 font-mono text-sm">¡Sudoku resuelto!<br/>Time: <span className="text-white font-bold">{formatTime(time)}</span></p>
+                                <button onClick={() => setGameState('menu')} className="px-10 py-3 bg-zinc-800 hover:bg-white hover:text-black border border-white/20 rounded-full text-xs font-bold uppercase tracking-widest transition-all">Continuar</button>
                             </div>
                         </div>
                     )}
@@ -1110,9 +1110,9 @@
                         <div className="fixed inset-0 z-50 bg-black/95 backdrop-blur-xl flex items-center justify-center animate-pop">
                              <div className="p-8 flex flex-col items-center text-center border border-red-900/50 rounded-2xl bg-red-950/10">
                                 <i className="ph-duotone ph-warning text-red-500 text-7xl mb-4 animate-pulse"></i>
-                                <h2 className="text-4xl font-black text-white mb-2 italic tracking-tighter">FAILURE</h2>
+                                <h2 className="text-4xl font-black text-white mb-2 italic tracking-tighter">PERDISTE</h2>
                                 <p className="text-red-300/70 mb-8 font-mono text-xs max-w-[200px]">Error threshold exceeded. System lockout initiated.</p>
-                                <button onClick={() => setGameState('menu')} className="w-full bg-red-600 hover:bg-red-500 py-3 rounded text-xs font-bold uppercase tracking-widest transition-all text-white shadow-[0_0_20px_rgba(220,38,38,0.3)]">Reboot System</button>
+                                <button onClick={() => setGameState('menu')} className="w-full bg-red-600 hover:bg-red-500 py-3 rounded text-xs font-bold uppercase tracking-widest transition-all text-white shadow-[0_0_20px_rgba(220,38,38,0.3)]">Reintentar</button>
                             </div>
                         </div>
                     )}
@@ -1145,9 +1145,9 @@
                             <div className="w-full mt-4 flex flex-col gap-3 max-w-[380px]">
                                 <div className="flex justify-between gap-2 px-1">
                                     <button onClick={handleUndo} className="flex-1 h-12 rounded bg-zinc-900 border border-white/5 flex flex-col items-center justify-center gap-1 text-zinc-400 hover:text-white hover:bg-zinc-800 transition-all active:scale-95 group"><i className="ph-bold ph-arrow-u-up-left text-lg group-hover:-translate-y-0.5 transition-transform"></i><span className="text-[9px] uppercase font-bold tracking-wider">Undo</span></button>
-                                    <button onClick={handleErase} className="flex-1 h-12 rounded bg-zinc-900 border border-white/5 flex flex-col items-center justify-center gap-1 text-zinc-400 hover:text-white hover:bg-zinc-800 transition-all active:scale-95 group"><i className="ph-bold ph-eraser text-lg group-hover:-translate-y-0.5 transition-transform"></i><span className="text-[9px] uppercase font-bold tracking-wider">Erase</span></button>
-                                    <button onClick={() => { setIsNoteMode(!isNoteMode); if(settings.sound) SoundFX.click(); }} className={`flex-1 h-12 rounded border flex flex-col items-center justify-center gap-1 transition-all active:scale-95 ${isNoteMode ? 'bg-emerald-900/30 border-emerald-500 text-emerald-400' : 'bg-zinc-900 border-white/5 text-zinc-400 hover:text-white hover:bg-zinc-800'}`}><div className="relative"><i className={`ph-bold ph-pencil-simple text-lg ${isNoteMode ? 'animate-bounce' : ''}`}></i><span className="absolute -top-1 -right-2 text-[8px] bg-zinc-950 px-1 rounded border border-white/10">{isNoteMode ? 'ON' : 'OFF'}</span></div><span className="text-[9px] uppercase font-bold tracking-wider">Notes</span></button>
-                                     <button onClick={handleHint} className="flex-1 h-12 rounded bg-zinc-900 border border-white/5 flex flex-col items-center justify-center gap-1 text-zinc-400 hover:text-yellow-200 hover:bg-yellow-900/20 hover:border-yellow-500/30 transition-all active:scale-95 group"><i className="ph-bold ph-lightbulb text-lg group-hover:-translate-y-0.5 transition-transform"></i><span className="text-[9px] uppercase font-bold tracking-wider">Hint</span></button>
+                                    <button onClick={handleErase} className="flex-1 h-12 rounded bg-zinc-900 border border-white/5 flex flex-col items-center justify-center gap-1 text-zinc-400 hover:text-white hover:bg-zinc-800 transition-all active:scale-95 group"><i className="ph-bold ph-eraser text-lg group-hover:-translate-y-0.5 transition-transform"></i><span className="text-[9px] uppercase font-bold tracking-wider">Borrar</span></button>
+                                    <button onClick={() => { setIsNoteMode(!isNoteMode); if(settings.sound) SoundFX.click(); }} className={`flex-1 h-12 rounded border flex flex-col items-center justify-center gap-1 transition-all active:scale-95 ${isNoteMode ? 'bg-emerald-900/30 border-emerald-500 text-emerald-400' : 'bg-zinc-900 border-white/5 text-zinc-400 hover:text-white hover:bg-zinc-800'}`}><div className="relative"><i className={`ph-bold ph-pencil-simple text-lg ${isNoteMode ? 'animate-bounce' : ''}`}></i><span className="absolute -top-1 -right-2 text-[8px] bg-zinc-950 px-1 rounded border border-white/10">{isNoteMode ? 'ON' : 'OFF'}</span></div><span className="text-[9px] uppercase font-bold tracking-wider">Notas</span></button>
+                                     <button onClick={handleHint} className="flex-1 h-12 rounded bg-zinc-900 border border-white/5 flex flex-col items-center justify-center gap-1 text-zinc-400 hover:text-yellow-200 hover:bg-yellow-900/20 hover:border-yellow-500/30 transition-all active:scale-95 group"><i className="ph-bold ph-lightbulb text-lg group-hover:-translate-y-0.5 transition-transform"></i><span className="text-[9px] uppercase font-bold tracking-wider">Pista</span></button>
                                 </div>
                                 <div className="grid grid-cols-9 gap-1 sm:gap-2 mt-1">
                                     {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(num => {
@@ -1166,5 +1166,8 @@
         const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(<SudokuApp />);
     </script>
+
+<!-- God's Plan Games: volver al menú -->
+<a href="index.html" id="gp-back" style="position:fixed;left:12px;bottom:12px;z-index:9999;display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border-radius:999px;background:rgba(23,20,20,.92);border:1px solid rgba(255,236,234,.15);color:#f4efee;font:600 13px/1 Inter,system-ui,sans-serif;text-decoration:none;backdrop-filter:blur(6px)">&larr; Juegos</a>
 </body>
 </html>

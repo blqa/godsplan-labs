@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Memorama | God's Plan Games</title>
+<meta name="theme-color" content="#0b0a0a">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2064%2064'%3E%3Crect%20width='64'%20height='64'%20rx='14'%20fill='%230b0a0a'/%3E%3Cpath%20d='M28%2010h8v16h16v8H36v22h-8V34H12v-8h16z'%20fill='%23ef5058'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/games.css">
+<style>
+  .deck { display: grid; gap: .5rem; width: min(var(--w), calc(100vw - 3.5rem)); }
+  .card { aspect-ratio: 1; perspective: 600px; border: 0; padding: 0; background: none; cursor: pointer; }
+  .card__in { position: relative; width: 100%; height: 100%; transition: transform .35s ease; transform-style: preserve-3d; }
+  .card.up .card__in, .card.done .card__in { transform: rotateY(180deg); }
+  .face { position: absolute; inset: 0; display: grid; place-items: center; border-radius: var(--gp-radius-md); backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+  .back { background: var(--gp-bg-3); border: 1px solid var(--gp-line); }
+  .back svg { width: 34%; fill: var(--gp-crimson-700); }
+  .front { background: #f4efee; transform: rotateY(180deg); font-size: clamp(1.4rem, 6vw, 2.4rem); }
+  .card.done .front { background: #2a1a1a; box-shadow: inset 0 0 0 2px var(--gp-line-accent); }
+  .card:hover .back { border-color: var(--gp-line-strong); }
+</style>
+</head>
+<body>
+<header class="g-bar">
+  <a class="g-back" href="index.html">← Juegos</a>
+  <h1 class="g-title">Memo<b>rama</b></h1>
+  <div class="g-bar__end">
+    <button class="btn btn--sm" data-pairs="8">8 pares</button>
+    <button class="btn btn--sm" data-pairs="12">12 pares</button>
+    <button class="btn btn--sm" data-pairs="18">18 pares</button>
+  </div>
+</header>
+<main class="g-main">
+  <div class="g-stats">
+    <div class="g-stat"><span>intentos</span><strong id="moves">0</strong></div>
+    <div class="g-stat"><span>tiempo</span><strong id="time">0:00</strong></div>
+    <div class="g-stat"><span>récord</span><strong id="best">—</strong></div>
+  </div>
+  <div class="g-board"><div class="deck" id="deck"></div></div>
+  <p class="g-help">Voltea dos cartas. Si son iguales se quedan; si no, se vuelven a esconder. Encuentra todos los pares con los menos intentos.</p>
+</main>
+<script src="assets/games.js"></script>
+<script>
+(function () {
+  var ICONS = ['🌮', '🌶️', '🥑', '🌵', '🎸', '🎮', '💎', '🔥', '⚡', '🌙', '⭐', '🍉', '🐙', '🦋', '🚀', '🎲', '🍩', '🐱', '🌈', '🎧'];
+  var COLS = { 8: 4, 12: 6, 18: 6 }, W = { 8: '24rem', 12: '34rem', 18: '34rem' };
+  var pairs = GP.get('memo_pairs') || 8, deck = document.getElementById('deck');
+  var up, matched, moves, lock, t0, timer;
+  var cross = '<svg viewBox="0 0 64 64"><path d="M28 10h8v16h16v8H36v22h-8V34H12v-8h16z"/></svg>';
+
+  function start(p) {
+    if (p) { pairs = p; GP.set('memo_pairs', p); }
+    document.querySelectorAll('[data-pairs]').forEach(function (b) { b.setAttribute('aria-pressed', +b.dataset.pairs === pairs); });
+    up = []; matched = 0; moves = 0; lock = false; t0 = null; clearInterval(timer);
+    document.getElementById('moves').textContent = 0; document.getElementById('time').textContent = '0:00';
+    var best = GP.best('memo_' + pairs); document.getElementById('best').textContent = best ? best + ' int.' : '—';
+    var set = GP.shuffle(ICONS.slice()).slice(0, pairs), cards = GP.shuffle(set.concat(set));
+    deck.style.setProperty('--w', W[pairs]); deck.style.gridTemplateColumns = 'repeat(' + COLS[pairs] + ', 1fr)'; deck.innerHTML = '';
+    cards.forEach(function (icon, i) {
+      var b = document.createElement('button'); b.className = 'card'; b.dataset.icon = icon; b.setAttribute('aria-label', 'Carta ' + (i + 1));
+      b.innerHTML = '<div class="card__in"><div class="face back">' + cross + '</div><div class="face front">' + icon + '</div></div>';
+      b.onclick = function () { flip(b); };
+      deck.appendChild(b);
+    });
+  }
+  function flip(b) {
+    if (lock || b.classList.contains('up') || b.classList.contains('done')) return;
+    if (!t0) { t0 = Date.now(); GP.played('memorama'); timer = setInterval(function () { document.getElementById('time').textContent = GP.fmtTime(Math.floor((Date.now() - t0) / 1000)); }, 500); }
+    b.classList.add('up'); up.push(b);
+    if (up.length < 2) return;
+    moves++; document.getElementById('moves').textContent = moves;
+    var a = up[0], c = up[1]; up = [];
+    if (a.dataset.icon === c.dataset.icon) {
+      a.classList.add('done'); c.classList.add('done'); a.classList.remove('up'); c.classList.remove('up'); matched++;
+      if (matched === pairs) finish();
+    } else { lock = true; setTimeout(function () { a.classList.remove('up'); c.classList.remove('up'); lock = false; }, 800); }
+  }
+  function finish() {
+    clearInterval(timer);
+    var rec = GP.best('memo_' + pairs, moves, false); document.getElementById('best').textContent = GP.best('memo_' + pairs) + ' int.';
+    setTimeout(function () { GP.modal({ title: '¡Todos los pares!', text: moves + ' intentos en ' + GP.fmtTime(Math.floor((Date.now() - t0) / 1000)) + (rec ? ' · ¡nuevo récord!' : ''), buttons: [{ label: 'Jugar otra vez', primary: true, onClick: function () { start(); } }] }); }, 450);
+  }
+  document.querySelectorAll('[data-pairs]').forEach(function (b) { b.onclick = function () { start(+b.dataset.pairs); }; });
+  start();
+})();
+</script>
+</body>
+</html>

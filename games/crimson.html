@@ -65,7 +65,7 @@
             mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
         }
     </style>
-    <link rel="icon" type="image/svg+xml" data-gp href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2064%2064'%3E%3Crect%20width='64'%20height='64'%20rx='14'%20fill='%230a0a0a'/%3E%3Cpath%20d='M28%2010h8v16h16v8H36v22h-8V34H12v-8h16z'%20fill='%238a0303'/%3E%3C/svg%3E">
+    <link rel="icon" type="image/svg+xml" data-gp href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2064%2064'%3E%3Crect%20width='64'%20height='64'%20rx='14'%20fill='%230b0a0a'/%3E%3Cpath%20d='M28%2010h8v16h16v8H36v22h-8V34H12v-8h16z'%20fill='%23ef5058'/%3E%3C/svg%3E">
     <meta name="theme-color" content="#0a0a0a" data-gp>
 </head>
 <body class="pt-20 flex flex-col h-screen">
@@ -349,15 +349,15 @@
                             <h1 className="text-3xl md:text-4xl font-black tracking-tighter italic text-white drop-shadow-[0_0_15px_rgba(220,38,38,0.6)] leading-none">
                                 CRIMSON <span className="text-red-600">PUZZLE</span>
                             </h1>
-                            <p className="text-zinc-500 text-xs font-mono tracking-widest mt-1 uppercase">Visual Logic Protocol</p>
+                            <p className="text-zinc-500 text-xs font-mono tracking-widest mt-1 uppercase">Rompecabezas deslizable</p>
                         </div>
                         <div className="flex gap-2">
                             <div className="glass-panel rounded-lg p-1.5 min-w-[60px] flex flex-col items-center">
-                                <span className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider">Moves</span>
+                                <span className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider">Movimientos</span>
                                 <span className="text-lg font-bold text-white leading-none">{moves}</span>
                             </div>
                             <div className="glass-panel rounded-lg p-1.5 min-w-[60px] flex flex-col items-center">
-                                <span className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider">Best</span>
+                                <span className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider">Récord</span>
                                 <span className="text-lg font-bold text-red-500 leading-none">{bestScore > 0 ? bestScore : '-'}</span>
                             </div>
                         </div>
@@ -401,14 +401,14 @@
                         {gameState === 'won' && (
                         <div className="absolute inset-0 z-20 bg-black/90 backdrop-blur-sm rounded-xl flex flex-col items-center justify-center animate-in fade-in zoom-in duration-300">
                             <i className="ph-fill ph-trophy text-yellow-500 text-5xl mb-3 drop-shadow-[0_0_25px_rgba(234,179,8,0.6)] animate-bounce"></i>
-                            <h2 className="text-3xl font-black text-white mb-2 italic">YOU WIN!</h2>
+                            <h2 className="text-3xl font-black text-white mb-2 italic">¡GANASTE!</h2>
                             <div className="flex gap-6 mb-5 text-xs font-mono text-zinc-400">
                                 <div className="flex flex-col items-center">
-                                    <span className="text-[10px] uppercase text-zinc-600">Time</span>
+                                    <span className="text-[10px] uppercase text-zinc-600">Tiempo</span>
                                     <span className="text-lg text-white">{formatTime(time)}</span>
                                 </div>
                                 <div className="flex flex-col items-center">
-                                    <span className="text-[10px] uppercase text-zinc-600">Moves</span>
+                                    <span className="text-[10px] uppercase text-zinc-600">Movimientos</span>
                                     <span className="text-lg text-white">{moves}</span>
                                 </div>
                             </div>
@@ -468,7 +468,7 @@
 
                         <button onClick={resetProgress} className="group flex items-center gap-2 px-3 py-2 rounded-lg bg-white/5 hover:bg-red-900/20 border border-white/5 hover:border-red-500/30 transition-all">
                             <i className="ph-bold ph-trash text-zinc-500 group-hover:text-red-500 text-xs"></i>
-                            <span className="text-[10px] font-bold text-zinc-500 group-hover:text-red-400 uppercase tracking-wider">Reset Stats</span>
+                            <span className="text-[10px] font-bold text-zinc-500 group-hover:text-red-400 uppercase tracking-wider">Borrar récords</span>
                         </button>
                     </div>
 

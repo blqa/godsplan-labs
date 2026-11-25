@@ -1,300 +1,175 @@
 <!DOCTYPE html>
-<html lang="es" class="scroll-smooth">
+<html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GODSPLAN GAMES | Nexus Hub</title>
-    
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- FontAwesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Phosphor Icons -->
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
-
-    <!-- Google Fonts: Orbitron & Rajdhani -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
-
-    <!-- Configuración personalizada de Tailwind -->
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        brand: '#DC2626',
-                        gods: {
-                            black: '#050505',
-                            dark: '#0a0a0a',
-                            panel: '#121212',
-                            red: '#ff0000',
-                            blood: '#8a0000',
-                            accent: '#DC2626'
-                        }
-                    },
-                    fontFamily: {
-                        display: ['Orbitron', 'sans-serif'],
-                        body: ['Rajdhani', 'sans-serif'],
-                    },
-                    boxShadow: {
-                        'neon': '0 0 10px rgba(220, 38, 38, 0.5), 0 0 20px rgba(220, 38, 38, 0.3)',
-                        'neon-hover': '0 0 20px rgba(255, 0, 0, 0.8), 0 0 40px rgba(255, 0, 0, 0.4)',
-                    }
-                }
-            }
-        }
-    </script>
-
-    <style>
-        body {
-            background-color: #050505;
-            color: #e5e5e5;
-            font-family: 'Rajdhani', sans-serif;
-            overflow-x: hidden;
-        }
-
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #000; }
-        ::-webkit-scrollbar-thumb { background: #DC2626; border-radius: 4px; }
-
-        .bg-grid {
-            background-size: 40px 40px;
-            background-image: linear-gradient(to right, rgba(220, 38, 38, 0.05) 1px, transparent 1px),
-                              linear-gradient(to bottom, rgba(220, 38, 38, 0.05) 1px, transparent 1px);
-            mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
-        }
-
-        .text-glow { text-shadow: 0 0 15px rgba(255, 0, 0, 0.7); }
-    </style>
-    <link rel="icon" type="image/svg+xml" data-gp href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2064%2064'%3E%3Crect%20width='64'%20height='64'%20rx='14'%20fill='%230a0a0a'/%3E%3Cpath%20d='M28%2010h8v16h16v8H36v22h-8V34H12v-8h16z'%20fill='%238a0303'/%3E%3C/svg%3E">
-    <meta name="theme-color" content="#0a0a0a" data-gp>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Games | God's Plan Labs</title>
+<meta name="description" content="Juegos de God's Plan: 2048, Víbora, Buscaminas, Memorama, Palabra, Gato, Sudoku, Crucigrama, Arrow Zen y Crimson.">
+<link rel="canonical" href="https://labs.godsplan.dev/games/">
+<meta name="theme-color" content="#0b0a0a">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2064%2064'%3E%3Crect%20width='64'%20height='64'%20rx='14'%20fill='%230b0a0a'/%3E%3Cpath%20d='M28%2010h8v16h16v8H36v22h-8V34H12v-8h16z'%20fill='%23ef5058'/%3E%3C/svg%3E">
+<script>if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) document.documentElement.classList.add('motion');</script>
+<link rel="preload" href="../assets/fonts/Montserrat-var.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="../assets/fonts/Inter-var.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../assets/site.css">
+<style>
+  .hub { padding-top: clamp(7rem, 5rem + 6vw, 10rem); padding-bottom: clamp(4rem, 3rem + 4vw, 7rem); }
+  .hub__title { font-size: clamp(2.75rem, 1.2rem + 6vw, 5rem); font-weight: 800; letter-spacing: -.03em; line-height: 1.05; }
+  .hub__title .accent { color: var(--gp-crimson-400); }
+  .hub__sub { margin-top: 1.25rem; font-size: var(--gp-text-lead); color: var(--gp-text-2); }
+  .filters { display: flex; flex-wrap: wrap; gap: .5rem; justify-content: center; margin-top: 2.5rem; }
+  .chip { font: inherit; font-size: .875rem; padding: .45rem .9rem; border-radius: 999px; border: 1px solid var(--gp-line-strong); background: transparent; color: var(--gp-text-2); cursor: pointer; }
+  .chip:hover { color: var(--gp-text-1); background: var(--gp-bg-2); }
+  .chip[aria-pressed="true"] { background: var(--gp-crimson-tint); border-color: var(--gp-line-accent); color: var(--gp-crimson-300); }
+  .games { display: grid; gap: .75rem; margin-top: 2rem; text-align: left; }
+  @media (min-width: 640px) { .games { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 980px) { .games { grid-template-columns: repeat(3, 1fr); } }
+  .game { position: relative; display: grid; grid-template-columns: auto 1fr; gap: .25rem 1rem; align-items: start; padding: 1.25rem; background: var(--gp-bg-2); border: 1px solid var(--gp-line); border-radius: var(--gp-radius-lg); text-decoration: none; color: inherit; transition: border-color var(--gp-dur-1), background-color var(--gp-dur-1), transform var(--gp-dur-2) var(--gp-ease-out); }
+  .game:hover { border-color: var(--gp-line-strong); background: var(--gp-bg-3); transform: translateY(-2px); }
+  .game__icon { grid-row: span 3; width: 3.25rem; height: 3.25rem; display: grid; place-items: center; border-radius: var(--gp-radius-md); background: var(--gp-bg-0); border: 1px solid var(--gp-line); color: var(--gp-crimson-400); }
+  .game__icon svg { width: 1.6rem; height: 1.6rem; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+  .game__name { font-family: var(--gp-font-display); font-weight: 800; font-size: 1.3rem; letter-spacing: -.02em; line-height: 1.2; }
+  .game__desc { color: var(--gp-text-2); font-size: .9rem; line-height: 1.45; }
+  .game__meta { display: flex; gap: .5rem; flex-wrap: wrap; margin-top: .5rem; color: var(--gp-text-3); }
+  .tag { padding: .1rem .45rem; border: 1px solid var(--gp-line-strong); border-radius: var(--gp-radius-sm); }
+  .tag--new { color: var(--gp-crimson-300); border-color: var(--gp-line-accent); }
+  .game[hidden] { display: none; }
+  .continue { margin-top: 1.5rem; color: var(--gp-text-3); font-size: .9rem; }
+  .continue a { color: var(--gp-crimson-400); }
+</style>
 </head>
-<body class="antialiased min-h-screen flex flex-col">
-
-    <!-- Navbar Nuevo -->
-    <nav class="fixed top-0 left-0 right-0 z-50 px-6 py-4 backdrop-blur-md border-b border-white/5 bg-black/40">
-        <div class="max-w-7xl mx-auto flex justify-between items-center">
-            
-            <!-- Logo -->
-            <a href="index.html" class="flex items-center gap-3 cursor-pointer group">
-                <div class="relative w-9 h-9 flex items-center justify-center overflow-hidden rounded-full bg-zinc-900 border border-zinc-800 group-hover:border-brand/50 transition-colors">
-                    <i class="ph-duotone ph-planet text-brand text-2xl relative z-10 group-hover:rotate-180 transition-transform duration-700 ease-in-out"></i>
-                </div>
-                <div class="flex flex-col">
-                    <span class="font-bold tracking-tight text-white leading-none hover-scramble" data-text="GOD'S PLAN">GOD'S PLAN</span>
-                    <span class="text-[9px] text-zinc-500 font-mono tracking-widest uppercase">Nexus Hub v4.1</span>
-                </div>
-            </a>
-
-            <!-- Right Controls -->
-            <div class="flex items-center gap-6">
-                <!-- Clock -->
-                <div class="hidden md:flex flex-col items-end text-right border-r border-white/10 pr-6">
-                    <span id="sys-time" class="font-mono text-xs text-zinc-300 font-bold">00:00:00</span>
-                    <span id="sys-date" class="text-[10px] text-zinc-600 uppercase tracking-widest">LOADING...</span>
-                </div>
-
-                <!-- Status -->
-                <div class="flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-950/30 border border-emerald-500/20">
-                    <span class="relative flex h-2 w-2">
-                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                        <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                    </span>
-                    <span class="hidden sm:block text-[10px] font-bold text-emerald-500 tracking-wider">ONLINE</span>
-                </div>
-            </div>
-        </div>
+<body>
+<header class="site-header" id="header">
+  <div class="wrap site-header__bar">
+    <a href="https://labs.godsplan.dev" class="brand" aria-label="God's Plan Labs">
+      <svg class="brand__mark icon--fill" viewBox="0 0 64 64" aria-hidden="true"><path d="M28 10h8v16h16v8H36v22h-8V34H12v-8h16z"/></svg>
+      God's Plan
+    </a>
+    <nav class="nav" aria-label="Principal">
+      <a class="nav__link" href="https://labs.godsplan.dev">Labs</a>
+      <a class="nav__link" href="https://godsplan.dev">Agencia</a>
     </nav>
+  </div>
+</header>
 
-    <!-- Hero Section -->
-    <header class="relative pt-32 flex items-center justify-center min-h-[60vh] overflow-hidden">
-        <div class="absolute inset-0 z-0">
-            <div class="absolute inset-0 bg-gradient-to-b from-gods-black/30 via-gods-black/90 to-gods-black z-10"></div>
-            <!-- He quitado la imagen de fondo también para mantener el estilo limpio, dejando solo el grid -->
-            <div class="absolute inset-0 bg-grid z-0 opacity-50"></div>
-        </div>
+<main id="contenido">
+  <section class="hub">
+    <div class="wrap center">
+      <h1 class="hub__title" data-enter style="--d:0">God's Plan <span class="accent">Games.</span></h1>
+      <p class="hub__sub" data-enter style="--d:1">Diez juegos para el navegador. Sin instalar nada, también en el celular.</p>
+      <p class="continue" id="continue" hidden></p>
 
-        <div class="relative z-10 max-w-7xl mx-auto px-4 text-center mt-10">
-            <h1 class="text-6xl md:text-8xl font-black tracking-tighter text-white mb-4 leading-[0.9] font-display">
-                <span class="inline-block hover-scramble cursor-default" data-text="GOD'S">GOD'S</span>
-                <span class="inline-block text-transparent bg-clip-text bg-gradient-to-r from-brand to-red-600 text-glow hover-scramble cursor-default" data-text="PLAN">PLAN</span>
-            </h1>
-            <p class="mt-6 max-w-xl mx-auto text-xl text-gray-400 font-body mb-8">
-                El abismo digital. Conecta, juega y gana.
-            </p>
-            
-            <a href="#games" class="inline-flex items-center justify-center px-10 py-4 bg-transparent border-2 border-gods-accent text-gods-accent hover:bg-gods-accent hover:text-white font-display font-bold text-lg rounded-sm transition-all duration-300 shadow-[0_0_15px_rgba(220,38,38,0.3)] hover:shadow-neon">
-                ACCEDER AL HUB
-            </a>
-        </div>
-    </header>
+      <div class="filters" role="group" aria-label="Filtrar juegos" data-enter style="--d:2">
+        <button class="chip" data-f="todos" aria-pressed="true">Todos</button>
+        <button class="chip" data-f="logica">Lógica</button>
+        <button class="chip" data-f="arcade">Arcade</button>
+        <button class="chip" data-f="palabras">Palabras</button>
+      </div>
 
-    <!-- Games Hub Grid -->
-    <section id="games" class="py-20 bg-gods-black relative z-10 border-t border-white/5">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            
-            <div class="flex items-center gap-4 mb-10">
-                <i class="ph-duotone ph-circles-three-plus text-brand text-2xl"></i>
-                <h2 class="text-2xl font-display font-bold text-white tracking-widest">PROTOCOLOS ACTIVOS</h2>
-                <div class="h-[1px] flex-1 bg-gradient-to-r from-white/10 to-transparent"></div>
-            </div>
+      <div class="games" id="games">
+        <a class="game" href="2048.html" data-cat="logica" data-id="2048">
+          <span class="game__icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2"/></svg></span>
+          <span class="game__name">2048</span>
+          <span class="game__desc">Desliza y junta números iguales hasta llegar a 2048.</span>
+          <span class="game__meta mono"><span class="tag tag--new">nuevo</span><span data-best="2048" data-fmt="pts"></span></span>
+        </a>
+        <a class="game" href="vibora.html" data-cat="arcade" data-id="vibora">
+          <span class="game__icon"><svg viewBox="0 0 24 24"><path d="M4 18h6a3 3 0 0 0 0-6H8a3 3 0 0 1 0-6h8"/><circle cx="19" cy="6" r="1.6"/></svg></span>
+          <span class="game__name">Víbora</span>
+          <span class="game__desc">La clásica: come, crece y no te muerdas la cola.</span>
+          <span class="game__meta mono"><span class="tag tag--new">nuevo</span><span data-best="vibora" data-fmt="pts"></span></span>
+        </a>
+        <a class="game" href="buscaminas.html" data-cat="logica" data-id="buscaminas">
+          <span class="game__icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="6"/><path d="M12 3v3M12 20v1M3 13h3M18 13h3M5.6 6.6l2 2M16.4 8.6l2-2"/></svg></span>
+          <span class="game__name">Buscaminas</span>
+          <span class="game__desc">Abre el campo sin pisar ninguna mina. Tres niveles.</span>
+          <span class="game__meta mono"><span class="tag tag--new">nuevo</span><span data-best="minas_facil" data-fmt="time" data-label="fácil"></span></span>
+        </a>
+        <a class="game" href="memorama.html" data-cat="logica" data-id="memorama">
+          <span class="game__icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="8" height="16" rx="2"/><rect x="13" y="4" width="8" height="16" rx="2"/><path d="M7 10v4M17 10v4"/></svg></span>
+          <span class="game__name">Memorama</span>
+          <span class="game__desc">Encuentra todos los pares con los menos intentos.</span>
+          <span class="game__meta mono"><span class="tag tag--new">nuevo</span><span data-best="memo_8" data-fmt="int" data-label="8 pares"></span></span>
+        </a>
+        <a class="game" href="palabra.html" data-cat="palabras" data-id="palabra">
+          <span class="game__icon"><svg viewBox="0 0 24 24"><rect x="2" y="8" width="5" height="8" rx="1"/><rect x="9.5" y="8" width="5" height="8" rx="1"/><rect x="17" y="8" width="5" height="8" rx="1"/></svg></span>
+          <span class="game__name">Palabra</span>
+          <span class="game__desc">Adivina la palabra de 5 letras en 6 intentos. Una nueva cada día.</span>
+          <span class="game__meta mono"><span class="tag tag--new">nuevo</span><span data-best="palabra" data-fmt="racha"></span></span>
+        </a>
+        <a class="game" href="gato.html" data-cat="arcade" data-id="gato">
+          <span class="game__icon"><svg viewBox="0 0 24 24"><path d="M9 3v18M15 3v18M3 9h18M3 15h18"/></svg></span>
+          <span class="game__name">Gato</span>
+          <span class="game__desc">Tres en línea contra la computadora o contra un amigo.</span>
+          <span class="game__meta mono"><span class="tag tag--new">nuevo</span></span>
+        </a>
+        <a class="game" href="sudoku.html" data-cat="logica" data-id="sudoku">
+          <span class="game__icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18M15 3v18M3 9h18M3 15h18"/></svg></span>
+          <span class="game__name">Sudoku</span>
+          <span class="game__desc">Llena la cuadrícula del 1 al 9 sin repetir. Con reto diario.</span>
+          <span class="game__meta mono"><span class="tag">reto diario</span></span>
+        </a>
+        <a class="game" href="crucigrama.html" data-cat="palabras" data-id="crucigrama">
+          <span class="game__icon"><svg viewBox="0 0 24 24"><path d="M4 4h6v6H4zM10 10h6v6h-6zM16 4h4v6h-4zM4 14h6v6H4z"/></svg></span>
+          <span class="game__name">Crucigrama</span>
+          <span class="game__desc">Resuelve las pistas y completa el tablero. Con reto diario.</span>
+          <span class="game__meta mono"><span class="tag">reto diario</span></span>
+        </a>
+        <a class="game" href="arrow.html" data-cat="logica" data-id="arrow">
+          <span class="game__icon"><svg viewBox="0 0 24 24"><path d="M12 3v18M3 12h18M12 3l-3 3M12 3l3 3M21 12l-3-3M21 12l-3 3"/></svg></span>
+          <span class="game__name">Arrow Zen</span>
+          <span class="game__desc">Saca todas las flechas del tablero sin que choquen.</span>
+          <span class="game__meta mono"><span data-arrow></span></span>
+        </a>
+        <a class="game" href="crimson.html" data-cat="logica" data-id="crimson">
+          <span class="game__icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></span>
+          <span class="game__name">Crimson</span>
+          <span class="game__desc">Rompecabezas deslizable: ordena los números moviendo las fichas.</span>
+          <span class="game__meta mono"><span data-crimson></span></span>
+        </a>
+      </div>
+    </div>
+  </section>
+</main>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                
-                <!-- Game Module 1: CRIMSON -->
-                <a href="crimson.html" class="group relative bg-gods-panel border border-white/5 hover:border-brand/50 rounded-xl overflow-hidden transition-all duration-500 hover:shadow-[0_0_30px_rgba(220,38,38,0.15)] hover:-translate-y-1 block h-64">
-                    <div class="absolute inset-0 bg-grid opacity-10 group-hover:opacity-20 transition-opacity"></div>
-                    <div class="absolute top-0 right-0 p-4 opacity-50">
-                        <span class="text-[9px] font-mono text-zinc-600 group-hover:text-brand transition-colors">SYS.01</span>
-                    </div>
-                    
-                    <div class="h-full relative flex flex-col items-center justify-center p-6 z-10">
-                        <!-- Background Glow Effect -->
-                        <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-brand/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer__row">
+      <a href="https://godsplan.dev" class="brand"><svg class="brand__mark icon--fill" viewBox="0 0 64 64" aria-hidden="true"><path d="M28 10h8v16h16v8H36v22h-8V34H12v-8h16z"/></svg>God's Plan</a>
+      <nav class="footer__links" aria-label="Pie de página">
+        <a href="https://labs.godsplan.dev">Labs</a>
+        <a href="https://godsplan.dev">Agencia</a>
+        <a href="https://godsplan.dev/tyc.html">Términos</a>
+      </nav>
+    </div>
+    <p class="footer__base mono">&copy; 2026 God's Plan · Games · México</p>
+  </div>
+</footer>
 
-                        <!-- Icon Container -->
-                        <div class="relative w-20 h-20 rounded-2xl bg-black/40 border border-white/10 flex items-center justify-center mb-6 group-hover:border-brand/40 group-hover:scale-110 group-hover:bg-brand/5 transition-all duration-500 shadow-lg">
-                             <i class="ph-duotone ph-squares-four text-4xl text-zinc-500 group-hover:text-brand transition-colors duration-300"></i>
-                        </div>
-                        
-                        <!-- Text Info -->
-                        <div class="text-center">
-                            <h3 class="text-3xl font-display font-bold text-white tracking-wide group-hover:text-brand transition-colors duration-300">CRIMSON</h3>
-                            <div class="h-0.5 w-8 bg-white/10 mx-auto my-3 group-hover:w-16 group-hover:bg-brand/50 transition-all duration-500"></div>
-                            <p class="text-zinc-500 text-[10px] font-mono tracking-[0.2em] uppercase group-hover:text-zinc-300 transition-colors">Visual Logic Protocol</p>
-                        </div>
-                    </div>
-                </a>
+<script src="../assets/site.js" defer></script>
+<script src="assets/games.js"></script>
+<script>
+(function () {
+  function fmt(v, f, label) {
+    if (v === null || v === undefined) return '';
+    var s = f === 'time' ? GP.fmtTime(v) : f === 'int' ? v + ' intentos' : f === 'racha' ? 'racha ' + v : v + ' pts';
+    return 'récord ' + (label ? label + ' ' : '') + s;
+  }
+  document.querySelectorAll('[data-best]').forEach(function (el) { el.textContent = fmt(GP.best(el.dataset.best), el.dataset.fmt, el.dataset.label); });
+  try { var cb = localStorage.getItem('crimson_best_4') || localStorage.getItem('crimson_best_3'); if (cb) document.querySelector('[data-crimson]').textContent = 'récord ' + cb + ' movimientos'; } catch (e) {}
+  try { var lvl = localStorage.getItem('arrow-puzzle-level'); if (lvl) document.querySelector('[data-arrow]').textContent = 'vas en el nivel ' + lvl; } catch (e) {}
 
-                <!-- Game Module 2: ARROW ZEN -->
-                <a href="arrow.html" class="group relative bg-gods-panel border border-white/5 hover:border-brand/50 rounded-xl overflow-hidden transition-all duration-500 hover:shadow-[0_0_30px_rgba(220,38,38,0.15)] hover:-translate-y-1 block h-64">
-                    <div class="absolute inset-0 bg-grid opacity-10 group-hover:opacity-20 transition-opacity"></div>
-                    <div class="absolute top-0 right-0 p-4 opacity-50">
-                        <span class="text-[9px] font-mono text-zinc-600 group-hover:text-brand transition-colors">SYS.02</span>
-                    </div>
+  var NAMES = { '2048': '2048', vibora: 'Víbora', buscaminas: 'Buscaminas', memorama: 'Memorama', palabra: 'Palabra', gato: 'Gato' };
+  var last = GP.get('last');
+  if (last && NAMES[last.game]) { var c = document.getElementById('continue'); c.innerHTML = 'Lo último que jugaste: <a href="' + (last.game === '2048' ? '2048' : last.game) + '.html">' + NAMES[last.game] + '</a>'; c.hidden = false; }
 
-                    <div class="h-full relative flex flex-col items-center justify-center p-6 z-10">
-                        <!-- Background Glow Effect -->
-                        <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-500/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-
-                        <!-- Icon Container -->
-                        <div class="relative w-20 h-20 rounded-2xl bg-black/40 border border-white/10 flex items-center justify-center mb-6 group-hover:border-blue-500/40 group-hover:scale-110 group-hover:bg-blue-500/5 transition-all duration-500 shadow-lg">
-                             <i class="ph-duotone ph-arrows-out-cardinal text-4xl text-zinc-500 group-hover:text-blue-400 transition-colors duration-300"></i>
-                        </div>
-                        
-                        <!-- Text Info -->
-                        <div class="text-center">
-                            <h3 class="text-3xl font-display font-bold text-white tracking-wide group-hover:text-blue-400 transition-colors duration-300">ARROW ZEN</h3>
-                            <div class="h-0.5 w-8 bg-white/10 mx-auto my-3 group-hover:w-16 group-hover:bg-blue-500/50 transition-all duration-500"></div>
-                            <p class="text-zinc-500 text-[10px] font-mono tracking-[0.2em] uppercase group-hover:text-zinc-300 transition-colors">Pathfinder Protocol</p>
-                        </div>
-                    </div>
-                </a>
-
-                <!-- Game Module 3: SUDOKU -->
-                <a href="sudoku.html" class="group relative bg-gods-panel border border-white/5 hover:border-brand/50 rounded-xl overflow-hidden transition-all duration-500 hover:shadow-[0_0_30px_rgba(220,38,38,0.15)] hover:-translate-y-1 block h-64">
-                    <div class="absolute inset-0 bg-grid opacity-10 group-hover:opacity-20 transition-opacity"></div>
-                    <div class="absolute top-0 right-0 p-4 opacity-50">
-                        <span class="text-[9px] font-mono text-zinc-600 group-hover:text-brand transition-colors">SYS.03</span>
-                    </div>
-
-                    <div class="h-full relative flex flex-col items-center justify-center p-6 z-10">
-                        <!-- Background Glow Effect -->
-                        <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-purple-500/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-
-                        <!-- Icon Container -->
-                        <div class="relative w-20 h-20 rounded-2xl bg-black/40 border border-white/10 flex items-center justify-center mb-6 group-hover:border-purple-500/40 group-hover:scale-110 group-hover:bg-purple-500/5 transition-all duration-500 shadow-lg">
-                             <i class="ph-duotone ph-grid-nine text-4xl text-zinc-500 group-hover:text-purple-400 transition-colors duration-300"></i>
-                        </div>
-                        
-                        <!-- Text Info -->
-                        <div class="text-center">
-                            <h3 class="text-3xl font-display font-bold text-white tracking-wide group-hover:text-purple-400 transition-colors duration-300">SUDOKU</h3>
-                            <div class="h-0.5 w-8 bg-white/10 mx-auto my-3 group-hover:w-16 group-hover:bg-purple-500/50 transition-all duration-500"></div>
-                            <p class="text-zinc-500 text-[10px] font-mono tracking-[0.2em] uppercase group-hover:text-zinc-300 transition-colors">Numeric Matrix</p>
-                        </div>
-                    </div>
-                </a>
-
-            </div>
-            
-            <div class="mt-16 flex justify-center">
-                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-white/5 bg-white/5 text-[10px] text-zinc-500 font-mono">
-                    <span class="w-1.5 h-1.5 rounded-full bg-zinc-600 animate-pulse"></span>
-                    ESPERANDO NUEVOS MÓDULOS...
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer Minimalista -->
-    <footer class="bg-gods-black border-t border-gods-panel py-8">
-        <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4">
-            <a href="https://godsplan.dev" class="text-white font-display font-bold hover:opacity-80 transition-opacity">
-                GODS<span class="text-gods-accent">PLAN</span>
-            </a>
-            <nav class="flex gap-6 text-sm text-gray-500">
-                <a href="https://godsplan.dev" class="hover:text-gods-red transition-colors">Agencia</a>
-                <a href="https://godsplan.dev/proyectos/" class="hover:text-gods-red transition-colors">Proyectos</a>
-                <a href="https://godsplan.dev/tyc.html" class="hover:text-gods-red transition-colors">Términos</a>
-            </nav>
-            <div class="text-gray-600 text-xs">
-                © 2026 <a href="https://godsplan.dev" class="hover:text-gray-400 transition-colors">God's Plan</a> · godsplan.dev
-            </div>
-        </div>
-    </footer>
-
-    <script>
-        // Init window.app para evitar errores
-        window.app = {
-            router: function(route) {
-                console.log('Navigating to:', route);
-            }
-        };
-
-        // Reloj del Sistema
-        function updateSystemClock() {
-            const now = new Date();
-            const timeElement = document.getElementById('sys-time');
-            const dateElement = document.getElementById('sys-date');
-            
-            if(timeElement) {
-                timeElement.textContent = now.toLocaleTimeString('en-US', { hour12: false });
-            }
-            if(dateElement) {
-                dateElement.textContent = now.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }).toUpperCase();
-            }
-        }
-        setInterval(updateSystemClock, 1000);
-        updateSystemClock();
-
-        // Efecto Scramble
-        const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        document.querySelectorAll(".hover-scramble").forEach(element => {
-            element.onmouseover = event => {
-                let iterations = 0;
-                const interval = setInterval(() => {
-                    const originalText = event.target.dataset.text;
-                    if(!originalText) return clearInterval(interval);
-
-                    event.target.innerText = event.target.innerText.split("")
-                        .map((letter, index) => {
-                            if(index < iterations) return originalText[index];
-                            return letters[Math.floor(Math.random() * 26)]
-                        })
-                        .join("");
-                    
-                    if(iterations >= originalText.length){ 
-                        clearInterval(interval);
-                    }
-                    
-                    iterations += 1 / 3;
-                }, 30);
-            }
-        });
-    </script>
+  document.querySelectorAll('[data-f]').forEach(function (b) {
+    b.onclick = function () {
+      document.querySelectorAll('[data-f]').forEach(function (x) { x.setAttribute('aria-pressed', x === b); });
+      document.querySelectorAll('.game').forEach(function (g) { g.hidden = b.dataset.f !== 'todos' && g.dataset.cat !== b.dataset.f; });
+    };
+  });
+})();
+</script>
 </body>
 </html>

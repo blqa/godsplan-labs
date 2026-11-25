@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Buscaminas | God's Plan Games</title>
+<meta name="theme-color" content="#0b0a0a">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2064%2064'%3E%3Crect%20width='64'%20height='64'%20rx='14'%20fill='%230b0a0a'/%3E%3Cpath%20d='M28%2010h8v16h16v8H36v22h-8V34H12v-8h16z'%20fill='%23ef5058'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/games.css">
+<style>
+  .g-main { max-width: 52rem; }
+  .field { display: grid; gap: 3px; width: min(var(--w), calc(100vw - 3.5rem)); }
+  .sq { aspect-ratio: 1; display: grid; place-items: center; border: 0; padding: 0; border-radius: 5px; background: #2a2323; cursor: pointer; font-family: var(--gp-font-display); font-weight: 800; font-size: clamp(.7rem, 2.4vw, 1.05rem); transition: background-color .1s; }
+  .sq:hover { background: #352c2c; }
+  .sq.open { background: var(--gp-bg-1); cursor: default; }
+  .sq.boom { background: var(--gp-crimson-700); animation: g-shake .3s; }
+  .sq.flag::after { content: "⚑"; color: var(--gp-crimson-400); font-family: var(--gp-font-sans); }
+  .sq.mine::after { content: "●"; color: #f4efee; }
+  .n1 { color: #7fb4ff; } .n2 { color: #3ecf8e; } .n3 { color: #ef5058; } .n4 { color: #c79bff; } .n5 { color: #ffb35c; } .n6 { color: #5ce1e6; } .n7 { color: #f4efee; } .n8 { color: #958b89; }
+  .modebar { display: flex; gap: .5rem; align-items: center; }
+</style>
+</head>
+<body>
+<header class="g-bar">
+  <a class="g-back" href="index.html">← Juegos</a>
+  <h1 class="g-title">Busca<b>minas</b></h1>
+  <div class="g-bar__end">
+    <button class="btn btn--sm" data-lvl="facil">Fácil</button>
+    <button class="btn btn--sm" data-lvl="medio">Medio</button>
+    <button class="btn btn--sm" data-lvl="dificil">Difícil</button>
+  </div>
+</header>
+<main class="g-main">
+  <div class="g-stats">
+    <div class="g-stat"><span>minas</span><strong id="left">0</strong></div>
+    <div class="g-stat"><span>tiempo</span><strong id="time">0:00</strong></div>
+    <div class="g-stat"><span>récord</span><strong id="best">—</strong></div>
+  </div>
+  <div class="modebar">
+    <button class="btn btn--sm" id="mode" aria-pressed="false">⚑ Modo bandera</button>
+    <button class="btn btn--sm btn--primary" id="new">Nuevo</button>
+  </div>
+  <div class="g-board"><div class="field" id="field"></div></div>
+  <p class="g-help">Clic para abrir, clic derecho (o mantener presionado en el celular) para poner bandera. Clic en un número con sus banderas completas abre lo de alrededor.</p>
+</main>
+<script src="assets/games.js"></script>
+<script>
+(function () {
+  var LV = { facil: { r: 9, c: 9, m: 10, w: '24rem' }, medio: { r: 14, c: 14, m: 32, w: '34rem' }, dificil: { r: 16, c: 22, m: 70, w: '48rem' } };
+  var lvl = GP.get('minas_lvl') || 'facil', cfg, cells, first, over, opened, flags, t0, timer, flagMode = false;
+  var field = document.getElementById('field'), leftEl = document.getElementById('left'), timeEl = document.getElementById('time'), bestEl = document.getElementById('best');
+
+  function start(l) {
+    if (l) { lvl = l; GP.set('minas_lvl', l); }
+    cfg = LV[lvl]; cells = []; first = true; over = false; opened = 0; flags = 0; clearInterval(timer); timeEl.textContent = '0:00';
+    document.querySelectorAll('[data-lvl]').forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.lvl === lvl); });
+    field.style.setProperty('--w', cfg.w); field.style.gridTemplateColumns = 'repeat(' + cfg.c + ', 1fr)'; field.innerHTML = '';
+    for (var r = 0; r < cfg.r; r++) for (var c = 0; c < cfg.c; c++) {
+      var b = document.createElement('button'); b.className = 'sq'; b.dataset.r = r; b.dataset.c = c; b.setAttribute('aria-label', 'Casilla ' + (r + 1) + ', ' + (c + 1));
+      field.appendChild(b); cells.push({ r: r, c: c, mine: false, n: 0, open: false, flag: false, el: b });
+    }
+    var best = GP.best('minas_' + lvl); bestEl.textContent = best ? GP.fmtTime(best) : '—';
+    leftEl.textContent = cfg.m;
+  }
+  function at(r, c) { return r >= 0 && c >= 0 && r < cfg.r && c < cfg.c ? cells[r * cfg.c + c] : null; }
+  function around(x) { var out = []; for (var dr = -1; dr <= 1; dr++) for (var dc = -1; dc <= 1; dc++) { if (dr || dc) { var n = at(x.r + dr, x.c + dc); if (n) out.push(n); } } return out; }
+  function plant(safe) {
+    var banned = around(safe).concat([safe]), pool = cells.filter(function (x) { return banned.indexOf(x) < 0; });
+    GP.shuffle(pool).slice(0, cfg.m).forEach(function (x) { x.mine = true; });
+    cells.forEach(function (x) { x.n = around(x).filter(function (y) { return y.mine; }).length; });
+    t0 = Date.now(); timer = setInterval(function () { timeEl.textContent = GP.fmtTime(Math.floor((Date.now() - t0) / 1000)); }, 500);
+    GP.played('buscaminas');
+  }
+  function open(x) {
+    if (over || x.open || x.flag) return;
+    if (first) { first = false; plant(x); }
+    if (x.mine) return lose(x);
+    var stack = [x];
+    while (stack.length) {
+      var y = stack.pop(); if (y.open || y.flag) continue;
+      y.open = true; opened++; y.el.classList.add('open');
+      if (y.n) { y.el.textContent = y.n; y.el.classList.add('n' + y.n); } else around(y).forEach(function (z) { if (!z.open) stack.push(z); });
+    }
+    if (opened === cfg.r * cfg.c - cfg.m) win();
+  }
+  function chord(x) {
+    if (!x.open || !x.n) return;
+    var nb = around(x); if (nb.filter(function (y) { return y.flag; }).length !== x.n) return;
+    nb.forEach(function (y) { if (!y.flag && !y.open) open(y); });
+  }
+  function flag(x) { if (over || x.open) return; x.flag = !x.flag; x.el.classList.toggle('flag', x.flag); flags += x.flag ? 1 : -1; leftEl.textContent = cfg.m - flags; }
+  function lose(x) {
+    over = true; clearInterval(timer);
+    cells.forEach(function (y) { if (y.mine && !y.flag) y.el.classList.add('mine', 'open'); });
+    x.el.classList.add('boom');
+    setTimeout(function () { GP.modal({ title: 'Pisaste una mina', text: 'Inténtalo otra vez.', buttons: [{ label: 'Jugar otra vez', primary: true, onClick: function () { start(); } }] }); }, 650);
+  }
+  function win() {
+    over = true; clearInterval(timer);
+    var s = Math.floor((Date.now() - t0) / 1000), rec = GP.best('minas_' + lvl, s, false);
+    cells.forEach(function (y) { if (y.mine && !y.flag) y.el.classList.add('flag'); });
+    bestEl.textContent = GP.fmtTime(GP.best('minas_' + lvl)); leftEl.textContent = 0;
+    GP.modal({ title: '¡Limpiaste el campo!', text: 'Tiempo: ' + GP.fmtTime(s) + (rec ? ' · ¡nuevo récord!' : ''), buttons: [{ label: 'Jugar otra vez', primary: true, onClick: function () { start(); } }] });
+  }
+  function cellOf(e) { var b = e.target.closest('.sq'); return b ? at(+b.dataset.r, +b.dataset.c) : null; }
+
+  var pressTimer, longPressed = false;
+  field.addEventListener('click', function (e) { var x = cellOf(e); if (!x || longPressed) { longPressed = false; return; } if (x.open) chord(x); else if (flagMode) flag(x); else open(x); });
+  field.addEventListener('contextmenu', function (e) { e.preventDefault(); var x = cellOf(e); if (x) { if (x.open) chord(x); else flag(x); } });
+  field.addEventListener('touchstart', function (e) { var x = cellOf(e); if (!x) return; longPressed = false; pressTimer = setTimeout(function () { longPressed = true; if (!x.open) { flag(x); if (navigator.vibrate) navigator.vibrate(20); } }, 380); }, { passive: true });
+  field.addEventListener('touchend', function () { clearTimeout(pressTimer); });
+  field.addEventListener('touchmove', function () { clearTimeout(pressTimer); }, { passive: true });
+
+  document.querySelectorAll('[data-lvl]').forEach(function (b) { b.onclick = function () { start(b.dataset.lvl); }; });
+  document.getElementById('new').onclick = function () { start(); };
+  var modeBtn = document.getElementById('mode');
+  modeBtn.onclick = function () { flagMode = !flagMode; modeBtn.setAttribute('aria-pressed', flagMode); };
+  start();
+})();
+</script>
+</body>
+</html>

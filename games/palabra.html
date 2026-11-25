@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Palabra | God's Plan Games</title>
+<meta name="theme-color" content="#0b0a0a">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2064%2064'%3E%3Crect%20width='64'%20height='64'%20rx='14'%20fill='%230b0a0a'/%3E%3Cpath%20d='M28%2010h8v16h16v8H36v22h-8V34H12v-8h16z'%20fill='%23ef5058'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/games.css">
+<style>
+  .rows { display: grid; gap: .4rem; }
+  .row { display: grid; grid-template-columns: repeat(5, 1fr); gap: .4rem; }
+  .row.bad { animation: g-shake .3s; }
+  .lt { width: clamp(3rem, 14vw, 3.75rem); aspect-ratio: 1; display: grid; place-items: center; border: 2px solid var(--gp-line-strong); border-radius: var(--gp-radius-sm); font-family: var(--gp-font-display); font-weight: 800; font-size: clamp(1.4rem, 6vw, 1.9rem); text-transform: uppercase; }
+  .lt.filled { border-color: var(--gp-text-3); animation: g-pop .1s; }
+  .lt.ok { background: #1f7a4f; border-color: #1f7a4f; }
+  .lt.near { background: #9a6b12; border-color: #9a6b12; }
+  .lt.no { background: var(--gp-bg-3); border-color: var(--gp-bg-3); color: var(--gp-text-3); }
+  .kb { display: grid; gap: .35rem; width: min(34rem, 96vw); }
+  .kr { display: flex; gap: .3rem; justify-content: center; }
+  .k { flex: 1; max-width: 2.6rem; min-height: 3.2rem; border: 0; border-radius: var(--gp-radius-sm); background: #3a3131; font-weight: 600; text-transform: uppercase; cursor: pointer; }
+  .k.wide { max-width: 4.2rem; flex: 1.6; font-size: .8rem; }
+  .k.ok { background: #1f7a4f; } .k.near { background: #9a6b12; } .k.no { background: var(--gp-bg-2); color: var(--gp-text-3); }
+  .toast { position: fixed; top: 4.5rem; left: 50%; transform: translateX(-50%); background: var(--gp-text-1); color: var(--gp-bg-0); font-weight: 600; padding: .5rem 1rem; border-radius: var(--gp-radius-sm); opacity: 0; transition: opacity .2s; pointer-events: none; z-index: 60; }
+  .toast.on { opacity: 1; }
+</style>
+</head>
+<body>
+<header class="g-bar">
+  <a class="g-back" href="index.html">← Juegos</a>
+  <h1 class="g-title">Pala<b>bra</b></h1>
+  <div class="g-bar__end"><button class="btn btn--sm" data-mode="dia">Del día</button><button class="btn btn--sm" data-mode="libre">Libre</button></div>
+</header>
+<main class="g-main">
+  <div class="g-stats">
+    <div class="g-stat"><span>ganadas</span><strong id="wins">0</strong></div>
+    <div class="g-stat"><span>racha</span><strong id="streak">0</strong></div>
+    <div class="g-stat"><span>mejor racha</span><strong id="best">0</strong></div>
+  </div>
+  <div class="rows" id="rows"></div>
+  <div class="kb" id="kb"></div>
+  <p class="g-help">Adivina la palabra de 5 letras en 6 intentos. Verde: letra en su lugar. Amarillo: está en la palabra, en otro lugar. Sin acentos.</p>
+</main>
+<div class="toast" id="toast"></div>
+<script src="assets/games.js"></script>
+<script>
+(function () {
+  var WORDS = ('ABRIL ACERO ACTOR AGUJA ALDEA ALEGRE ALMOHADA ALTAR AMIGO ANCHO ANGEL ANIMO APODO ARBOL ARENA ARETE ARROZ ASADO ATAJO AVION AYUDA AZUL BAILE BALON BANCO BARCO BARRO BESAR BOLSA BOMBA BOTON BRAZO BRUJA BUENO BURRO CABLE CABRA CALLE CALOR CAMPO CANTO CARGA CARNE CARTA CASCO CAUSA CEBRA CELDA CERDO CHILE CIELO CINTA CIRCO CLARO CLAVO COBRE COCHE COMER CORAL CORTO COSTA CREMA CRUDO CUERO CULPA CURVA DANZA DEDOS DIENTE DISCO DOLOR DRAMA DUCHA DULCE DUROS ENERO ENTRE ESPIA ETAPA FALDA FALTA FAROL FELIZ FIBRA FIRMA FLACO FLOJO FLOTA FOCOS FONDO FORMA FRASE FRENO FRESA FRITO FRUTA FUEGO FUERZA GAFAS GALLO GANSO GARRA GATOS GENTE GLOBO GOLPE GORRA GOTAS GRANO GRASA GRAVE GRITO GRUPO GUAPO GUSTO HABLA HACHA HIELO HIGOS HILOS HOGAR HOJAS HONGO HORNO HOTEL HUEVO HUMOR IDEAL IGUAL ISLAS JABON JAULA JOVEN JUEGO JUGAR JUNIO JUSTO LAPIZ LARGO LECHE LENTO LETRA LIBRO LIMON LINEA LISTO LLAMA LLAVE LLENO LLUVIA LOMBRIZ LUCHA LUGAR MADRE MANGO MANTA MARCO MAREA MATIZ MELON MENTA METAL METRO MIEDO MISMO MOLER MONTE MORAL MOSCA MOTOR MUEBLE MUNDO MUSEO NADAR NARIZ NEGRO NIEVE NOCHE NORTE NOVIA NUBES NUEVO OBRAS OLIVO ONDAS ORDEN ORUGA PADRE PAGAR PAJAR PALMA PALOS PANDA PAPEL PARED PARTE PASTO PATIO PAUSA PECHO PEDAL PEINE PELEA PERLA PERRO PIANO PIEDRA PILAS PINTA PIZZA PLANO PLATO PLAYA PLAZA PLUMA POBRE POLLO POSTE PRADO PRESA PRIMO PULPO PUNTA QUESO RADIO RAMAS RANGO RATON RAYOS RECTO REGLA REINA RELOJ RESTO RITMO ROBOT ROJOS RUEDA RUIDO SABIO SALSA SALTO SANTO SELVA SENDA SERIE SIGLO SILLA SOBRE SOMBRA SONAR SUAVE SUCIO SUELO SUENO SUERTE TABLA TACOS TANGO TARDE TARRO TECHO TEMAS TIBIO TIGRE TINTA TOALLA TORRE TRAJE TRIGO TRUCO TUMBA TURNO VACAS VALLE VAPOR VASOS VELAS VERDE VIAJE VIDRIO VIEJO VIRUS VISTA VIUDA VOLAR YEGUA ZORRO').split(' ').filter(function (w) { return w.length === 5; });
+  var rowsEl = document.getElementById('rows'), kb = document.getElementById('kb'), toastEl = document.getElementById('toast');
+  var mode = 'dia', answer, row, col, guesses, done, keyState;
+
+  function dayIndex() { var d = new Date(); return Math.floor((Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) - Date.UTC(2026, 0, 1)) / 864e5); }
+  function todayKey() { var d = new Date(); return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(); }
+  function stats() { return GP.get('palabra_stats') || { wins: 0, streak: 0, best: 0 }; }
+  function showStats() { var s = stats(); document.getElementById('wins').textContent = s.wins; document.getElementById('streak').textContent = s.streak; document.getElementById('best').textContent = s.best; }
+
+  function build() {
+    rowsEl.innerHTML = '';
+    for (var r = 0; r < 6; r++) { var rw = document.createElement('div'); rw.className = 'row'; for (var c = 0; c < 5; c++) { var l = document.createElement('div'); l.className = 'lt'; rw.appendChild(l); } rowsEl.appendChild(rw); }
+    kb.innerHTML = ''; keyState = {};
+    ['QWERTYUIOP', 'ASDFGHJKLÑ', '⏎ZXCVBNM⌫'].forEach(function (line) {
+      var kr = document.createElement('div'); kr.className = 'kr';
+      line.split('').forEach(function (ch) {
+        var k = document.createElement('button'); k.className = 'k'; k.dataset.k = ch;
+        if (ch === '⏎') { k.textContent = 'Enviar'; k.classList.add('wide'); } else if (ch === '⌫') { k.textContent = '⌫'; k.classList.add('wide'); k.setAttribute('aria-label', 'Borrar'); } else k.textContent = ch;
+        k.onclick = function () { press(ch === '⏎' ? 'Enter' : ch === '⌫' ? 'Backspace' : ch); k.blur(); };
+        kr.appendChild(k);
+      });
+      kb.appendChild(kr);
+    });
+  }
+  function start(m) {
+    if (m) mode = m;
+    document.querySelectorAll('[data-mode]').forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.mode === mode); });
+    answer = mode === 'dia' ? WORDS[((dayIndex() * 7919) % WORDS.length + WORDS.length) % WORDS.length] : WORDS[Math.floor(Math.random() * WORDS.length)];
+    row = 0; col = 0; guesses = []; done = false; build(); showStats();
+    if (mode === 'dia') { var saved = GP.get('palabra_dia'); if (saved && saved.day === todayKey()) saved.guesses.forEach(function (g) { g.split('').forEach(function (ch) { press(ch, true); }); press('Enter', true); }); }
+  }
+  function toast(t) { toastEl.textContent = t; toastEl.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(function () { toastEl.classList.remove('on'); }, 1500); }
+  function cell(r, c) { return rowsEl.children[r].children[c]; }
+  function press(k, replay) {
+    if (done) return;
+    if (k === 'Enter') {
+      if (col < 5) { rowsEl.children[row].classList.remove('bad'); void rowsEl.offsetWidth; rowsEl.children[row].classList.add('bad'); return toast('Faltan letras'); }
+      var g = ''; for (var c = 0; c < 5; c++) g += cell(row, c).textContent;
+      score(g); guesses.push(g);
+      if (mode === 'dia' && !replay) GP.set('palabra_dia', { day: todayKey(), guesses: guesses });
+      if (g === answer) return end(true, replay);
+      row++; col = 0; if (row === 6) end(false, replay);
+      return;
+    }
+    if (k === 'Backspace') { if (col > 0) { col--; var e = cell(row, col); e.textContent = ''; e.classList.remove('filled'); } return; }
+    if (/^[A-ZÑ]$/.test(k) && col < 5) { var el = cell(row, col); el.textContent = k; el.classList.add('filled'); col++; }
+  }
+  function score(g) {
+    var res = Array(5).fill('no'), left = {};
+    for (var i = 0; i < 5; i++) { if (g[i] === answer[i]) res[i] = 'ok'; else left[answer[i]] = (left[answer[i]] || 0) + 1; }
+    for (i = 0; i < 5; i++) if (res[i] !== 'ok' && left[g[i]]) { res[i] = 'near'; left[g[i]]--; }
+    var rank = { no: 1, near: 2, ok: 3 };
+    for (i = 0; i < 5; i++) {
+      cell(row, i).classList.add(res[i]);
+      var cur = keyState[g[i]]; if (!cur || rank[res[i]] > rank[cur]) keyState[g[i]] = res[i];
+    }
+    kb.querySelectorAll('.k').forEach(function (k) { var s = keyState[k.dataset.k]; if (s) { k.classList.remove('ok', 'near', 'no'); k.classList.add(s); } });
+  }
+  function end(win, replay) {
+    done = true;
+    if (!replay) {
+      var s = stats();
+      var counted = mode !== 'dia' || GP.get('palabra_counted') !== todayKey();
+      if (counted) { if (win) { s.wins++; s.streak++; s.best = Math.max(s.best, s.streak); GP.best('palabra', s.best, true); } else s.streak = 0; GP.set('palabra_stats', s); if (mode === 'dia') GP.set('palabra_counted', todayKey()); }
+      showStats(); GP.played('palabra');
+    }
+    setTimeout(function () {
+      GP.modal({ title: win ? '¡Adivinaste!' : 'Era ' + answer, text: win ? 'En ' + guesses.length + ' de 6 intentos.' : 'Suerte para la próxima.', buttons: [{ label: 'Otra palabra (libre)', primary: true, onClick: function () { start('libre'); } }].concat(mode === 'dia' ? [] : [{ label: 'Palabra del día', onClick: function () { start('dia'); } }]) });
+    }, replay ? 200 : 700);
+  }
+  document.addEventListener('keydown', function (e) {
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    var k = e.key; if (k.length === 1) k = k.toUpperCase();
+    if (k === 'Enter' || k === 'Backspace' || /^[A-ZÑ]$/.test(k)) { e.preventDefault(); press(k); }
+  });
+  document.querySelectorAll('[data-mode]').forEach(function (b) { b.onclick = function () { start(b.dataset.mode); b.blur(); }; });
+  start('dia');
+})();
+</script>
+</body>
+</html>
